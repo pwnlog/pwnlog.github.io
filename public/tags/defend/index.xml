@@ -1,0 +1,87 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Defend - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/defend/</link>
+        <description>Defend - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/defend/" rel="self" type="application/rss+xml" /><item>
+    <title>Linux Privilege Escalation - Cron Jobs for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-cron-jobs/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-cron-jobs/</guid>
+    <description><![CDATA[Dear time can u help me 3l3v4t3 /(^.^)/]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Groups for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-groups/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-groups/</guid>
+    <description><![CDATA[Groups can be dangerous &lt;*-*&lt;]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - NFS Root Squashing for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-nfs-root-squashing/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlopg</author>
+    <guid>//localhost:1313/linux-privesc-nfs-root-squashing/</guid>
+    <description><![CDATA[Shares can lead to root!]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Open Shell Sessions for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-open-shell-sessions/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-open-shell-sessions/</guid>
+    <description><![CDATA[Any root sessions active?]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Port Forwarding for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-port-forwarding/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-port-forwarding/</guid>
+    <description><![CDATA[Services can go outside too? (*&lt;*)]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Services for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-services/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-services/</guid>
+    <description><![CDATA[Services always have a thing don&rsquo;t they? (^_^)]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Shared Object Injection for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-so-injection/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-so-injection/</guid>
+    <description><![CDATA[Can I load malicious libraries? (*&lt;*)]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Sockets for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-sockets/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-sockets/</guid>
+    <description><![CDATA[Can I manipulate this sockets communications? (*-*)]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - SSH for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-ssh/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-ssh/</guid>
+    <description><![CDATA[SSH can always be a door! (90_90)]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Sudo for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-sudo/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-sudo/</guid>
+    <description><![CDATA[Sudo or uid 0? (?_?)]]></description>
+</item>
+</channel>
+</rss>

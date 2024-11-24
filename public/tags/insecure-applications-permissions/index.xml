@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Insecure Applications Permissions - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/insecure-applications-permissions/</link>
+        <description>Insecure Applications Permissions - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/insecure-applications-permissions/" rel="self" type="application/rss+xml" /><item>
+    <title>Windows Local Privilege Escalation - Applications for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-apps/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-apps/</guid>
+    <description><![CDATA[Apps lead the way please&hellip; (8_*)]]></description>
+</item>
+</channel>
+</rss>

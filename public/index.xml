@@ -1,0 +1,89 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>pwnlog</title>
+        <link>//localhost:1313/</link>
+        <description>IT Security</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</lastBuildDate>
+            <atom:link href="//localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+        <item>
+    <title>Windows Local Privilege Escalation - Services for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-services/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-services/</guid>
+    <description><![CDATA[Which users or should I say which permissions are running in those services? (8_9)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Applications for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-apps/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-apps/</guid>
+    <description><![CDATA[Apps lead the way please&hellip; (8_*)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Credential Hunting for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-credential-hunting/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-credential-hunting/</guid>
+    <description><![CDATA[I know you are storing those cr3ds in s3cr3ts but are you really? (*_*)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - DLL Hijacking for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-dll-hijacking/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-dll-hijacking/</guid>
+    <description><![CDATA[Libraries can be hijacked, replaced, or manipulated (00&lt;00)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - PATH Hijacking for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-path-hijacking/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-path-hijacking/</guid>
+    <description><![CDATA[File systems path permissions and replacements. Here we go again (@_@)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Port Forwarding for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-port-forwarding/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-port-forwarding/</guid>
+    <description><![CDATA[Let us interact with that service you&rsquo;re hiding (3_3)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Registry Hives for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-registry/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-registry/</guid>
+    <description><![CDATA[Registry, settings, permissions&hellip; you name it (&lt;|&lt;)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-scheduled-tasks/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-scheduled-tasks/</guid>
+    <description><![CDATA[Using time to change our permissions (o+o)]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Cron Jobs for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-cron-jobs/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-cron-jobs/</guid>
+    <description><![CDATA[Dear time can u help me 3l3v4t3 /(^.^)/]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Groups for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-groups/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-groups/</guid>
+    <description><![CDATA[Groups can be dangerous &lt;*-*&lt;]]></description>
+</item>
+</channel>
+</rss>

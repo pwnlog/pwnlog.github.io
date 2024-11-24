@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - Port Forwarding for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-port-forwarding/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - Port Forwarding for CTF Creators">
+  <meta property="og:description" content="Services can go outside too? (*&lt;*)">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Ssh">
+    <meta property="article:tag" content="Local Port Forwarding">
+    <meta property="article:tag" content="Remote Port Forwarding">
+    <meta property="article:tag" content="Dynamic Port Forwarding">
+    <meta property="article:tag" content="Defend">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - Port Forwarding for CTF Creators">
+  <meta name="twitter:description" content="Services can go outside too? (*&lt;*)">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-port-forwarding/" /><link rel="prev" href="//localhost:1313/linux-privesc-services/" /><link rel="next" href="//localhost:1313/linux-privesc-open-shell-sessions/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - Port Forwarding for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-port-forwarding\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, ssh, local port forwarding, remote port forwarding, dynamic port forwarding, defend","wordcount":  1760 ,
+        "url": "\/\/localhost:1313\/linux-privesc-port-forwarding\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - Port Forwarding for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1760 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;9 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#port-forwarding">Port Forwarding</a></li>
+    <li><a href="#apache2-scenario">Apache2 Scenario</a></li>
+    <li><a href="#privilege-escalation-via-local-port-forwarding">Privilege Escalation via Local Port Forwarding</a></li>
+    <li><a href="#privilege-escalation-via-remote-port-forwarding">Privilege Escalation via Remote Port Forwarding</a></li>
+    <li><a href="#privilege-escalation-via-dynamic-port-forwarding">Privilege Escalation via Dynamic Port Forwarding</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="port-forwarding">Port Forwarding</h1>
+<p>When there&rsquo;s a service listening on localhost and not externally, it doesn&rsquo;t mean that we cannot access this service. Port forwarding as it name implies it allow us to foward a port to another socket. If this particular service is vulnerable to anything related an elevation of privilege, then it can be used as an elevation path.</p>
+<h1 id="apache2-scenario">Apache2 Scenario</h1>
+<p>Install apache2 with apt:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install apache2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Configure the apache2 listening ports:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cat /etc/apache2/ports.conf
+</span></span><span class="line"><span class="cl"><span class="c1"># If you just change the port or add more ports here, you will likely also</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># have to change the VirtualHost statement in</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># /etc/apache2/sites-enabled/000-default.conf</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Listen 127.0.0.1:80
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;IfModule ssl_module&gt;
+</span></span><span class="line"><span class="cl">	Listen 127.0.0.1:443
+</span></span><span class="line"><span class="cl">&lt;/IfModule&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;IfModule mod_gnutls.c&gt;
+</span></span><span class="line"><span class="cl">	Listen 127.0.0.1:443
+</span></span><span class="line"><span class="cl">&lt;/IfModule&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># vim: syntax=apache ts=4 sw=4 sts=4 sr noet</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Enable the service, restart the service, and check its status:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl <span class="nb">enable</span> apache2 <span class="o">&amp;&amp;</span> sudo systemctl restart apache2 <span class="o">&amp;&amp;</span> sudo systemctl status apache2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Check if port 80 is listening on the loopback interface:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ss -tnlp <span class="p">|</span> grep <span class="m">80</span>
+</span></span><span class="line"><span class="cl">LISTEN  <span class="m">0</span>        <span class="m">511</span>            127.0.0.1:80             0.0.0.0:*    
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The options above are the following:</p>
+<ul>
+<li>-t: Display TCP sockets.</li>
+<li>-n: Do not try to resolve service names.</li>
+<li>-l: Display only listening sockets</li>
+<li>-p: Show process using socket.</li>
+</ul>
+<p>Verify if it&rsquo;s working by going to the browser and opening the localhost URL <code>http://localhost:80</code>.</p>
+<p>Do a nmap scan from an attacker host to prove that&rsquo;s listening only on localhost:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo nmap -p80 192.168.146.131
+</span></span><span class="line"><span class="cl"><span class="o">[</span>sudo<span class="o">]</span> password <span class="k">for</span> pwnlog:
+</span></span><span class="line"><span class="cl">...&lt;SNIP&gt;...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PORT   STATE  SERVICE
+</span></span><span class="line"><span class="cl">80/tcp closed http
+</span></span><span class="line"><span class="cl">MAC Address: 00:0C:29:6A:00:F9 <span class="o">(</span>VMware<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Nmap <span class="k">done</span>: <span class="m">1</span> IP address <span class="o">(</span><span class="m">1</span> host up<span class="o">)</span> scanned in 0.25 seconds
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As you can see the port is closed externally.</p>
+<h1 id="privilege-escalation-via-local-port-forwarding">Privilege Escalation via Local Port Forwarding</h1>
+<p>Local Port Forwarding means forwarding the port that&rsquo;s listening on the target host loopback interface to our host. This is done by connecting to the target host.</p>
+<ul>
+<li>Local: Connect to the target host from your adversary host.</li>
+</ul>
+<p>This technique involves forwarding the port that&rsquo;s listening on the loopback interface in the target/victim host to our remote host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@parrot:~$ ssh -L &lt;your-port&gt;:127.0.0.1:&lt;port-to-forward&gt; user@&lt;target-ip&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@parrot:~$ ssh -L 9898:127.0.0.1:80 user@192.168.146.131
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>After authenticating successfully to the target host. We can see that our adversary host now has established a socket:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ss -tlnp <span class="p">|</span> grep <span class="m">9898</span>
+</span></span><span class="line"><span class="cl">LISTEN <span class="m">0</span>      <span class="m">128</span>        127.0.0.1:9898      0.0.0.0:*    users:<span class="o">((</span><span class="s2">&#34;ssh&#34;</span>,pid<span class="o">=</span>491131,fd<span class="o">=</span>5<span class="o">))</span>
+</span></span><span class="line"><span class="cl">LISTEN <span class="m">0</span>      <span class="m">128</span>            <span class="o">[</span>::1<span class="o">]</span>:9898         <span class="o">[</span>::<span class="o">]</span>:*    users:<span class="o">((</span><span class="s2">&#34;ssh&#34;</span>,pid<span class="o">=</span>491131,fd<span class="o">=</span>4<span class="o">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In our adversary host, we can enumerate the response headers to see if the <code>Server</code> header indicates that is running Apache2 in Ubuntu:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ curl -I http://localhost:9898
+</span></span><span class="line"><span class="cl">HTTP/1.1 <span class="m">200</span> OK
+</span></span><span class="line"><span class="cl">Date: Tue, <span class="m">20</span> Dec <span class="m">2021</span> 20:26:08 GMT
+</span></span><span class="line"><span class="cl">Server: Apache/2.4.41 <span class="o">(</span>Ubuntu<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Last-Modified: Tue, <span class="m">20</span> Dec <span class="m">2021</span> 00:11:10 GMT
+</span></span><span class="line"><span class="cl">ETag: <span class="s2">&#34;2aa6-5d429a897fe9c&#34;</span>
+</span></span><span class="line"><span class="cl">Accept-Ranges: bytes
+</span></span><span class="line"><span class="cl">Content-Length: <span class="m">10918</span>
+</span></span><span class="line"><span class="cl">Vary: Accept-Encoding
+</span></span><span class="line"><span class="cl">Content-Type: text/html
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see from the output above we have successfully forwarded port 80 from the target machine (Ubuntu) to our adversary host on port 9898 (ParrotOS/Kali Linux).</p>
+<p>When we&rsquo;re done we can close this connection by exiting the SSH session.</p>
+<h1 id="privilege-escalation-via-remote-port-forwarding">Privilege Escalation via Remote Port Forwarding</h1>
+<p>Remote Port Forwarding means forwarding the port that&rsquo;s listening on the target host loopback interface to our host. This is done by connecting to our host <strong>from</strong> the target host.</p>
+<ul>
+<li>Remote: Connect to your adversary host from the target host.</li>
+</ul>
+<p>This technique involves forwarding the port that&rsquo;s listening on the loopback interface in the target/victim host to our remote host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@victim-host:~$ ssh -R &lt;your-port&gt;:localhost:&lt;port-to-forward&gt; your_username@your_adversary_host_IP
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~$ ssh -R 9999:localhost:80 user@10.10.10.14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now go to your adversary host and verify that port 9999 is listening on your localhost:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ <span class="nb">echo</span> <span class="s2">&#34;This host is `hostname`&#34;</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s1">&#39;&#39;</span> <span class="o">&amp;&amp;</span>  ss -tnlp <span class="p">|</span> grep <span class="m">9999</span>
+</span></span><span class="line"><span class="cl">This host is kali
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">LISTEN <span class="m">0</span>      <span class="m">128</span>        127.0.0.1:9999      0.0.0.0:*
+</span></span><span class="line"><span class="cl">LISTEN <span class="m">0</span>      <span class="m">128</span>            <span class="o">[</span>::1<span class="o">]</span>:9999         <span class="o">[</span>::<span class="o">]</span>:*
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>When we <code>exit</code> the ssh connection that&rsquo;s in the victim machine then the port will stop being forwarded.</p>
+<h1 id="privilege-escalation-via-dynamic-port-forwarding">Privilege Escalation via Dynamic Port Forwarding</h1>
+<p>Dynamic port forwarding means that it&rsquo;ll forward all the ports from the remote host to our SOCKS port.</p>
+<p>SOCKS works on the OSI Layer 5 (Session Layer), so don&rsquo;t expect things like ICMP, ARP or the half-open reset that SYN scan on Nmap to work. To scan via proxy with Nmap we need to do a TCP connect scan with the option <code>-sT</code> and we should ignore ICMP with <code>-Pn</code>.</p>
+<p>There are different tools to help we out when Dynamic port forwarding is being used. The most common one is <code>proxychains</code> which are available for Linux and Mac but also for Windows.</p>
+<p>Dynamic port forwarding allows we to create a socket on the local (ssh client) machine, which acts as a SOCKS proxy server. When a client connects to this port, the connection is forwarded to the remote (ssh server) machine, which is then forwarded to a dynamic port on the destination machine.</p>
+<p>This way, all the applications using the SOCKS proxy will connect to the SSH server, and the server will forward all the traffic to its actual destination.</p>
+<p>Install the <code>proxychains</code> package:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install proxychains
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, we can build it from the <a href="https://github.com/haad/proxychains" target="_blank" rel="noopener noreffer ">source code</a> from GitHub.</p>
+<p>Let&rsquo;s configure the proxychains:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /etc/proxychains.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the following configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">socks4  127.0.0.1 <span class="m">9090</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In Linux, macOS, and other Unix systems to create a dynamic port forwarding (SOCKS) pass the <code>-D</code> option to the <code>ssh</code> client:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ssh -D <span class="o">[</span>LOCAL_IP:<span class="o">]</span>LOCAL_PORT <span class="o">[</span>USER@<span class="o">]</span>SSH_SERVER
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The options used are as follows:</p>
+<ul>
+<li><code>[LOCAL_IP:]LOCAL_PORT</code> - The local machine IP address and port number. When <code>LOCAL_IP</code> is omitted, the ssh client binds on localhost.</li>
+<li><code>[USER@]SERVER_IP</code> - The remote SSH user and server IP address.</li>
+</ul>
+<p>The following command will create a SOCKS tunnel on port <code>9090</code> and connect to the target machine, we&rsquo;re gonna execute this command from our adversary host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ssh -D <span class="m">9090</span> -N -f user@10.10.10.14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The options used are as follows:</p>
+<ul>
+<li>-N: Do not execute a remote command.  This is useful for just forwarding ports.</li>
+<li>-f: Requests ssh to go to the background just before command execution.  This is useful if ssh is going to ask for passwords or passphrases, but the user wants it in the background.</li>
+</ul>
+<p>Verify that the socket has been established, and execute this command in your adversary host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ss -tnlp <span class="p">|</span> grep <span class="m">9090</span>
+</span></span><span class="line"><span class="cl">LISTEN <span class="m">0</span>      <span class="m">128</span>        127.0.0.1:9090      0.0.0.0:*    users:<span class="o">((</span><span class="s2">&#34;ssh&#34;</span>,pid<span class="o">=</span>500777,fd<span class="o">=</span>5<span class="o">))</span>
+</span></span><span class="line"><span class="cl">LISTEN <span class="m">0</span>      <span class="m">128</span>            <span class="o">[</span>::1<span class="o">]</span>:9090         <span class="o">[</span>::<span class="o">]</span>:*    users:<span class="o">((</span><span class="s2">&#34;ssh&#34;</span>,pid<span class="o">=</span>500777,fd<span class="o">=</span>4<span class="o">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Once the tunneling is established, we can configure your application to use it. <a href="https://linuxize.com/post/how-to-setup-ssh-socks-tunnel-for-private-browsing/" target="_blank" rel="noopener noreffer ">This article</a> explains how to configure Firefox and Google Chrome browsers to use the SOCKS proxy.</p>
+<p>The port forwarding has to be separately configured for each application that we want to tunnel the traffic through it.</p>
+<p>In the victim host, I have these ports open:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ss -tnlp
+</span></span><span class="line"><span class="cl">State               Recv-Q              Send-Q                             Local Address:Port                             Peer Address:Port              Process              
+</span></span><span class="line"><span class="cl">LISTEN              <span class="m">0</span>                   <span class="m">511</span>                                    127.0.0.1:80                                    0.0.0.0:*                                      
+</span></span><span class="line"><span class="cl">LISTEN              <span class="m">0</span>                   <span class="m">4096</span>                               127.0.0.53%lo:53                                    0.0.0.0:*                                      
+</span></span><span class="line"><span class="cl">LISTEN              <span class="m">0</span>                   <span class="m">128</span>                                      0.0.0.0:22                                    0.0.0.0:*                                      
+</span></span><span class="line"><span class="cl">LISTEN              <span class="m">0</span>                   <span class="m">5</span>                                      127.0.0.1:631                                   0.0.0.0:*                                      
+</span></span><span class="line"><span class="cl">LISTEN              <span class="m">0</span>                   <span class="m">128</span>                                         <span class="o">[</span>::<span class="o">]</span>:22                                       <span class="o">[</span>::<span class="o">]</span>:*                                      
+</span></span><span class="line"><span class="cl">LISTEN              <span class="m">0</span>                   <span class="m">5</span>                                          <span class="o">[</span>::1<span class="o">]</span>:631                                      <span class="o">[</span>::<span class="o">]</span>:*             
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can do port scans and service scans with nmap:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo proxychains nmap -sT -Pn 127.0.0.1 -vvv 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">Starting Nmap 7.92 <span class="o">(</span> https://nmap.org <span class="o">)</span> at 2021-12-28 15:48 EST
+</span></span><span class="line"><span class="cl">Initiating Connect Scan at 15:48
+</span></span><span class="line"><span class="cl">Scanning localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> <span class="o">[</span><span class="m">1000</span> ports<span class="o">]</span>
+</span></span><span class="line"><span class="cl">Discovered open port 22/tcp on 127.0.0.1
+</span></span><span class="line"><span class="cl">Discovered open port 80/tcp on 127.0.0.1
+</span></span><span class="line"><span class="cl">Discovered open port 631/tcp on 127.0.0.1
+</span></span><span class="line"><span class="cl">Completed Connect Scan at 15:48, 1.30s elapsed <span class="o">(</span><span class="m">1000</span> total ports<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Nmap scan report <span class="k">for</span> localhost <span class="o">(</span>127.0.0.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Host is up, received user-set <span class="o">(</span>0.0011s latency<span class="o">)</span>.
+</span></span><span class="line"><span class="cl">Scanned at 2021-12-28 15:48:24 EST <span class="k">for</span> 2s
+</span></span><span class="line"><span class="cl">Not shown: <span class="m">997</span> closed tcp ports <span class="o">(</span>conn-refused<span class="o">)</span>
+</span></span><span class="line"><span class="cl">PORT    STATE SERVICE REASON
+</span></span><span class="line"><span class="cl">22/tcp  open  ssh     syn-ack
+</span></span><span class="line"><span class="cl">80/tcp  open  http    syn-ack
+</span></span><span class="line"><span class="cl">631/tcp open  ipp     syn-ack
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Read data files from: /usr/bin/../share/nmap
+</span></span><span class="line"><span class="cl">Nmap <span class="k">done</span>: <span class="m">1</span> IP address <span class="o">(</span><span class="m">1</span> host up<span class="o">)</span> scanned in 1.35 seconds
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Noticed how I used the options:</p>
+<ul>
+<li>-sT = TCP connect scan, rather than the default <code>-sS</code> SYN scan. The SYN won’t work because the proxy doesn&rsquo;t pass the TCP handshake packets back to our adversary host, an SYN scan, which sends the SYN packet, sees the ACK, and then ends the connection, this won’t be passed back over the proxy, therefore, SYN scans don&rsquo;t work with proxies.</li>
+<li>-Pn = Ignore ICMP request/response because ICMP doesn&rsquo;t go through the proxy.</li>
+</ul>
+<p>Without these options the scan will fail because the proxy will drop any SYN scans, we need the full TCP handshake to know if the port is open or not.</p>
+<p>We can try to run Firefox with <code>proxychains</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">proxychains firefox
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we can access port 80 from the target host with the SOCKS port that is defined in our <code>proxychains</code> configuration file so we can navigate to <code>http://localhost:80</code> in our adversary host browser and we will see the apache2 default page.</p>
+<p>This can be seen by using curl with proxychains and enumerating the response headers:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ proxychains curl -I http://localhost:80
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> config file found: /etc/proxychains.conf
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> DLL init: proxychains-ng 4.15
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:9090  ...  127.0.0.1:80  ...  OK
+</span></span><span class="line"><span class="cl">HTTP/1.1 <span class="m">200</span> OK
+</span></span><span class="line"><span class="cl">Date: Tue, <span class="m">20</span> Dec <span class="m">2021</span> 21:00:29 GMT
+</span></span><span class="line"><span class="cl">Server: Apache/2.4.41 <span class="o">(</span>Ubuntu<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Last-Modified: Tue, <span class="m">20</span> Dec <span class="m">2021</span> 00:11:10 GMT
+</span></span><span class="line"><span class="cl">ETag: <span class="s2">&#34;2aa6-5d429a897fe9c&#34;</span>
+</span></span><span class="line"><span class="cl">Accept-Ranges: bytes
+</span></span><span class="line"><span class="cl">Content-Length: <span class="m">10918</span>
+</span></span><span class="line"><span class="cl">Vary: Accept-Encoding
+</span></span><span class="line"><span class="cl">Content-Type: text/html
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The advantage of using <code>proxychains</code> with dynamic port forwarding is that we can access all the ports in the target dynamically. Let&rsquo;s try to log in to SSH using the <code>proxychains</code> to prove this:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ proxychains ssh user@localhost
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> config file found: /etc/proxychains.conf
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> DLL init: proxychains-ng 4.15
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:9090  ...  127.0.0.1:22  ...  OK
+</span></span><span class="line"><span class="cl">user@localhost<span class="err">&#39;</span>s password:
+</span></span><span class="line"><span class="cl">Welcome to Ubuntu 20.04.3 LTS <span class="o">(</span>GNU/Linux 5.11.0-43-generic x86_64<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;...SNIP...&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~$ hostname
+</span></span><span class="line"><span class="cl">ubuntu
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see from the output above we&rsquo;re able to log in to SSH via <code>proxychains</code>. This is almost the same as executing <code>ssh user@localhost</code> in the victim machine.</p>
+<p>We can close this connection by killing its PID, first finding the PID of the process:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ps -ef <span class="p">|</span> grep <span class="s1">&#39;ssh -D 9090&#39;</span> <span class="p">|</span> grep -v <span class="s1">&#39;grep&#39;</span> 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">kali      <span class="m">500777</span>       <span class="m">1</span>  <span class="m">0</span> 15:42 ?        00:00:02 ssh -D <span class="m">9090</span> -N -f user@10.10.10.14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The PID is the one in the second field from the output above, in this case, is (500777). Now kill the process:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ <span class="nb">kill</span> -9 <span class="m">500777</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/ssh/">Ssh</a>,&nbsp;<a href="/tags/local-port-forwarding/">Local Port Forwarding</a>,&nbsp;<a href="/tags/remote-port-forwarding/">Remote Port Forwarding</a>,&nbsp;<a href="/tags/dynamic-port-forwarding/">Dynamic Port Forwarding</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-services/" class="prev" rel="prev" title="Linux Privilege Escalation - Services for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - Services for CTF Creators</a>
+            <a href="/linux-privesc-open-shell-sessions/" class="next" rel="next" title="Linux Privilege Escalation - Open Shell Sessions for CTF Creators">Linux Privilege Escalation - Open Shell Sessions for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

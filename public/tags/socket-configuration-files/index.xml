@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Socket Configuration Files - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/socket-configuration-files/</link>
+        <description>Socket Configuration Files - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/socket-configuration-files/" rel="self" type="application/rss+xml" /><item>
+    <title>Linux Privilege Escalation - Sockets for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-sockets/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-sockets/</guid>
+    <description><![CDATA[Can I manipulate this sockets communications? (*-*)]]></description>
+</item>
+</channel>
+</rss>

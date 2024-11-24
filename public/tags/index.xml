@@ -1,0 +1,87 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Tags - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/</link>
+        <description>Tags - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/" rel="self" type="application/rss+xml" /><item>
+    <title>Insecure Registry Hives</title>
+    <link>//localhost:1313/tags/insecure-registry-hives/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/insecure-registry-hives/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Insecure Service Executable</title>
+    <link>//localhost:1313/tags/insecure-service-executable/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/insecure-service-executable/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Insecure Service Permissions</title>
+    <link>//localhost:1313/tags/insecure-service-permissions/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/insecure-service-permissions/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Local Privilege Escalation</title>
+    <link>//localhost:1313/tags/local-privilege-escalation/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/local-privilege-escalation/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Services</title>
+    <link>//localhost:1313/tags/services/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/services/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Unquoted Path Service</title>
+    <link>//localhost:1313/tags/unquoted-path-service/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/unquoted-path-service/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Windows</title>
+    <link>//localhost:1313/tags/windows/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/windows/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Alwaysinstallelevated</title>
+    <link>//localhost:1313/tags/alwaysinstallelevated/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/alwaysinstallelevated/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Answer Files</title>
+    <link>//localhost:1313/tags/answer-files/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/answer-files/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Applications</title>
+    <link>//localhost:1313/tags/applications/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>//localhost:1313/tags/applications/</guid>
+    <description><![CDATA[]]></description>
+</item>
+</channel>
+</rss>

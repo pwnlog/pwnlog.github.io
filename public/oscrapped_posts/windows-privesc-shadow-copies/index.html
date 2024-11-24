@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - Shadow Copies - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - Shadow Copies"><meta property="og:url" content="//localhost:1313/oscrapped_posts/windows-privesc-shadow-copies/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - Shadow Copies">
+  <meta property="og:description" content="Windows Local Privilege Escalation - Shadow Copies">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="oscrapped_posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Shadow Copies">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="article:tag" content="Windows">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - Shadow Copies">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - Shadow Copies">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/oscrapped_posts/windows-privesc-shadow-copies/" /><link rel="prev" href="//localhost:1313/oscrapped_posts/windows-privesc-wsl/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - Shadow Copies",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/oscrapped_posts\/windows-privesc-shadow-copies\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "oscrapped_posts","keywords": "shadow copies, local privilege escalation, windows","wordcount":  647 ,
+        "url": "\/\/localhost:1313\/oscrapped_posts\/windows-privesc-shadow-copies\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - Shadow Copies"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="page single special"><h1 class="single-title animate__animated animate__pulse animate__faster">Windows Local Privilege Escalation - Shadow Copies</h1><div class="content" id="content"><h1 id="shadow-copies">Shadow Copies</h1>
+<p>The Volume Shadow Copy Service (VSS), which was introduced in Windows Server 2003, is known by multiple names:</p>
+<ul>
+<li>Volume Shadow Copy Service</li>
+<li>Volume Snapshot Service (VS)</li>
+<li>Shadow Copies</li>
+</ul>
+<p>Shadow Copies (also known as Volume Snapshot Service, Volume Shadow Copy Service or VSS) are snapshots or copies of computer volumes and files. Therefore, Shadow Copies are used to create backups of a system manually or automatically. These can then be restored. The problems lies in the fact that if we gained administrator privileges we could gather sensitive files which may contain sensitive information.</p>
+<h1 id="lab-information">Lab Information</h1>
+<p>This lab was created and tested on the following environment:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Target Operating System</th>
+          <th>Attacking Operating System</th>
+          <th>Network Class</th>
+          <th>Virtualization Environment</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Windows 11 Enterprise Evalution Edition</td>
+          <td>Kali Linux 2021.4</td>
+          <td>IPv4 Class C</td>
+          <td>VMware Workstation 17.0 Pro</td>
+      </tr>
+  </tbody>
+</table>
+<p>The date of this writing.</p>
+<p>![[date.png]]</p>
+<p>Windows operating system version.</p>
+<p>![[winver.png]]</p>
+<p>Windows updates information.</p>
+<p>![[hotfix.png]]</p>
+<h1 id="configuration">Configuration</h1>
+<p>Open System Properties with the <code>sysdm.cpl</code> command.</p>
+<p>![[sysdm.png]]</p>
+<p>Click on the <code>System Protection</code> tab.</p>
+<p>![[system-protection-tab.png]]</p>
+<p>Click on the <code>Configure</code> button.</p>
+<p>![[configure-button.png]]</p>
+<p>Enable system protection and configure the max usage.</p>
+<p>![[turn-on-system-protection.png]]</p>
+<p>Apply the changes and click on the <code>Create</code> button.</p>
+<p>![[create-restore-point.png]]</p>
+<p>Create a backup name.</p>
+<p>![[restore-point-name.png]]</p>
+<p>Then it&rsquo;ll start creating the restore point.</p>
+<p>![[creating-a-restore-point.png]]</p>
+<p>Once it has completed, we&rsquo;ll receive a window prompt.</p>
+<p>![[restore-point-was-created.png]]</p>
+<p>Alternatively, we could create a backup of a <code>C:\</code> with WMIC.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wmic shadowcopy call create volume=&#39;C:\&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>![[wmic-shadow-copy.png]]</p>
+<h1 id="working-with-shadow-copies">Working with Shadow Copies</h1>
+<p>We can list shadow copies using <code>vssadmin</code>. However, we need administrator privileges.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">vssadmin</span> <span class="n">list</span> <span class="n">shadows</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>![[vssadmin-list-shadows.png]]</p>
+<p>If we want to delete a restore point/shadow. We can do it again using System Properties.</p>
+<p>![[delete-restore-point-gui.png]]</p>
+<p>Alternatively, we could use <code>vssadmin</code> to delete a restore point/shadow.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">vssadmin delete shadows /Shadow={shadow copy ID}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>![[vssadmin-delete-shadow.png]]</p>
+<blockquote>
+<p>Note: I used <code>cmd.exe</code> to execute the command above.</p>
+</blockquote>
+<p>If we want to delete all the restore points/shadows, we could also do it.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">vssadmin delete shadows /all
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="symlink-shadow-copy">Symlink Shadow Copy</h2>
+<p>We can create a symlink to access a shadow easily.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mklink /d C:\ShadowCopy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy2\
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>![[mklink-shadow-copy.png]]</p>
+<blockquote>
+<p>Note: In the image above, I didn&rsquo;t use a backslash (<code>\</code>) at the end of the command. This will throw an error the following error:</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">C:\Windows\system32&gt;cd C:\ShadowCopy
+</span></span><span class="line"><span class="cl">The parameter is incorrect.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can fix this by removing the directory and creating a symlink with the backslash (<code>\</code>) at the end.</p>
+<p>![[shadow-copy-linked.png]]</p>
+<h1 id="privilege-escalation-via-shadow-copies">Privilege Escalation via Shadow Copies</h1>
+<p>We&rsquo;re looking for sensitive information such as credentials, memory dumps, or other.</p>
+<h2 id="dump-sam--system-backups">Dump SAM &amp; SYSTEM Backups</h2>
+<p>SAM and SYSTEM files cannot normally be accessed on an active system but they can be accessed in backups. They are commonly located in these directories:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">%SYSTEMROOT%\repair\SAM
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%\System32\config\RegBack\SAM
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%\System32\config\SAM
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%\repair\system
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%\System32\config\SYSTEM
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%\System32\config\RegBack\system
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Once these files has been exfiltrated from the system, we could use impacket to crack them.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">impacket-secretsdump -sam SAM -system SYSTEM LOCAL
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="others">Others</h2>
+<p>The creativity here is up to the adversary and what he/she can find.</p>
+<h2 id="detection">Detection</h2>
+<p>We can log the command line events by configuring Group Policy. Take into consideration the following policies.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Policy</th>
+          <th>Path</th>
+          <th>Setting</th>
+          <th>Short Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Audit Process Creation</td>
+          <td>Local Computer Policy -&gt; Computer Configuration -&gt; Windows Settings -&gt; Security Settings -&gt; Advanced Audit Policy Configuration -&gt; System Audit Policies -&gt; Detailed Tracking</td>
+          <td>Success</td>
+          <td>Logs every process that&rsquo;s created</td>
+      </tr>
+      <tr>
+          <td>Include command line in process creation events</td>
+          <td>Local Computer Policy -&gt; Computer Configuration -&gt; Administrative Templates -&gt; System -&gt; Audit Process Creation</td>
+          <td>Enabled</td>
+          <td>Logs the command line commands and arguments</td>
+      </tr>
+  </tbody>
+</table>
+<p>Access to the following path is immediatly suspicious because it&rsquo;s not common for a process to access shadow copies.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"> <span class="p">\\?\</span><span class="n">GLOBALROOT</span><span class="p">\</span><span class="n">Device</span><span class="p">\</span><span class="n">HarddiskVolumeShadowCopy</span><span class="p">&lt;</span><span class="n">Number</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="defense">Defense</h1>
+<p>There are a few things that we could consider:</p>
+<ul>
+<li>Harden ACLs</li>
+<li>Avoid storing potential sensitive files that could be leveraged to elevate privileges</li>
+</ul>
+<h1 id="mitigationremediation">Mitigation/Remediation</h1>
+<p>Backups are really important for system administrators. Therefore, deleting backups it&rsquo;s not recommended. One of the best solutions would be store backups in cold storage/offline storage. However, that might not always be an option.</p>
+</div></div></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

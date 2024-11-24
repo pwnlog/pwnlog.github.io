@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - SSH for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-ssh/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - SSH for CTF Creators">
+  <meta property="og:description" content="SSH can always be a door! (90_90)">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Ssh">
+    <meta property="article:tag" content="Ssh Private Keys">
+    <meta property="article:tag" content="Ssh Encrypted Private Keys">
+    <meta property="article:tag" content="Ssh Agent Forwarding">
+    <meta property="article:tag" content="Ssh Hardening">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - SSH for CTF Creators">
+  <meta name="twitter:description" content="SSH can always be a door! (90_90)">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-ssh/" /><link rel="prev" href="//localhost:1313/linux-privesc-sudo/" /><link rel="next" href="//localhost:1313/linux-privesc-sockets/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - SSH for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-ssh\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, ssh, ssh private keys, ssh encrypted private keys, ssh agent forwarding, ssh hardening, defend","wordcount":  990 ,
+        "url": "\/\/localhost:1313\/linux-privesc-ssh\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - SSH for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;990 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#ssh">SSH</a></li>
+    <li><a href="#privilege-escalation-via-ssh-private-keys">Privilege Escalation via SSH Private Keys</a></li>
+    <li><a href="#privilege-escalation-via-ssh-encrypted-private-keys">Privilege Escalation via SSH Encrypted Private Keys</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="ssh">SSH</h1>
+<p>SSH allows us to establish an encrypted remote or local connection to a terminal. Depending on how the SSH service is configured we may be able to log in as another user or even the root user by one of these methods:</p>
+<ul>
+<li>Private Keys</li>
+<li>Agent Forwarding</li>
+<li>Credentials</li>
+</ul>
+<p>There are a numbers of ways that SSH can be used to elevate privileges on a system. Ranging from SSH keys to SSH agents.</p>
+<h1 id="privilege-escalation-via-ssh-private-keys">Privilege Escalation via SSH Private Keys</h1>
+<p>First, let&rsquo;s make sure that we can log in as root by reading the SSH configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ grep PermitRootLogin /etc/ssh/sshd_config
+</span></span><span class="line"><span class="cl"><span class="c1">#PermitRootLogin prohibit-password</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># the setting of &#34;PermitRootLogin without-password&#34;.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Generate the keys without a passphrase:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:~# ssh-keygen 
+</span></span><span class="line"><span class="cl">Generating public/private rsa key pair.
+</span></span><span class="line"><span class="cl">Enter file in which to save the key <span class="o">(</span>/root/.ssh/id_rsa<span class="o">)</span>: 
+</span></span><span class="line"><span class="cl">Created directory <span class="s1">&#39;/root/.ssh&#39;</span>.
+</span></span><span class="line"><span class="cl">Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>: 
+</span></span><span class="line"><span class="cl">Enter same passphrase again: 
+</span></span><span class="line"><span class="cl">Your identification has been saved in /root/.ssh/id_rsa
+</span></span><span class="line"><span class="cl">Your public key has been saved in /root/.ssh/id_rsa.pub
+</span></span><span class="line"><span class="cl">The key fingerprint is:
+</span></span><span class="line"><span class="cl">SHA256:xxxxxxxxxxxxxxxxxxxxxxxxx root@pwn
+</span></span><span class="line"><span class="cl">The key<span class="err">&#39;</span>s randomart image is:
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Verify if these keys were created:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:~# ls -l /root/.ssh
+</span></span><span class="line"><span class="cl">total <span class="m">8</span>
+</span></span><span class="line"><span class="cl">-rw------- <span class="m">1</span> root root <span class="m">2602</span> Dec <span class="m">20</span> 20:45 id_rsa
+</span></span><span class="line"><span class="cl">-rw-r--r-- <span class="m">1</span> root root  <span class="m">565</span> Dec <span class="m">20</span> 20:45 id_rsa.pub
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the public key to the <code>authorized_keys</code> file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat /root/.ssh/id_rsa.pub &gt; /root/.ssh/authorized_keys
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>A common misconfiguration that may see in CTF machines is where the private key is stored in insecure locations, in directories in which we have read permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/tmp
+</span></span><span class="line"><span class="cl">/var/tmp
+</span></span><span class="line"><span class="cl">/var/backups
+</span></span><span class="line"><span class="cl">/var/www/html
+</span></span><span class="line"><span class="cl">/opt
+</span></span><span class="line"><span class="cl">/.ssh
+</span></span><span class="line"><span class="cl">/.custom_hidden_directory
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s create a backup of the private key (normally we wouldn&rsquo;t do this in a real machine):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:~# cp /root/.ssh/id_rsa /var/backups <span class="o">&amp;&amp;</span> chmod <span class="m">755</span> -R /var/backups
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Switch to the user-privileged user, to simulate the adversary scenario:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ ls -la /var/backups/id_rsa 
+</span></span><span class="line"><span class="cl">-rwxr-xr-x <span class="m">1</span> root root <span class="m">2602</span> Dec <span class="m">20</span> 20:45 /var/backups/id_rsa
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /var/backups/id_rsa 
+</span></span><span class="line"><span class="cl">-----BEGIN OPENSSH PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span><span class="line"><span class="cl">-----END OPENSSH PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As the adversary, we would either copy this text and create a file in our adversary host or transfer this file to our adversary host.</p>
+<p>In our adversary host we must add the correct permissions to the private key:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">chmod <span class="m">600</span> id_rsa
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Finally, log in as the owner of the private key and connect to the target host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ssh -i id_rsa root@10.10.10.14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The output will look something like this:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ ssh -i id_rsa root@10.10.10.14
+</span></span><span class="line"><span class="cl">Welcome to Ubuntu 20.04.3 LTS <span class="o">(</span>GNU/Linux 5.11.0-43-generic x86_64<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;...SNIP...&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">root@pwn:~# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:~# hostname
+</span></span><span class="line"><span class="cl">ubuntu
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-ssh-encrypted-private-keys">Privilege Escalation via SSH Encrypted Private Keys</h1>
+<p>First, let&rsquo;s make sure that we can log in as root by reading the SSH configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ grep PermitRootLogin /etc/ssh/sshd_config
+</span></span><span class="line"><span class="cl"><span class="c1">#PermitRootLogin prohibit-password</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># the setting of &#34;PermitRootLogin without-password&#34;.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Generate the keys, overwrite the existing keys and add a passphrase, I will use (<code>passme</code>) as the passphrase:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:~# ssh-keygen
+</span></span><span class="line"><span class="cl">Generating public/private rsa key pair.
+</span></span><span class="line"><span class="cl">Enter file in which to save the key <span class="o">(</span>/root/.ssh/id_rsa<span class="o">)</span>: 
+</span></span><span class="line"><span class="cl">/root/.ssh/id_rsa already exists.
+</span></span><span class="line"><span class="cl">Overwrite <span class="o">(</span>y/n<span class="o">)</span>? y 
+</span></span><span class="line"><span class="cl">Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>: 
+</span></span><span class="line"><span class="cl">Enter same passphrase again: 
+</span></span><span class="line"><span class="cl">Your identification has been saved in /root/.ssh/id_rsa
+</span></span><span class="line"><span class="cl">Your public key has been saved in /root/.ssh/id_rsa.pub
+</span></span><span class="line"><span class="cl">The key fingerprint is:
+</span></span><span class="line"><span class="cl">SHA256:xxxxxxxxxxxxxxxxxxxxxxxx root@pwn
+</span></span><span class="line"><span class="cl">The key<span class="err">&#39;</span>s randomart image is:
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Verify if these keys were created:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:~# ls -l /root/.ssh
+</span></span><span class="line"><span class="cl">total <span class="m">12</span>
+</span></span><span class="line"><span class="cl">-rw-r--r-- <span class="m">1</span> root root  <span class="m">565</span> Dec <span class="m">28</span> 17:22 authorized_keys
+</span></span><span class="line"><span class="cl">-rw------- <span class="m">1</span> root root <span class="m">2635</span> Dec <span class="m">28</span> 17:30 id_rsa
+</span></span><span class="line"><span class="cl">-rw-r--r-- <span class="m">1</span> root root  <span class="m">565</span> Dec <span class="m">28</span> 17:30 id_rsa.pub
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the public key to the authorized_keys file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat /root/.ssh/id_rsa.pub &gt; /root/.ssh/authorized_keys
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>A common misconfiguration that may see in CTF machines is where the private key is stored in insecure locations, in directories in which we have read permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/tmp
+</span></span><span class="line"><span class="cl">/var/tmp
+</span></span><span class="line"><span class="cl">/var/backups
+</span></span><span class="line"><span class="cl">/var/www/html
+</span></span><span class="line"><span class="cl">/opt
+</span></span><span class="line"><span class="cl">/.ssh
+</span></span><span class="line"><span class="cl">/.custom_hidden_directory
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s create a backup of the private key (normally we wouldn&rsquo;t do this in a real machine):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">root@pwn:~# cp /root/.ssh/id_rsa /var/backups <span class="o">&amp;&amp;</span> chmod <span class="m">755</span> -R /var/backups
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Switch to the user-privileged user, to simulate the adversary scenario:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ cat /var/backups/id_rsa 
+</span></span><span class="line"><span class="cl">-----BEGIN OPENSSH PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span><span class="line"><span class="cl">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span class="line"><span class="cl">-----END OPENSSH PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Once we find the private key we can read the file and add it to our adversary host.</p>
+<p>Now we need to crack this key, to do that we must convert the SSH key into a format that John understands, for that we can use ssh2john.</p>
+<p>Find where ssh2john is located, otherwise, download it.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ find / -name <span class="s1">&#39;ssh2john.py&#39;</span> 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">/usr/share/john/ssh2john.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Convert the private key to <code>John</code> crackable format:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/usr/share/john/ssh2john.py id_rsa &gt; id_rsa.john
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Attempt to crack the hash with JohnTheRipper, this may take a while:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ john --wordlist<span class="o">=</span>/usr/share/wordlists/rockyou.txt id_rsa.john
+</span></span><span class="line"><span class="cl">Using default input encoding: UTF-8
+</span></span><span class="line"><span class="cl">Loaded <span class="m">1</span> password <span class="nb">hash</span> <span class="o">(</span>SSH, SSH private key <span class="o">[</span>RSA/DSA/EC/OPENSSH 32/64<span class="o">])</span>
+</span></span><span class="line"><span class="cl">Cost <span class="m">1</span> <span class="o">(</span>KDF/cipher <span class="o">[</span><span class="nv">0</span><span class="o">=</span>MD5/AES <span class="nv">1</span><span class="o">=</span>MD5/3DES <span class="nv">2</span><span class="o">=</span>Bcrypt/AES<span class="o">])</span> is <span class="m">2</span> <span class="k">for</span> all loaded hashes
+</span></span><span class="line"><span class="cl">Cost <span class="m">2</span> <span class="o">(</span>iteration count<span class="o">)</span> is <span class="m">16</span> <span class="k">for</span> all loaded hashes
+</span></span><span class="line"><span class="cl">Will run <span class="m">8</span> OpenMP threads
+</span></span><span class="line"><span class="cl">Press <span class="s1">&#39;q&#39;</span> or Ctrl-C to abort, almost any other key <span class="k">for</span> status
+</span></span><span class="line"><span class="cl">passme           <span class="o">(</span>id_rsa<span class="o">)</span>
+</span></span><span class="line"><span class="cl">1g 0:00:04:52 DONE <span class="o">(</span>2021-12-28 16:41<span class="o">)</span> 0.003415g/s 63.16p/s 63.16c/s 63.16C/s sweetgurl..maria13
+</span></span><span class="line"><span class="cl">Use the <span class="s2">&#34;--show&#34;</span> option to display all of the cracked passwords reliably
+</span></span><span class="line"><span class="cl">Session completed.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we know the passphrase of the private key which is (<code>passme</code>) so we can attempt to log in.</p>
+<p>In our adversary host we must add the correct permissions to the private key:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">chmod <span class="m">600</span> id_rsa
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Finally, log in as the owner of the private key:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ ssh -i id_rsa root@10.10.10.14
+</span></span><span class="line"><span class="cl">Enter passphrase <span class="k">for</span> key <span class="s1">&#39;id_rsa&#39;</span>: <span class="c1"># &lt;- passphrase here</span>
+</span></span><span class="line"><span class="cl">Welcome to Ubuntu 20.04.3 LTS <span class="o">(</span>GNU/Linux 5.11.0-43-generic x86_64<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;...SNIP...&gt; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">root@pwn:~# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:~#
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/ssh/">Ssh</a>,&nbsp;<a href="/tags/ssh-private-keys/">Ssh Private Keys</a>,&nbsp;<a href="/tags/ssh-encrypted-private-keys/">Ssh Encrypted Private Keys</a>,&nbsp;<a href="/tags/ssh-agent-forwarding/">Ssh Agent Forwarding</a>,&nbsp;<a href="/tags/ssh-hardening/">Ssh Hardening</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-sudo/" class="prev" rel="prev" title="Linux Privilege Escalation - Sudo for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - Sudo for CTF Creators</a>
+            <a href="/linux-privesc-sockets/" class="next" rel="next" title="Linux Privilege Escalation - Sockets for CTF Creators">Linux Privilege Escalation - Sockets for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

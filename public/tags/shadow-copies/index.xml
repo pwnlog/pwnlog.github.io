@@ -1,0 +1,22 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Shadow Copies - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/shadow-copies/</link>
+        <description>Shadow Copies - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/shadow-copies/" rel="self" type="application/rss+xml" /><item>
+    <title>Windows Local Privilege Escalation - Shadow Copies</title>
+    <link>//localhost:1313/oscrapped_posts/windows-privesc-shadow-copies/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/oscrapped_posts/windows-privesc-shadow-copies/</guid>
+    <description><![CDATA[<h1 id="shadow-copies">Shadow Copies</h1>
+<p>The Volume Shadow Copy Service (VSS), which was introduced in Windows Server 2003, is known by multiple names:</p>
+<ul>
+<li>Volume Shadow Copy Service</li>
+<li>Volume Snapshot Service (VS)</li>
+<li>Shadow Copies</li>
+</ul>
+<p>Shadow Copies (also known as Volume Snapshot Service, Volume Shadow Copy Service or VSS) are snapshots or copies of computer volumes and files. Therefore, Shadow Copies are used to create backups of a system manually or automatically. These can then be restored. The problems lies in the fact that if we gained administrator privileges we could gather sensitive files which may contain sensitive information.</p>]]></description>
+</item>
+</channel>
+</rss>

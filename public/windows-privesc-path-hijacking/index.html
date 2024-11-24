@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - PATH Hijacking for CTF Creators - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - PATH Hijacking"><meta property="og:url" content="//localhost:1313/windows-privesc-path-hijacking/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - PATH Hijacking for CTF Creators">
+  <meta property="og:description" content="Windows Local Privilege Escalation - PATH Hijacking">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Path Hijacking">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="article:tag" content="Windows">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - PATH Hijacking for CTF Creators">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - PATH Hijacking">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/windows-privesc-path-hijacking/" /><link rel="prev" href="//localhost:1313/windows-privesc-port-forwarding/" /><link rel="next" href="//localhost:1313/windows-privesc-dll-hijacking/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - PATH Hijacking for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/windows-privesc-path-hijacking\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "path hijacking, local privilege escalation, windows","wordcount":  1682 ,
+        "url": "\/\/localhost:1313\/windows-privesc-path-hijacking\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - PATH Hijacking"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows Local Privilege Escalation - PATH Hijacking for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-local-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-20">2022-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1682 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;8 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#path-environment-variable">%PATH% Environment Variable</a>
+      <ul>
+        <li><a href="#path-usage">%PATH% Usage</a></li>
+      </ul>
+    </li>
+    <li><a href="#path-hijacking-privilege-escalation">%PATH% Hijacking Privilege Escalation</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="path-environment-variable">%PATH% Environment Variable</h1>
+<p>The <code>%PATH%</code> environment variable is a critical component for the operating system. It specifies the directories that the system searches to find executable files for commands, tools, or programs. When a user types a command in the terminal or command prompt, the system looks through the directories listed in the <code>%PATH%</code> variable to locate the executable file associated with that command.</p>
+<p>This environment variable is particularly useful for running programs without needing to specify their full paths. Instead of typing the complete path to an executable, users can simply type the command name, and the system will search the directories in the <code>%PATH%</code> variable to find and execute the program.</p>
+<p>The <code>%PATH%</code> variable is used for relative paths, meaning it searches through the specified directories in the order they are listed. If the executable is found in one of these directories, it is executed. If not, the system returns an error indicating that the command was not found.</p>
+<p>For example, if the <code>%PATH%</code> variable includes directories like <code>C:\Windows\System32</code> and <code>C:\Program Files</code>, the system will search these directories for the executable file when a command is entered. This allows for efficient and convenient execution of programs without needing to navigate to their specific directories.</p>
+<p>Properly configuring the <code>%PATH%</code> variable is essential for ensuring that the system can locate and run the necessary programs efficiently. It is also important to avoid adding unnecessary or insecure directories to the <code>%PATH%</code> variable, as this can pose security risks.</p>
+<p>In summary, the environment variable <code>%PATH%</code> is used for <strong>relative paths</strong> and not <strong>absolute paths</strong>.</p>
+<p>This is a relative path:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">cmd.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This is an absolute path:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">C<span class="p">:</span><span class="nl">\Windows\System32\cmd.exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>When we use a relative path the system needs to search for the executable file and to search for it, it uses the %PATH% environment variable. The first directory listed in the %PATH% environment variable will be the first directory that will be searched, here is an example:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">C<span class="p">:</span><span class="nl">\Windows\system32</span><span class="c1"> # First search in here, if its not here then continue</span>
+</span></span><span class="line"><span class="cl">C<span class="p">:</span><span class="nl">\Windows</span><span class="c1">          # Second search in here, if its not here then continue</span>
+</span></span><span class="line"><span class="cl">C<span class="p">:</span><span class="nl">\Windows\System32\Wbem</span><span class="c1"> # If its here, then execute the command and stop searching</span>
+</span></span><span class="line"><span class="cl">C<span class="p">:</span><span class="nl">\Windows\System32\WindowsPowerShell\v1.0\</span>
+</span></span><span class="line"><span class="cl">C<span class="p">:</span><span class="nl">\Windows\System32\OpenSSH\</span>
+</span></span><span class="line"><span class="cl">C<span class="p">:</span><span class="nl">\Program</span><span class="c1"> Files\dotnet\</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: The %PATH% environment variable is used to search the name of the executable, it doesn&rsquo;t verify the integrity of the file, which means that we can create an illegitimate executable as long as we can hijack the %PATH%.</p>
+</blockquote>
+<p>The <strong>user environment variables</strong> can be found in the registry <code>HKEY_CURRENT_USER\Environment</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-reg" data-lang="reg"><span class="line"><span class="cl"><span class="err">PS</span> <span class="err">C:\Users\user&gt;</span> <span class="err">reg</span> <span class="err">query</span> <span class="err">&#34;HKEY_CURRENT_USER\Environment&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">HKEY_CURRENT_USER\Environment</span>
+</span></span><span class="line"><span class="cl">    <span class="err">Path</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%USERPROFILE%\AppData\Local\Microsoft\WindowsApps</span><span class="c1">;%USERPROFILE%\.dotnet\tools</span>
+</span></span><span class="line"><span class="cl">    <span class="err">TEMP</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%USERPROFILE%\AppData\Local\Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="err">TMP</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%USERPROFILE%\AppData\Local\Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="err">OneDrive</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">C:\Users\user\OneDrive</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <strong>system environment variables</strong> can be found in the registry <code>&quot;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment&quot;</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-reg" data-lang="reg"><span class="line"><span class="cl"><span class="err">PS</span> <span class="err">C:\Users\user&gt;</span> <span class="err">reg</span> <span class="err">query</span> <span class="err">&#34;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session</span> <span class="err">Manager\Environment&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session</span> <span class="err">Manager\Environment</span>
+</span></span><span class="line"><span class="cl">    <span class="err">ComSpec</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%SystemRoot%\system32\cmd.exe</span>
+</span></span><span class="line"><span class="cl">    <span class="err">DriverData</span>    <span class="err">REG_SZ</span>    <span class="err">C:\Windows\System32\Drivers\DriverData</span>
+</span></span><span class="line"><span class="cl">    <span class="err">OS</span>    <span class="err">REG_SZ</span>    <span class="err">Windows_NT</span>
+</span></span><span class="line"><span class="cl">    <span class="err">Path</span>    <span class="err">REG_SZ</span>    <span class="err">C:\Windows\system32</span><span class="c1">;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\</span>
+</span></span><span class="line"><span class="cl">    <span class="err">PATHEXT</span>    <span class="err">REG_SZ</span>    <span class="err">.COM</span><span class="c1">;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC</span>
+</span></span><span class="line"><span class="cl">    <span class="err">PROCESSOR_ARCHITECTURE</span>    <span class="err">REG_SZ</span>    <span class="err">AMD64</span>
+</span></span><span class="line"><span class="cl">    <span class="err">PSModulePath</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%ProgramFiles%\WindowsPowerShell\Modules</span><span class="c1">;%SystemRoot%\system32\WindowsPowerShell\v1.0\Modules</span>
+</span></span><span class="line"><span class="cl">    <span class="err">TEMP</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%SystemRoot%\TEMP</span>
+</span></span><span class="line"><span class="cl">    <span class="err">TMP</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%SystemRoot%\TEMP</span>
+</span></span><span class="line"><span class="cl">    <span class="err">USERNAME</span>    <span class="err">REG_SZ</span>    <span class="err">SYSTEM</span>
+</span></span><span class="line"><span class="cl">    <span class="err">windir</span>    <span class="err">REG_EXPAND_SZ</span>    <span class="err">%SystemRoot%</span>
+</span></span><span class="line"><span class="cl">    <span class="err">NUMBER_OF_PROCESSORS</span>    <span class="err">REG_SZ</span>    <span class="err">4</span>
+</span></span><span class="line"><span class="cl">    <span class="err">PROCESSOR_LEVEL</span>    <span class="err">REG_SZ</span>    <span class="err">6</span>
+</span></span><span class="line"><span class="cl">    <span class="err">PROCESSOR_IDENTIFIER</span>    <span class="err">REG_SZ</span>    <span class="err">Intel64</span> <span class="err">Family</span> <span class="err">6</span> <span class="err">Model</span> <span class="err">165</span> <span class="err">Stepping</span> <span class="err">5,</span> <span class="err">GenuineIntel</span>
+</span></span><span class="line"><span class="cl">    <span class="err">PROCESSOR_REVISION</span>    <span class="err">REG_SZ</span>    <span class="err">a505</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">PS</span> <span class="err">C:\Users\user&gt;</span> <span class="err">(echo</span> <span class="err">&#34;</span> <span class="err">C:\Windows\system32</span><span class="c1">;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\&#34;).split(&#34;;&#34;)</span>
+</span></span><span class="line"><span class="cl"> <span class="err">C:\Windows\system32</span>
+</span></span><span class="line"><span class="cl"><span class="err">C:\Windows</span>
+</span></span><span class="line"><span class="cl"><span class="err">C:\Windows\System32\Wbem</span>
+</span></span><span class="line"><span class="cl"><span class="err">C:\Windows\System32\WindowsPowerShell\v1.0\</span>
+</span></span><span class="line"><span class="cl"><span class="err">C:\Windows\System32\OpenSSH\</span>
+</span></span><span class="line"><span class="cl"><span class="err">C:\Program</span> <span class="err">Files\dotnet\</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <strong>current process %PATH% environment variable</strong> can be found with:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="p">(</span><span class="nv">$env:Path</span><span class="p">).</span><span class="py">split</span><span class="p">(</span><span class="s2">&#34;;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">Wbem</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">OpenSSH</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">dotnet</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">WindowsApps</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\.</span><span class="n">dotnet</span><span class="p">\</span><span class="n">tools</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, both the user environment variables and the system environment variables can be found using the GUI:</p>
+<ul>
+<li><strong>Windows XP</strong> - Right-click My Computer, and then click Properties → Advanced → Environment variables → Choose New, Edit or Delete.</li>
+<li><strong>Windows 7</strong> - Click on Start → Computer → Properties → Advanced System Settings → Environment variables → Choose New, Edit or Delete.</li>
+<li><strong>Windows 8</strong> - Right click on the bottom left corner to get Power User Task Menu → Select System → Advanced System Settings → Environment variables → Choose New, Edit or Delete.</li>
+<li><strong>Windows 10</strong> - Right click on Start Menu to get Power User Task Menu → Select System → Advanced System Settings → Environment variables → Choose New, Edit or Delete.</li>
+</ul>
+<p>In <strong>Windows 11</strong> is at the following path <code>Control Panel\System and Security\System\About\Advanced Settings</code> or <code>Settings &gt; System &gt; About</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/advanced-system-settings.png" title="/images/posts/advanced-system-settings.png" data-thumbnail="/images/posts/advanced-system-settings.png" data-sub-html="<h2>Advanced System Settings</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/advanced-system-settings.png"
+            data-srcset="/images/posts/advanced-system-settings.png, /images/posts/advanced-system-settings.png 1.5x, /images/posts/advanced-system-settings.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/advanced-system-settings.png" />
+    </a><figcaption class="image-caption">Advanced System Settings</figcaption>
+    </figure>
+<p>System Properties -&gt; Advanced -&gt; Environment Variables&hellip;:</p>
+<figure><a class="lightgallery" href="/images/posts/advanced-system-settings-2.png" title="/images/posts/advanced-system-settings-2.png" data-thumbnail="/images/posts/advanced-system-settings-2.png" data-sub-html="<h2>Advanced System Settings</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/advanced-system-settings-2.png"
+            data-srcset="/images/posts/advanced-system-settings-2.png, /images/posts/advanced-system-settings-2.png 1.5x, /images/posts/advanced-system-settings-2.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/advanced-system-settings-2.png" />
+    </a><figcaption class="image-caption">Advanced System Settings</figcaption>
+    </figure>
+<p>Now we can see both (user and system) environment variables:</p>
+<figure><a class="lightgallery" href="/images/posts/advanced-settings-3.png" title="/images/posts/advanced-settings-3.png" data-thumbnail="/images/posts/advanced-settings-3.png" data-sub-html="<h2>Advanced System Settings</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/advanced-settings-3.png"
+            data-srcset="/images/posts/advanced-settings-3.png, /images/posts/advanced-settings-3.png 1.5x, /images/posts/advanced-settings-3.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/advanced-settings-3.png" />
+    </a><figcaption class="image-caption">Advanced System Settings</figcaption>
+    </figure>
+<h2 id="path-usage">%PATH% Usage</h2>
+<p>We can change the user environment variable with setx and since this environment variable belongs to our current user we don&rsquo;t need to execute this as administrator:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">query</span> <span class="s2">&#34;HKEY_CURRENT_USER\Environment&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HKEY_CURRENT_USER</span><span class="p">\</span><span class="n">Environment</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Path</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">WindowsApps</span><span class="p">;</span><span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\.</span><span class="n">dotnet</span><span class="p">\</span><span class="n">tools</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TEMP</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TMP</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OneDrive</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">OneDrive</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">setx</span> <span class="n">PATH</span> <span class="s2">&#34;C:\Temp;%PATH%&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">SUCCESS</span><span class="err">:</span> <span class="n">Specified</span> <span class="n">value</span> <span class="n">was</span> <span class="n">saved</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">query</span> <span class="s2">&#34;HKEY_CURRENT_USER\Environment&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HKEY_CURRENT_USER</span><span class="p">\</span><span class="n">Environment</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Path</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Temp</span><span class="p">;</span><span class="k">%</span><span class="n">PATH</span><span class="p">%</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TEMP</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TMP</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OneDrive</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">OneDrive</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, we can use PowerShell to change the user environment variable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="p">[</span><span class="no">Environment</span><span class="p">]::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span> <span class="s1">&#39;Path&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\Temp;%USERPROFILE%\AppData\Local\Microsoft\WindowsApps;%USERPROFILE%\.dotnet\tools&#39;</span><span class="p">,</span> <span class="p">[</span><span class="no">EnvironmentVariableTarget</span><span class="p">]::</span><span class="n">User</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">query</span> <span class="s2">&#34;HKEY_CURRENT_USER\Environment&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HKEY_CURRENT_USER</span><span class="p">\</span><span class="n">Environment</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Path</span>    <span class="n">REG_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Temp</span><span class="p">;</span><span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">WindowsApps</span><span class="p">;</span><span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\.</span><span class="n">dotnet</span><span class="p">\</span><span class="n">tools</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TEMP</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TMP</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">USERPROFILE</span><span class="p">%\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OneDrive</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">OneDrive</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Changing the system %PATH% environment variable requires to be executed as administrator:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="p">[</span><span class="no">Environment</span><span class="p">]::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span> <span class="s1">&#39;Path&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\Temp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="no">EnvironmentVariableTarget</span><span class="p">]::</span><span class="n">Machine</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">query</span> <span class="s2">&#34;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment&#34;</span> <span class="p">|</span> <span class="n">findstr</span> <span class="s2">&#34;Path&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Path</span>    <span class="n">REG_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PSModulePath</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">ProgramFiles</span><span class="p">%\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">Modules</span><span class="p">;</span><span class="k">%</span><span class="n">SystemRoot</span><span class="p">%\</span><span class="n">system32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span><span class="n">Modules</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>There is a problem with the above configuration and that is the value of the <code>Path</code> registry key (it only has one directory), it must not disturb other programs that use this environment variable therefore let&rsquo;s change its value:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="p">[</span><span class="no">Environment</span><span class="p">]::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span> <span class="s1">&#39;Path&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\Temp;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\&#39;</span><span class="p">,</span> <span class="p">[</span><span class="no">EnvironmentVariableTarget</span><span class="p">]::</span><span class="n">Machine</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">query</span> <span class="s2">&#34;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment&#34;</span> <span class="p">|</span> <span class="n">findstr</span> <span class="s2">&#34;Path&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Path</span>    <span class="n">REG_SZ</span>    <span class="n">C:</span><span class="p">\</span><span class="n">Temp</span><span class="p">;</span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">;</span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">;</span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">Wbem</span><span class="p">;</span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\;</span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">OpenSSH</span><span class="p">\;</span><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">dotnet</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PSModulePath</span>    <span class="n">REG_EXPAND_SZ</span>    <span class="k">%</span><span class="n">ProgramFiles</span><span class="p">%\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">Modules</span><span class="p">;</span><span class="k">%</span><span class="n">SystemRoot</span><span class="p">%\</span><span class="n">system32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span><span class="n">Modules</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now it won&rsquo;t disturb other programs that use the system %PATH% environment variable and we will be able to hijack our target program.</p>
+<p>We can also change the current process %PATH% environment variable and this can be executed as our current user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nv">$env:Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Temp;</span><span class="nv">$env:Path</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="p">(</span><span class="nv">$env:Path</span><span class="p">).</span><span class="py">split</span><span class="p">(</span><span class="s2">&#34;;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">Wbem</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">OpenSSH</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">dotnet</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">AppData</span><span class="p">\</span><span class="n">Local</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">WindowsApps</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\.</span><span class="n">dotnet</span><span class="p">\</span><span class="n">tools</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, if we have access to the GUI we can go to:</p>
+<ul>
+<li>System Properties -&gt; Advanced -&gt; Environment Variables&hellip; -&gt; System variables</li>
+</ul>
+<h1 id="path-hijacking-privilege-escalation">%PATH% Hijacking Privilege Escalation</h1>
+<p>To create a vulnerable $PATH hijacking scenario we need the following requirements:</p>
+<ul>
+<li>PATH contains a writable folder.</li>
+<li>The writable folder is <strong>before or above</strong> the folder that contains the legitimate binary.</li>
+</ul>
+<p>The &ldquo;vulnerability&rdquo; or &ldquo;problem&rdquo; lies in the fact that if we&rsquo;re able to write to a directory that&rsquo;s before or above the valid program/command/tool/application, we can then create a malicious binary with the same name as the valid program/command/tool/application. Once it is found Windows will stop searching for the program since it will assume that it found it and it will execute it:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span> <span class="c"># First search in here, if its not here then continue</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span>          <span class="c"># If we have write access then we can create a malicious binary with the same name as the valid binary. Once the binary -name- is found Windows will stop searching for the program since it will assume that it found it and it will execute it.</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">Wbem</span> 
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">OpenSSH</span><span class="p">\</span> <span class="c"># Valid binary is here but it won&#39;t be executed since it already found it and it stopped searching.</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">dotnet</span><span class="p">\</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run PowerShell and create a directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">mkdir</span> <span class="n">C:</span><span class="p">\</span><span class="n">Temp</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the <code>modify</code> (M) permission:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">icacls</span><span class="p">.</span><span class="py">exe</span> <span class="s2">&#34;C:\Temp&#34;</span> <span class="p">/</span><span class="n">grant</span> <span class="s2">&#34;NT AUTHORTY\Authenticated Users:M&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">NT</span> <span class="n">AUTHORTY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span> <span class="n">No</span> <span class="n">mapping</span> <span class="n">between</span> <span class="n">account</span> <span class="n">names</span> <span class="n">and</span> <span class="n">security</span> <span class="n">IDs</span> <span class="n">was</span> <span class="n">done</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">0</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">1</span> <span class="n">files</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">icacls</span><span class="p">.</span><span class="py">exe</span> <span class="s2">&#34;C:\Temp&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Temp</span> <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SYSTEM</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">M</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">IO</span><span class="p">)(</span><span class="n">M</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Copy <code>calc.exe</code> to <code>C:\Temp\cmd.exe</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">where</span><span class="p">.</span><span class="py">exe</span> <span class="n">calc</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">calc</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="nb">copy </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">calc</span><span class="p">.</span><span class="py">exe</span> <span class="n">C:</span><span class="p">\</span><span class="n">Temp</span><span class="p">\</span><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Change the <code>$PATH</code> environment variable of the current process:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="nv">$env:Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Temp;</span><span class="nv">$env:Path</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="p">(</span><span class="nv">$env:Path</span><span class="p">).</span><span class="py">split</span><span class="p">(</span><span class="s2">&#34;;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Temp</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">Wbem</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">OpenSSH</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">dotnet</span><span class="p">\</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: Remember this is the PATH environment variable of our current process, if this executable was executed by a Service, Task Scheduler, or something else. We would need to use the system %PATH% environment variable instead, depending on the configuration.</p>
+</blockquote>
+<p>Review which <code>cmd.exe</code> will be loaded first:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="nb">cd </span><span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="n">where</span><span class="p">.</span><span class="py">exe</span> <span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Temp</span><span class="p">\</span><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Because the directory &ldquo;<code>C:\Temp</code>&rdquo; is before &ldquo;<code>C:\Windows\system32\</code>&rdquo; in the PATH environment variable, the next time the user runs &ldquo;cmd.exe&rdquo;, our calculator will run, instead of the legitimate one in the system32 folder.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As expected the calculator was spawned:</p>
+<figure><a class="lightgallery" href="/images/posts/calculator.png" title="/images/posts/calculator.png" data-thumbnail="/images/posts/calculator.png" data-sub-html="<h2>Calculator</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/calculator.png"
+            data-srcset="/images/posts/calculator.png, /images/posts/calculator.png 1.5x, /images/posts/calculator.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/calculator.png" />
+    </a><figcaption class="image-caption">Calculator</figcaption>
+    </figure>
+<p>Now, let&rsquo;s try it with the same binary (cmd.exe):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="nb">copy </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span> <span class="n">C:</span><span class="p">\</span><span class="n">Temp</span><span class="p">\</span><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Execute the cmd.exe again:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">The</span> <span class="n">system</span> <span class="n">cannot</span> <span class="n">find</span> <span class="n">message</span> <span class="n">text</span> <span class="k">for</span> <span class="n">message</span> <span class="n">number</span> <span class="n">0x2350</span> <span class="k">in</span> <span class="n">the</span> <span class="n">message</span> <span class="n">file</span> <span class="k">for</span> <span class="n">Application</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">Microsoft</span> <span class="n">Corporation</span><span class="p">.</span> <span class="n">All</span> <span class="n">rights</span> <span class="n">reserved</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="n">Not</span> <span class="n">enough</span> <span class="n">memory</span> <span class="n">resources</span> <span class="n">are</span> <span class="n">available</span> <span class="n">to</span> <span class="k">process</span> <span class="n">this</span> <span class="n">command</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Using Process Hacker as Administrator we can see the process tree:</p>
+<figure><a class="lightgallery" href="/images/posts/process-hacker-process-tree.png" title="/images/posts/process-hacker-process-tree.png" data-thumbnail="/images/posts/process-hacker-process-tree.png" data-sub-html="<h2>Process Hacker Process Tree</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/process-hacker-process-tree.png"
+            data-srcset="/images/posts/process-hacker-process-tree.png, /images/posts/process-hacker-process-tree.png 1.5x, /images/posts/process-hacker-process-tree.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/process-hacker-process-tree.png" />
+    </a><figcaption class="image-caption">Process Hacker Process Tree</figcaption>
+    </figure>
+<p>We can also view the token of the <code>cmd.exe</code> process and from there we can see that is running with High-Integrity Level and we have more privileges since <code>cmd.exe</code> was executed from an administrator PowerShell console:</p>
+<figure><a class="lightgallery" href="/images/posts/process-hacker-token%201.png" title="/images/posts/process-hacker-token 1.png" data-thumbnail="/images/posts/process-hacker-token 1.png" data-sub-html="<h2>Process Hacker Token</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/process-hacker-token%201.png"
+            data-srcset="/images/posts/process-hacker-token%201.png, /images/posts/process-hacker-token%201.png 1.5x, /images/posts/process-hacker-token%201.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/process-hacker-token 1.png" />
+    </a><figcaption class="image-caption">Process Hacker Token</figcaption>
+    </figure>
+<p>If this was executed by a service with the LocalSystem user (System Integrity Level) or by a task scheduler running with the highest level (High Integrity Level), or simply by an administrator (High Integrity Level) we could elevate our privileges as long as we replace the <code>cmd.exe</code> command with our payload or implant.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-03-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/path-hijacking/">Path Hijacking</a>,&nbsp;<a href="/tags/local-privilege-escalation/">Local Privilege Escalation</a>,&nbsp;<a href="/tags/windows/">Windows</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/windows-privesc-port-forwarding/" class="prev" rel="prev" title="Windows Local Privilege Escalation - Port Forwarding for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation - Port Forwarding for CTF Creators</a>
+            <a href="/windows-privesc-dll-hijacking/" class="next" rel="next" title="Windows Local Privilege Escalation - DLL Hijacking for CTF Creators">Windows Local Privilege Escalation - DLL Hijacking for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

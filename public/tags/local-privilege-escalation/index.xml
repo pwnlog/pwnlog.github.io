@@ -1,0 +1,121 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Local Privilege Escalation - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/local-privilege-escalation/</link>
+        <description>Local Privilege Escalation - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/local-privilege-escalation/" rel="self" type="application/rss+xml" /><item>
+    <title>Windows Local Privilege Escalation - Services for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-services/</link>
+    <pubDate>Sun, 20 Mar 2022 11:35:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-services/</guid>
+    <description><![CDATA[Which users or should I say which permissions are running in those services? (8_9)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Applications for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-apps/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-apps/</guid>
+    <description><![CDATA[Apps lead the way please&hellip; (8_*)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Credential Hunting for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-credential-hunting/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-credential-hunting/</guid>
+    <description><![CDATA[I know you are storing those cr3ds in s3cr3ts but are you really? (*_*)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - DLL Hijacking for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-dll-hijacking/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-dll-hijacking/</guid>
+    <description><![CDATA[Libraries can be hijacked, replaced, or manipulated (00&lt;00)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - PATH Hijacking for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-path-hijacking/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-path-hijacking/</guid>
+    <description><![CDATA[File systems path permissions and replacements. Here we go again (@_@)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Port Forwarding for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-port-forwarding/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-port-forwarding/</guid>
+    <description><![CDATA[Let us interact with that service you&rsquo;re hiding (3_3)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Registry Hives for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-registry/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-registry/</guid>
+    <description><![CDATA[Registry, settings, permissions&hellip; you name it (&lt;|&lt;)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-scheduled-tasks/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-scheduled-tasks/</guid>
+    <description><![CDATA[Using time to change our permissions (o+o)]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - Shadow Copies</title>
+    <link>//localhost:1313/oscrapped_posts/windows-privesc-shadow-copies/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/oscrapped_posts/windows-privesc-shadow-copies/</guid>
+    <description><![CDATA[<h1 id="shadow-copies">Shadow Copies</h1>
+<p>The Volume Shadow Copy Service (VSS), which was introduced in Windows Server 2003, is known by multiple names:</p>
+<ul>
+<li>Volume Shadow Copy Service</li>
+<li>Volume Snapshot Service (VS)</li>
+<li>Shadow Copies</li>
+</ul>
+<p>Shadow Copies (also known as Volume Snapshot Service, Volume Shadow Copy Service or VSS) are snapshots or copies of computer volumes and files. Therefore, Shadow Copies are used to create backups of a system manually or automatically. These can then be restored. The problems lies in the fact that if we gained administrator privileges we could gather sensitive files which may contain sensitive information.</p>]]></description>
+</item>
+<item>
+    <title>Windows Local Privilege Escalation - WSL</title>
+    <link>//localhost:1313/oscrapped_posts/windows-privesc-wsl/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/oscrapped_posts/windows-privesc-wsl/</guid>
+    <description><![CDATA[<h1 id="lab-information">Lab Information</h1>
+<p>This lab was created and tested on the following environment:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Target Operating System</th>
+          <th>Attacking Operating System</th>
+          <th>Network Class</th>
+          <th>Virtualization Environment</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Windows 11 Enterprise Evalution Edition</td>
+          <td>Kali Linux 2021.4</td>
+          <td>IPv4 Class C</td>
+          <td>VMware Workstation 17.0 Pro</td>
+      </tr>
+  </tbody>
+</table>
+<p>The date of this writing.</p>
+<p>![[date.png]]</p>
+<p>Windows operating system version.</p>
+<p>![[winver.png]]</p>
+<p>Windows updates information.</p>
+<p>![[hotfix.png]]</p>
+<h1 id="configuration">Configuration</h1>
+<p>Open PowerShell or Windows Command Prompt as <strong>administrator</strong> by right-clicking and selecting &ldquo;Run as administrator&rdquo; and enter the following command.</p>]]></description>
+</item>
+</channel>
+</rss>

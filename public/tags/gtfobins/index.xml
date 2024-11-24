@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Gtfobins - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/gtfobins/</link>
+        <description>Gtfobins - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/gtfobins/" rel="self" type="application/rss+xml" /><item>
+    <title>Linux Privilege Escalation - SUID/SGID for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-suid-segid/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-suid-segid/</guid>
+    <description><![CDATA[ID or GID as 0? (&lt;_&lt;)]]></description>
+</item>
+</channel>
+</rss>

@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Cron Jobs - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/cron-jobs/</link>
+        <description>Cron Jobs - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/cron-jobs/" rel="self" type="application/rss+xml" /><item>
+    <title>Linux Privilege Escalation - Cron Jobs for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-cron-jobs/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-cron-jobs/</guid>
+    <description><![CDATA[Dear time can u help me 3l3v4t3 /(^.^)/]]></description>
+</item>
+</channel>
+</rss>

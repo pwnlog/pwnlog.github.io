@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Path Dll Hijacking - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/path-dll-hijacking/</link>
+        <description>Path Dll Hijacking - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/path-dll-hijacking/" rel="self" type="application/rss+xml" /><item>
+    <title>Windows Local Privilege Escalation - DLL Hijacking for CTF Creators</title>
+    <link>//localhost:1313/windows-privesc-dll-hijacking/</link>
+    <pubDate>Sun, 20 Mar 2022 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/windows-privesc-dll-hijacking/</guid>
+    <description><![CDATA[Libraries can be hijacked, replaced, or manipulated (00&lt;00)]]></description>
+</item>
+</channel>
+</rss>

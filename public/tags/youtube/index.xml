@@ -1,0 +1,184 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Youtube - Tag - pwnlog</title>
+        <link>//localhost:1313/tags/youtube/</link>
+        <description>Youtube - Tag - pwnlog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</lastBuildDate><atom:link href="//localhost:1313/tags/youtube/" rel="self" type="application/rss+xml" /><item>
+    <title>Linux Privilege Escalation - Cron Jobs for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-cron-jobs/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-cron-jobs/</guid>
+    <description><![CDATA[<h1 id="cron-jobs">Cron Jobs</h1>
+<p>Cron jobs are scheduled task which are used to automate specific task at specific time intervals. Cron tables (crontabs) store the configuration of these cron jobs. These can be configured to run as high privileged users or groups. However, if they are misconfigured, it can lead to elevation of privilege.</p>
+<h1 id="cron-jobs-syntax">Cron Jobs Syntax</h1>
+<p>Here is the syntax of a cron job:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># Example of job definition:​</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># .---------------- minute (0 - 59)​</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># |  .------------- hour (0 - 23)​</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># |  |  .---------- day of month (1 - 31)​</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...​</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat​</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># |  |  |  |  |​</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># *  *  *  *  * user-name command to be executed</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="cron-jobs-symbols">Cron Jobs Symbols</h1>
+<p>These are the meaning of each symbol:</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Groups for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-groups/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-groups/</guid>
+    <description><![CDATA[<h1 id="groups">Groups</h1>
+<p>Groups are a collection of user. However, if these groups are misconfigured by hacing wrong access control lists (ACLs), they can be abused to elevate privileges. Also in UNIX there are some specific groups that have a few capabilities that can be abused as well.</p>
+<h1 id="privilege-escalation-via-sudo-group">Privilege Escalation via Sudo Group</h1>
+<p>We&rsquo;ll add the current user to the sudo group and reboot the system to apply the changes:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo usermod -aG sudo user <span class="o">&amp;&amp;</span> reboot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The following configuration is very common on sudo:</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - NFS Root Squashing for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-nfs-root-squashing/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlopg</author>
+    <guid>//localhost:1313/linux-privesc-nfs-root-squashing/</guid>
+    <description><![CDATA[<h1 id="nfs">NFS</h1>
+<p>A root squash is an NFS feature which allows mapping a remote root user whose user ID (UID) is zero (0) to a local nobody user whose user ID (UID) is 65534, which has minimal privileges. This means that anyone can create a file as the root user even without having valid credentials on the NFS server as the root user. The file that we created can then be used to elevate privileges.</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Open Shell Sessions for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-open-shell-sessions/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-open-shell-sessions/</guid>
+    <description><![CDATA[<h1 id="open-shell-sessions">Open Shell Sessions</h1>
+<p>A terminal session represents an interaction with a terminal for software or an operating system. In UNIX systems, these sessions are stored as socket files and character files. If a terminal session has read, write, and execute permissions, it is possible to attach to the session. Programs such as GNU screen and tmux facilitate the management of terminal sessions and are known as terminal multiplexers.</p>
+<h1 id="privilege-escalation-via-screen">Privilege Escalation via Screen</h1>
+<p>List the screen sessions directory recursively:</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Port Forwarding for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-port-forwarding/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-port-forwarding/</guid>
+    <description><![CDATA[<h1 id="port-forwarding">Port Forwarding</h1>
+<p>When there&rsquo;s a service listening on localhost and not externally, it doesn&rsquo;t mean that we cannot access this service. Port forwarding as it name implies it allow us to foward a port to another socket. If this particular service is vulnerable to anything related an elevation of privilege, then it can be used as an elevation path.</p>
+<h1 id="apache2-scenario">Apache2 Scenario</h1>
+<p>Install apache2 with apt:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install apache2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Configure the apache2 listening ports:</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Services for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-services/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-services/</guid>
+    <description><![CDATA[<h1 id="services">Services</h1>
+<p>Services are programs that run in the background waiting to be used or carrying out some tasks.</p>
+<p>Service <strong>configuration files</strong> should never be <strong>writable</strong> by other users.</p>
+<p>Programs used by <strong>service configuration files</strong> should never be <strong>writable</strong> by other users.</p>
+<p>Some <strong>programs</strong> that are running as a service may be <strong>vulnerable</strong>.</p>
+<h2 id="service-configuration-files">Service Configuration Files</h2>
+<p>The service configuration files end with <strong>.service</strong> and define how services are managed by the operating system.</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Shared Object Injection for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-so-injection/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-so-injection/</guid>
+    <description><![CDATA[<h1 id="libraries">Libraries</h1>
+<p>A library is a file containing compiled code that is used by developers to avoid re-writing the same pieces of code used in multiple programs; this is often known as modular programming. It can contain classes, methods or data structures and will be linked to the program that will use it at the compilation time.</p>
+<p>There are two main types of libraries in Linux:</p>
+<ul>
+<li>Static libraries (.a extension)</li>
+<li>Dynamic or shared libraries (.so extension)</li>
+</ul>
+<h2 id="static-libraries">Static Libraries</h2>
+<p>Static libraries will become part of the program so they will be unalterable once the compilation is done. This means that the running program has its own copy of the library, which won’t be interesting to us, since we cannot do anything.</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Sockets for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-sockets/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-sockets/</guid>
+    <description><![CDATA[<h1 id="sockets">Sockets</h1>
+<p>A Unix-domain socket allows communication between two different processes on either the same machine or different machines in client-server application frameworks. It’s a way of communicating among computers using a standard Unix descriptors file.</p>
+<p>Sockets can be configured using <strong>.socket</strong> files.</p>
+<p>For more information regarding sockets, we can read the man page of systemd.socket:
+<a href="https://www.freedesktop.org/software/systemd/man/systemd.socket.html" target="_blank" rel="noopener noreffer ">systemd.socket</a>. Information regarding special systemd units, can be found on the man page of systemd.special: <a href="https://www.freedesktop.org/software/systemd/man/systemd.special.html" target="_blank" rel="noopener noreffer ">systemd.special</a></p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - SSH for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-ssh/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-ssh/</guid>
+    <description><![CDATA[<h1 id="ssh">SSH</h1>
+<p>SSH allows us to establish an encrypted remote or local connection to a terminal. Depending on how the SSH service is configured we may be able to log in as another user or even the root user by one of these methods:</p>
+<ul>
+<li>Private Keys</li>
+<li>Agent Forwarding</li>
+<li>Credentials</li>
+</ul>
+<p>There are a numbers of ways that SSH can be used to elevate privileges on a system. Ranging from SSH keys to SSH agents.</p>]]></description>
+</item>
+<item>
+    <title>Linux Privilege Escalation - Sudo for CTF Creators</title>
+    <link>//localhost:1313/linux-privesc-sudo/</link>
+    <pubDate>Tue, 28 Dec 2021 11:33:00 &#43;0800</pubDate>
+    <author>pwnlog</author>
+    <guid>//localhost:1313/linux-privesc-sudo/</guid>
+    <description><![CDATA[<h1 id="sudo">Sudo</h1>
+<p>Sudo can have as many misconfigurations as possible. It&rsquo;s a root to everything. Ranging from having valid credentials to hijacking code.</p>
+<p>Sudo permits an authorized user to execute a command as the superuser or another specified user, in accordance with the security policy. The default security policy is defined by sudoers, which is configured through the file /etc/sudoers or via LDAP.</p>
+<p>The security policy dictates how a user may utilize the sudo command.</p>]]></description>
+</item>
+</channel>
+</rss>
